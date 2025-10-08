@@ -1,0 +1,12 @@
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\bin\Debug\net9.0\ForumService.Domain.deps.json
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\bin\Debug\net9.0\ForumService.Domain.dll
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\bin\Debug\net9.0\ForumService.Domain.pdb
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ForumService.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ForumService.Domain.AssemblyInfoInputs.cache
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ForumService.Domain.AssemblyInfo.cs
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ForumService.Domain.csproj.CoreCompileInputs.cache
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ForumService.Domain.sourcelink.json
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ForumService.Domain.dll
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\refint\ForumService.Domain.dll
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ForumService.Domain.pdb
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ref\ForumService.Domain.dll
