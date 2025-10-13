@@ -17,8 +17,8 @@ namespace ForumService.Domain.Models
         public string Title { get; set; } = null!;
         public string? Summary { get; set; }
         public string Content { get; set; } = null!;
-        public string PostType { get; set; } = "Discussion";
-        public string Status { get; set; } = "Published";
+        public string PostType { get; set; } = "Post"; // "Post" | "Solution"
+        public string Status { get; set; } = "Draft"; // "Draft" | "PendingReview" | "Rejected" | "Published" |
         public long ViewsCount { get; set; } = 0;
         public int CommentCount { get; set; } = 0;
         public int UpvoteCount { get; set; } = 0; // Tracks total upvotes

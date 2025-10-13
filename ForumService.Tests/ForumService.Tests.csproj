@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ForumService.Core\ForumService.Core.csproj" />
     <ProjectReference Include="..\ForumService.Domain\ForumService.Domain.csproj" />
     <ProjectReference Include="..\ForumService.Infrastructure\ForumService.Infrastructure.csproj" />
   </ItemGroup>

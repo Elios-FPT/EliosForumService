@@ -1,17 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36518.9 d17.14
+VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForumService.Web", "ForumService.Web\ForumService.Web.csproj", "{150F7754-EA40-4317-B50C-058E3B659AF5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForumService.Core", "ForumService.Core\ForumService.Core.csproj", "{15DFA17A-9C24-4B4D-B53A-A6D668CDA93F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForumService.Infrastructure", "ForumService.Infrastructure\ForumService.Infrastructure.csproj", "{6895AACC-26EE-4F2F-8F81-C98AA5A5701B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForumService.Domain", "ForumService.Domain\ForumService.Domain.csproj", "{84AC086A-1989-4319-B592-C957138055C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForumService.Tests", "ForumService.Tests\ForumService.Tests.csproj", "{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForumService.Contract", "ForumService.Contract\ForumService.Contract.csproj", "{95DA071B-5291-4007-8F29-8C3AC08AEFAB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForumService.Core", "ForumService.Core\ForumService.Core.csproj", "{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +25,6 @@ Global
 		{150F7754-EA40-4317-B50C-058E3B659AF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{150F7754-EA40-4317-B50C-058E3B659AF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{150F7754-EA40-4317-B50C-058E3B659AF5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{15DFA17A-9C24-4B4D-B53A-A6D668CDA93F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{15DFA17A-9C24-4B4D-B53A-A6D668CDA93F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{15DFA17A-9C24-4B4D-B53A-A6D668CDA93F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{15DFA17A-9C24-4B4D-B53A-A6D668CDA93F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6895AACC-26EE-4F2F-8F81-C98AA5A5701B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6895AACC-26EE-4F2F-8F81-C98AA5A5701B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6895AACC-26EE-4F2F-8F81-C98AA5A5701B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +37,14 @@ Global
 		{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95DA071B-5291-4007-8F29-8C3AC08AEFAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95DA071B-5291-4007-8F29-8C3AC08AEFAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95DA071B-5291-4007-8F29-8C3AC08AEFAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95DA071B-5291-4007-8F29-8C3AC08AEFAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,13 @@
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\bin\Debug\net9.0\ForumService.Contract.deps.json
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\bin\Debug\net9.0\ForumService.Contract.dll
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\bin\Debug\net9.0\ForumService.Contract.pdb
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.csproj.AssemblyReference.cache
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.GeneratedMSBuildEditorConfig.editorconfig
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.AssemblyInfoInputs.cache
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.AssemblyInfo.cs
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.csproj.CoreCompileInputs.cache
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.sourcelink.json
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.dll
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\obj\Debug\net9.0\refint\ForumService.Contract.dll
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.pdb
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Contract\obj\Debug\net9.0\ref\ForumService.Contract.dll

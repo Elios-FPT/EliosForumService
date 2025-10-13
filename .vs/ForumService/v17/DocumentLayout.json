@@ -3,16 +3,16 @@
   "WorkspaceRootPath": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|d:\\doantotnghiep2025-dipp\\forumservice_dipp\\forumservice\\forumservice.web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|solutionrelative:forumservice.web\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}|ForumService.Core\\ForumService.Core.csproj|d:\\doantotnghiep2025-dipp\\forumservice_dipp\\forumservice\\forumservice.core\\handler\\email\\command\\sendemailcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}|ForumService.Core\\ForumService.Core.csproj|solutionrelative:forumservice.core\\handler\\email\\command\\sendemailcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6895AACC-26EE-4F2F-8F81-C98AA5A5701B}|ForumService.Infrastructure\\ForumService.Infrastructure.csproj|d:\\doantotnghiep2025-dipp\\forumservice_dipp\\forumservice\\forumservice.infrastructure\\data\\forumdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6895AACC-26EE-4F2F-8F81-C98AA5A5701B}|ForumService.Infrastructure\\ForumService.Infrastructure.csproj|solutionrelative:forumservice.infrastructure\\data\\forumdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{95DA071B-5291-4007-8F29-8C3AC08AEFAB}|ForumService.Contract\\ForumService.Contract.csproj|d:\\doantotnghiep2025-dipp\\forumservice_dipp\\forumservice\\forumservice.contract\\usecases\\post\\request.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{95DA071B-5291-4007-8F29-8C3AC08AEFAB}|ForumService.Contract\\ForumService.Contract.csproj|solutionrelative:forumservice.contract\\usecases\\post\\request.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|d:\\doantotnghiep2025-dipp\\forumservice_dipp\\forumservice\\forumservice.web\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|solutionrelative:forumservice.web\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+      "AbsoluteMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|d:\\doantotnghiep2025-dipp\\forumservice_dipp\\forumservice\\forumservice.web\\controllers\\post\\postcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|solutionrelative:forumservice.web\\controllers\\post\\postcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -439,39 +439,40 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Web\\Program.cs",
-              "RelativeDocumentMoniker": "ForumService.Web\\Program.cs",
-              "ToolTip": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Web\\Program.cs",
-              "RelativeToolTip": "ForumService.Web\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Title": "SendEmailCommandHandler.cs",
+              "DocumentMoniker": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Core\\Handler\\Email\\Command\\SendEmailCommandHandler.cs",
+              "RelativeDocumentMoniker": "ForumService.Core\\Handler\\Email\\Command\\SendEmailCommandHandler.cs",
+              "ToolTip": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Core\\Handler\\Email\\Command\\SendEmailCommandHandler.cs",
+              "RelativeToolTip": "ForumService.Core\\Handler\\Email\\Command\\SendEmailCommandHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-08T13:47:58.283Z",
+              "WhenOpened": "2025-10-13T14:19:22.723Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Request.cs",
+              "DocumentMoniker": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Contract\\UseCases\\Post\\Request.cs",
+              "RelativeDocumentMoniker": "ForumService.Contract\\UseCases\\Post\\Request.cs",
+              "ToolTip": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Contract\\UseCases\\Post\\Request.cs",
+              "RelativeToolTip": "ForumService.Contract\\UseCases\\Post\\Request.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAAwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-13T14:11:25.322Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Web\\appsettings.json",
-              "RelativeDocumentMoniker": "ForumService.Web\\appsettings.json",
-              "ToolTip": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Web\\appsettings.json",
-              "RelativeToolTip": "ForumService.Web\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-08T12:16:40.078Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ForumDbContext.cs",
-              "DocumentMoniker": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Infrastructure\\Data\\ForumDbContext.cs",
-              "RelativeDocumentMoniker": "ForumService.Infrastructure\\Data\\ForumDbContext.cs",
-              "ToolTip": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Infrastructure\\Data\\ForumDbContext.cs",
-              "RelativeToolTip": "ForumService.Infrastructure\\Data\\ForumDbContext.cs",
-              "ViewState": "AgIAACAAAAAAAAAAAAAUwDkAAAAcAAAAAAAAAA==",
+              "Title": "PostController.cs",
+              "DocumentMoniker": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Web\\Controllers\\Post\\PostController.cs",
+              "RelativeDocumentMoniker": "ForumService.Web\\Controllers\\Post\\PostController.cs",
+              "ToolTip": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Web\\Controllers\\Post\\PostController.cs",
+              "RelativeToolTip": "ForumService.Web\\Controllers\\Post\\PostController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAD4AAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-08T12:09:57.974Z",
+              "WhenOpened": "2025-10-13T09:23:21.162Z",
               "EditorCaption": ""
             }
           ]
