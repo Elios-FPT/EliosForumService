@@ -18,3 +18,5 @@ D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Infrastruc
 D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Infrastructure\obj\Debug\net9.0\ForumService.Infrastructure.pdb
 D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Infrastructure\obj\Debug\net9.0\ForumService.Infrastructure.genruntimeconfig.cache
 D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Infrastructure\obj\Debug\net9.0\ref\ForumService.Infrastructure.dll
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Infrastructure\bin\Debug\net9.0\ForumService.Contract.dll
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Infrastructure\bin\Debug\net9.0\ForumService.Contract.pdb

@@ -10,3 +10,7 @@ D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj
 D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\refint\ForumService.Domain.dll
 D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ForumService.Domain.pdb
 D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ref\ForumService.Domain.dll
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\bin\Debug\net9.0\ForumService.Contract.dll
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\bin\Debug\net9.0\ForumService.Contract.pdb
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ForumService.Domain.csproj.AssemblyReference.cache
+D:\DoAnTotNghiep2025-DIPP\ForumService_DIPP\ForumService\ForumService.Domain\obj\Debug\net9.0\ForumSer.55BB7328.Up2Date
