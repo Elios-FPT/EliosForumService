@@ -1,0 +1,7 @@
+{
+  "ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Contract",
+  "ForumService.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Core",
+  "ForumService.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Domain",
+  "ForumService.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Infrastructure",
+  "ForumService.Web, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Web"
+}

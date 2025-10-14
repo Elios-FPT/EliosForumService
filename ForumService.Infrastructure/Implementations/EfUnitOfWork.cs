@@ -1,6 +1,5 @@
 ﻿using ForumService.Core.Interfaces;
 using ForumService.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Threading.Tasks;
@@ -10,16 +9,39 @@ namespace ForumService.Infrastructure.Implementations
     public class EfUnitOfWork : IUnitOfWork
     {
         private readonly ForumDbContext _context;
-        private readonly IDbContextTransaction _transaction;
+        private IDbContextTransaction _transaction;
+        private bool _disposed;
 
         public EfUnitOfWork(ForumDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _transaction = _context.Database.BeginTransaction();
         }
 
+        /// <summary>
+        /// Bắt đầu transaction nếu chưa có.
+        /// </summary>
+        public async Task BeginTransactionAsync()
+        {
+            if (_transaction == null)
+                _transaction = await _context.Database.BeginTransactionAsync();
+        }
+
+        /// <summary>
+        /// Lưu thay đổi nhưng chưa commit transaction.
+        /// </summary>
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Commit transaction hiện tại.
+        /// </summary>
         public async Task CommitAsync()
         {
+            if (_transaction == null)
+                throw new InvalidOperationException("Transaction has not been started. Call BeginTransactionAsync() first.");
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -30,17 +52,55 @@ namespace ForumService.Infrastructure.Implementations
                 await RollbackAsync();
                 throw;
             }
+            finally
+            {
+                await DisposeTransactionAsync();
+            }
         }
 
+        /// <summary>
+        /// Rollback transaction nếu có lỗi.
+        /// </summary>
         public async Task RollbackAsync()
         {
-            await _transaction.RollbackAsync();
+            if (_transaction != null)
+            {
+                await _transaction.RollbackAsync();
+                await DisposeTransactionAsync();
+            }
         }
 
+        private async Task DisposeTransactionAsync()
+        {
+            if (_transaction != null)
+            {
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
+        }
+
+        /// <summary>
+        /// Giải phóng tài nguyên.
+        /// </summary>
         public void Dispose()
         {
-            _transaction?.Dispose();
-            _context?.Dispose();
+            DisposeAsync().GetAwaiter().GetResult();
+            GC.SuppressFinalize(this);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (!_disposed)
+            {
+                if (_transaction != null)
+                {
+                    await _transaction.DisposeAsync();
+                    _transaction = null;
+                }
+
+                await _context.DisposeAsync();
+                _disposed = true;
+            }
         }
     }
 }

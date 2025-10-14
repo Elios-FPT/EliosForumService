@@ -48,21 +48,31 @@ namespace ForumService.Web.Controllers.Post
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         public async Task<BaseResponseDto<bool>> CreatePost([FromBody] CreatePostRequest request)
         {
+            // map attachments nếu có
+            List<CreateAttachmentCommand>? attachments = request.Attachments?
+                .Select(a => new CreateAttachmentCommand(
+                    a.Filename,
+                    a.Url,
+                    a.ContentType,
+                    a.SizeBytes
+                ))
+                .ToList();
+
             var command = new CreatePostCommand(
                 AuthorId: request.AuthorId,
                 CategoryId: request.CategoryId,
                 Title: request.Title,
                 Summary: request.Summary,
                 Content: request.Content,
-                Attachments: request.Attachments,
                 PostType: request.PostType,
-                Status: request.Status
+                Status: request.Status,
+                Attachments: attachments
             );
 
             return await Sender.Send(command);
         }
 
-        /*
+       
         /// <summary>
         /// Updates an existing post.
         /// </summary>
@@ -79,100 +89,112 @@ namespace ForumService.Web.Controllers.Post
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<BaseResponseDto<bool>> UpdatePost([FromRoute] Guid postId, [FromBody] UpdatePostRequest request)
         {
+            // map attachments nếu có
+            List<CreateAttachmentCommand>? attachments = request.Attachments?
+                .Select(a => new CreateAttachmentCommand(
+                    a.Filename,
+                    a.Url,
+                    a.ContentType,
+                    a.SizeBytes
+                ))
+                .ToList();
+
             var command = new UpdatePostCommand(
                 PostId: postId,
                 Title: request.Title,
                 Summary: request.Summary,
                 Content: request.Content,
                 CategoryId: request.CategoryId,
-                Status: request.Status
-            );
-
-            return await Sender.Send(command);
-        }
-
-        /// <summary>
-        /// Deletes a post by its ID.
-        /// </summary>
-        [HttpDelete("{postId}")]
-        [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<BaseResponseDto<bool>> DeletePost([FromRoute] DeletePostRequest request)
-        {
-            var command = new DeletePostCommand(PostId: request.PostId);
-            return await Sender.Send(command);
-        }
-
-        /// <summary>
-        /// Retrieves a paginated list of posts with optional filters.
-        /// </summary>
-        [HttpGet]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostDto>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<BaseResponseDto<IEnumerable<PostDto>>> GetPosts([FromQuery] GetPostsRequest request)
-        {
-            var query = new GetPostsQuery(
-                AuthorId: request.AuthorId,
-                CategoryId: request.CategoryId,
                 Status: request.Status,
-                SearchKeyword: request.SearchKeyword,
-                Limit: request.Limit,
-                Offset: request.Offset
+                Attachments: attachments
             );
 
-            return await Sender.Send(query);
-        }
-
-        /// <summary>
-        /// Retrieves a single post by its ID.
-        /// </summary>
-        [HttpGet("{postId}")]
-        [ProducesResponseType(typeof(BaseResponseDto<PostDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<BaseResponseDto<PostDto>> GetPostById([FromRoute] GetPostByIdRequest request)
-        {
-            var query = new GetPostByIdQuery(PostId: request.PostId);
-            return await Sender.Send(query);
-        }
-
-        /// <summary>
-        /// Increments the view count of a post.
-        /// </summary>
-        [HttpPut("{postId}/view")]
-        [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<BaseResponseDto<bool>> IncrementViewCount([FromRoute] IncrementViewCountRequest request)
-        {
-            var command = new IncrementViewCountCommand(PostId: request.PostId);
             return await Sender.Send(command);
         }
 
-        /// <summary>
-        /// Marks or unmarks a post as featured.
-        /// </summary>
-        [HttpPut("{postId}/feature")]
-        [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<BaseResponseDto<bool>> ToggleFeatured([FromRoute] Guid postId, [FromBody] ToggleFeaturedRequest request)
-        {
-            var command = new ToggleFeaturedCommand(PostId: postId, IsFeatured: request.IsFeatured);
-            return await Sender.Send(command);
-        }
+        /*
+       /// <summary>
+       /// Deletes a post by its ID.
+       /// </summary>
+       [HttpDelete("{postId}")]
+       [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+       public async Task<BaseResponseDto<bool>> DeletePost([FromRoute] DeletePostRequest request)
+       {
+           var command = new DeletePostCommand(PostId: request.PostId);
+           return await Sender.Send(command);
+       }
 
-        /// <summary>
-        /// Retrieves the total number of posts by a specific author.
-        /// </summary>
-        [HttpGet("count/by-author")]
-        [ProducesResponseType(typeof(BaseResponseDto<int>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<BaseResponseDto<int>> GetPostCountByAuthor([FromQuery] GetPostCountByAuthorRequest request)
-        {
-            var query = new GetPostCountByAuthorQuery(AuthorId: request.AuthorId);
-            return await Sender.Send(query);
-        }
-        */
+       /// <summary>
+       /// Retrieves a paginated list of posts with optional filters.
+       /// </summary>
+       [HttpGet]
+       [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostDto>>), StatusCodes.Status200OK)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+       public async Task<BaseResponseDto<IEnumerable<PostDto>>> GetPosts([FromQuery] GetPostsRequest request)
+       {
+           var query = new GetPostsQuery(
+               AuthorId: request.AuthorId,
+               CategoryId: request.CategoryId,
+               Status: request.Status,
+               SearchKeyword: request.SearchKeyword,
+               Limit: request.Limit,
+               Offset: request.Offset
+           );
+
+           return await Sender.Send(query);
+       }
+
+       /// <summary>
+       /// Retrieves a single post by its ID.
+       /// </summary>
+       [HttpGet("{postId}")]
+       [ProducesResponseType(typeof(BaseResponseDto<PostDto>), StatusCodes.Status200OK)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+       public async Task<BaseResponseDto<PostDto>> GetPostById([FromRoute] GetPostByIdRequest request)
+       {
+           var query = new GetPostByIdQuery(PostId: request.PostId);
+           return await Sender.Send(query);
+       }
+
+       /// <summary>
+       /// Increments the view count of a post.
+       /// </summary>
+       [HttpPut("{postId}/view")]
+       [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+       public async Task<BaseResponseDto<bool>> IncrementViewCount([FromRoute] IncrementViewCountRequest request)
+       {
+           var command = new IncrementViewCountCommand(PostId: request.PostId);
+           return await Sender.Send(command);
+       }
+
+       /// <summary>
+       /// Marks or unmarks a post as featured.
+       /// </summary>
+       [HttpPut("{postId}/feature")]
+       [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+       public async Task<BaseResponseDto<bool>> ToggleFeatured([FromRoute] Guid postId, [FromBody] ToggleFeaturedRequest request)
+       {
+           var command = new ToggleFeaturedCommand(PostId: postId, IsFeatured: request.IsFeatured);
+           return await Sender.Send(command);
+       }
+
+       /// <summary>
+       /// Retrieves the total number of posts by a specific author.
+       /// </summary>
+       [HttpGet("count/by-author")]
+       [ProducesResponseType(typeof(BaseResponseDto<int>), StatusCodes.Status200OK)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+       public async Task<BaseResponseDto<int>> GetPostCountByAuthor([FromQuery] GetPostCountByAuthorRequest request)
+       {
+           var query = new GetPostCountByAuthorQuery(AuthorId: request.AuthorId);
+           return await Sender.Send(query);
+       }
+       */
     }
 }

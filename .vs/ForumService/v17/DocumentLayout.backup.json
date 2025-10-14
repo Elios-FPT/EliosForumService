@@ -1,18 +1,30 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\",
+  "WorkspaceRootPath": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|d:\\doantotnghiep2025-dipp\\forumservice_dipp\\forumservice\\forumservice.web\\controllers\\emailcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|solutionrelative:forumservice.web\\controllers\\emailcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|c:\\users\\user\\desktop\\check\\eliosforumservice\\forumservice.web\\controllers\\category\\categorycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|solutionrelative:forumservice.web\\controllers\\category\\categorycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6895AACC-26EE-4F2F-8F81-C98AA5A5701B}|ForumService.Infrastructure\\ForumService.Infrastructure.csproj|d:\\doantotnghiep2025-dipp\\forumservice_dipp\\forumservice\\forumservice.infrastructure\\implementations\\appconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6895AACC-26EE-4F2F-8F81-C98AA5A5701B}|ForumService.Infrastructure\\ForumService.Infrastructure.csproj|solutionrelative:forumservice.infrastructure\\implementations\\appconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}|ForumService.Tests\\ForumService.Tests.csproj|c:\\users\\user\\desktop\\check\\eliosforumservice\\forumservice.tests\\categorycontroller\\createcategorytests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}|ForumService.Tests\\ForumService.Tests.csproj|solutionrelative:forumservice.tests\\categorycontroller\\createcategorytests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}|ForumService.Core\\ForumService.Core.csproj|d:\\doantotnghiep2025-dipp\\forumservice_dipp\\forumservice\\forumservice.core\\interfaces\\iappconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}|ForumService.Core\\ForumService.Core.csproj|solutionrelative:forumservice.core\\interfaces\\iappconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}|ForumService.Core\\ForumService.Core.csproj|c:\\users\\user\\desktop\\check\\eliosforumservice\\forumservice.core\\handler\\category\\command\\createcategorycommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}|ForumService.Core\\ForumService.Core.csproj|solutionrelative:forumservice.core\\handler\\category\\command\\createcategorycommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}|ForumService.Tests\\ForumService.Tests.csproj|c:\\users\\user\\desktop\\check\\eliosforumservice\\forumservice.tests\\categorycontroller\\updatecategorytests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}|ForumService.Tests\\ForumService.Tests.csproj|solutionrelative:forumservice.tests\\categorycontroller\\updatecategorytests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}|ForumService.Core\\ForumService.Core.csproj|c:\\users\\user\\desktop\\check\\eliosforumservice\\forumservice.core\\handler\\category\\command\\deletecategorycommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}|ForumService.Core\\ForumService.Core.csproj|solutionrelative:forumservice.core\\handler\\category\\command\\deletecategorycommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{84AC086A-1989-4319-B592-C957138055C5}|ForumService.Domain\\ForumService.Domain.csproj|c:\\users\\user\\desktop\\check\\eliosforumservice\\forumservice.domain\\models\\post.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{84AC086A-1989-4319-B592-C957138055C5}|ForumService.Domain\\ForumService.Domain.csproj|solutionrelative:forumservice.domain\\models\\post.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,7 +34,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 103,
+          "SelectedChildIndex": 104,
           "Children": [
             {
               "$type": "Bookmark",
@@ -438,41 +450,80 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "EmailController.cs",
-              "DocumentMoniker": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Web\\Controllers\\EmailController.cs",
-              "RelativeDocumentMoniker": "ForumService.Web\\Controllers\\EmailController.cs",
-              "ToolTip": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Web\\Controllers\\EmailController.cs",
-              "RelativeToolTip": "ForumService.Web\\Controllers\\EmailController.cs",
-              "ViewState": "AgIAAE4AAAAAAAAAAAAYwAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "CreateCategoryTests.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Tests\\CategoryController\\CreateCategoryTests.cs",
+              "RelativeDocumentMoniker": "ForumService.Tests\\CategoryController\\CreateCategoryTests.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Tests\\CategoryController\\CreateCategoryTests.cs",
+              "RelativeToolTip": "ForumService.Tests\\CategoryController\\CreateCategoryTests.cs",
+              "ViewState": "AgIAAMQAAAAAAAAAAADwv78AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T08:59:03.749Z",
+              "WhenOpened": "2025-10-14T18:19:26.548Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "AppConfiguration.cs",
-              "DocumentMoniker": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Infrastructure\\Implementations\\AppConfiguration.cs",
-              "RelativeDocumentMoniker": "ForumService.Infrastructure\\Implementations\\AppConfiguration.cs",
-              "ToolTip": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Infrastructure\\Implementations\\AppConfiguration.cs",
-              "RelativeToolTip": "ForumService.Infrastructure\\Implementations\\AppConfiguration.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAwAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "CategoryController.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Web\\Controllers\\Category\\CategoryController.cs",
+              "RelativeDocumentMoniker": "ForumService.Web\\Controllers\\Category\\CategoryController.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Web\\Controllers\\Category\\CategoryController.cs",
+              "RelativeToolTip": "ForumService.Web\\Controllers\\Category\\CategoryController.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAAIwCkAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T08:58:12.809Z",
+              "WhenOpened": "2025-10-14T14:22:08.68Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UpdateCategoryTests.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Tests\\CategoryController\\UpdateCategoryTests.cs",
+              "RelativeDocumentMoniker": "ForumService.Tests\\CategoryController\\UpdateCategoryTests.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Tests\\CategoryController\\UpdateCategoryTests.cs",
+              "RelativeToolTip": "ForumService.Tests\\CategoryController\\UpdateCategoryTests.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T18:22:28.347Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "IAppConfiguration.cs",
-              "DocumentMoniker": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Core\\Interfaces\\IAppConfiguration.cs",
-              "RelativeDocumentMoniker": "ForumService.Core\\Interfaces\\IAppConfiguration.cs",
-              "ToolTip": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Core\\Interfaces\\IAppConfiguration.cs",
-              "RelativeToolTip": "ForumService.Core\\Interfaces\\IAppConfiguration.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Title": "CreateCategoryCommandHandler.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Core\\Handler\\Category\\Command\\CreateCategoryCommandHandler.cs",
+              "RelativeDocumentMoniker": "ForumService.Core\\Handler\\Category\\Command\\CreateCategoryCommandHandler.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Core\\Handler\\Category\\Command\\CreateCategoryCommandHandler.cs",
+              "RelativeToolTip": "ForumService.Core\\Handler\\Category\\Command\\CreateCategoryCommandHandler.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAUwHEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T08:57:45.533Z",
+              "WhenOpened": "2025-10-14T13:22:59.282Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Post.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Domain\\Models\\Post.cs",
+              "RelativeDocumentMoniker": "ForumService.Domain\\Models\\Post.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Domain\\Models\\Post.cs",
+              "RelativeToolTip": "ForumService.Domain\\Models\\Post.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAA5wBEAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T16:21:45.329Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "DeleteCategoryCommandHandler.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Core\\Handler\\Category\\Command\\DeleteCategoryCommandHandler.cs",
+              "RelativeDocumentMoniker": "ForumService.Core\\Handler\\Category\\Command\\DeleteCategoryCommandHandler.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Core\\Handler\\Category\\Command\\DeleteCategoryCommandHandler.cs",
+              "RelativeToolTip": "ForumService.Core\\Handler\\Category\\Command\\DeleteCategoryCommandHandler.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAiwB4AAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T14:30:07.225Z",
               "EditorCaption": ""
             }
           ]

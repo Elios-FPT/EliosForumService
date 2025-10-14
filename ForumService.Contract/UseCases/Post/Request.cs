@@ -19,7 +19,7 @@ namespace ForumService.Contract.UseCases.Post
             [Required, MaxLength(255)] string Title,
             string? Summary,
             [Required] string Content,
-            List<CreateAttachmentCommand>? Attachments = null,
+            List<CreateAttachmentRequest>? Attachments = null,
             string PostType = "Post",   // "Post" | "Solution"
             string Status = "Draft"     // "Draft" | "PendingReview" | "Rejected" | "Published"
         );
@@ -33,8 +33,8 @@ namespace ForumService.Contract.UseCases.Post
             string? Summary,
             [Required] string Content,
             Guid? CategoryId,
-            List<CreateAttachmentRequest>? Attachments,
-            string Status
+            string Status,
+            List<CreateAttachmentRequest>? Attachments = null
         );
 
         /// <summary>
@@ -89,10 +89,11 @@ namespace ForumService.Contract.UseCases.Post
         /// Request model for creating an attachment.
         /// </summary>
         public record CreateAttachmentRequest(
-            [Required] string Filename,
-            [Required] string Url,
+            string Filename,
+            string Url,
             string? ContentType,
             long? SizeBytes
         );
+
     }
 }

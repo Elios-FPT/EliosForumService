@@ -8,24 +8,29 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="IntegrationTests\**" />
+    <Compile Remove="UnitTests\**" />
+    <EmbeddedResource Remove="IntegrationTests\**" />
+    <EmbeddedResource Remove="UnitTests\**" />
+    <None Remove="IntegrationTests\**" />
+    <None Remove="UnitTests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.10" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ForumService.Web\ForumService.Web.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="IntegrationTests\" />
-    <Folder Include="UnitTests\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\ForumService.Domain\ForumService.Domain.csproj" />
-    <ProjectReference Include="..\ForumService.Infrastructure\ForumService.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
