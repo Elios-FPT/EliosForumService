@@ -2,8 +2,6 @@
 using ForumService.Contract.Shared;
 using ForumService.Core.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Category.Command;
@@ -25,6 +23,17 @@ namespace ForumService.Core.Handler.Category.Command
 
         public async Task<BaseResponseDto<bool>> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
         {
+            // Kiểm tra CategoryId không hợp lệ (Guid.Empty)
+            if (request.CategoryId == Guid.Empty)
+            {
+                return new BaseResponseDto<bool>
+                {
+                    Status = 400,
+                    Message = "Invalid CategoryId.",
+                    ResponseData = false
+                };
+            }
+
             var category = await _categoryRepository.GetByIdAsync(request.CategoryId);
             if (category == null)
             {
