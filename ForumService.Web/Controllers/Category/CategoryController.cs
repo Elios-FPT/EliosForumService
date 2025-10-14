@@ -64,14 +64,26 @@ namespace ForumService.Web.Controllers.Category
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<BaseResponseDto<bool>> UpdateCategory([FromRoute] Guid categoryId, [FromBody] UpdateCategoryRequest request)
         {
-            var command = new UpdateCategoryCommand(
-                CategoryId: categoryId,
-                Name: request.Name,
-                Description: request.Description,
-                IsActive: request.IsActive
-            );
+            try
+            {
+                var command = new UpdateCategoryCommand(
+                    CategoryId: categoryId,
+                    Name: request.Name,
+                    Description: request.Description,
+                    IsActive: request.IsActive
+                );
 
-            return await Sender.Send(command);
+                return await Sender.Send(command);
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<bool>
+                {
+                    Status = 500,
+                    Message = $"Failed to update category: {ex.Message}",
+                    ResponseData = false
+                };
+            }
         }
 
         /// <summary>
