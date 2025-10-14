@@ -19,9 +19,9 @@ namespace ForumService.Contract.UseCases.Post
             string Title,
             string? Summary,
             string Content,
-            List<CreateAttachmentCommand>? Attachments,
             string PostType,
-            string Status
+            string Status,
+            List<CreateAttachmentCommand>? Attachments = null
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>

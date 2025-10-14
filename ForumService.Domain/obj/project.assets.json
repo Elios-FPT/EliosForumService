@@ -716,11 +716,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Domain\\ForumService.Domain.csproj",
+      "projectUniqueName": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Domain\\ForumService.Domain.csproj",
       "projectName": "ForumService.Domain",
-      "projectPath": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Domain\\ForumService.Domain.csproj",
+      "projectPath": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Domain\\ForumService.Domain.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Domain\\obj\\",
+      "outputPath": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Domain\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -741,8 +741,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Contract\\ForumService.Contract.csproj": {
-              "projectPath": "D:\\DoAnTotNghiep2025-DIPP\\ForumService_DIPP\\ForumService\\ForumService.Contract\\ForumService.Contract.csproj"
+            "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Contract\\ForumService.Contract.csproj": {
+              "projectPath": "C:\\Users\\User\\Desktop\\Check\\EliosForumService\\ForumService.Contract\\ForumService.Contract.csproj"
             }
           }
         }
