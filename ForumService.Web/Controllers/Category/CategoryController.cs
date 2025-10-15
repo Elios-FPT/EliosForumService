@@ -1,12 +1,13 @@
 ﻿using Asp.Versioning;
 using ForumService.Contract.Shared;
+using ForumService.Contract.TransferObjects.Category;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using static ForumService.Contract.UseCases.Category.Command;
 using static ForumService.Contract.UseCases.Category.Query;
 using static ForumService.Contract.UseCases.Category.Request;
-using ForumService.Contract.TransferObjects.Category;
 
 namespace ForumService.Web.Controllers.Category
 {
@@ -94,10 +95,21 @@ namespace ForumService.Web.Controllers.Category
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<BaseResponseDto<bool>> DeleteCategory([FromRoute] DeleteCategoryRequest request)
         {
-            var command = new DeleteCategoryCommand(CategoryId: request.CategoryId);
-            return await Sender.Send(command);
+            try
+            {
+                var command = new DeleteCategoryCommand(CategoryId: request.CategoryId);
+                return await Sender.Send(command);
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<bool>
+                {
+                    Status = 500,
+                    Message = $"Failed to delete category: {ex.Message}",
+                    ResponseData = false
+                };
+            }
         }
-
         /// <summary>
         /// Retrieves all categories with optional filters.
         /// </summary>
@@ -105,12 +117,24 @@ namespace ForumService.Web.Controllers.Category
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CategoryDto>>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<IEnumerable<CategoryDto>>> GetCategories([FromQuery] GetCategoryListQuery request)
         {
-            var query = new GetCategoryListQuery(
-                SearchKeyword: request.SearchKeyword,
-                Limit: request.Limit,
-                Offset: request.Offset,
-                IsActive: request.IsActive);
-            return await Sender.Send(query);
+            try
+            {
+                var query = new GetCategoryListQuery(
+                    SearchKeyword: request.SearchKeyword,
+                    Limit: request.Limit,
+                    Offset: request.Offset,
+                    IsActive: request.IsActive);
+                return await Sender.Send(query);
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<IEnumerable<CategoryDto>>
+                {
+                    Status = 500,
+                    Message = $"Failed to retrieve categories: {ex.Message}",
+                    ResponseData = null
+                };
+            }
         }
 
         /// <summary>
@@ -121,8 +145,30 @@ namespace ForumService.Web.Controllers.Category
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<BaseResponseDto<CategoryDto>> GetCategoryById([FromRoute] GetCategoryByIdRequest request)
         {
-            var query = new GetCategoryByIdQuery(CategoryId: request.CategoryId);
-            return await Sender.Send(query);
+            try
+            {
+                var query = new GetCategoryByIdQuery(CategoryId: request.CategoryId);
+                var result = await Sender.Send(query);
+                if (result == null)
+                {
+                    return new BaseResponseDto<CategoryDto>
+                    {
+                        Status = 500,
+                        Message = "Failed to retrieve category: Handler returned null.",
+                        ResponseData = null
+                    };
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<CategoryDto>
+                {
+                    Status = 500,
+                    Message = $"Failed to retrieve category: {ex.Message}",
+                    ResponseData = null
+                };
+            }
         }
     }
 }
