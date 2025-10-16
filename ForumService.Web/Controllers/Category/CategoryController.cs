@@ -98,7 +98,17 @@ namespace ForumService.Web.Controllers.Category
             try
             {
                 var command = new DeleteCategoryCommand(CategoryId: request.CategoryId);
-                return await Sender.Send(command);
+                var result = await Sender.Send(command);
+                if (result == null)
+                {
+                    return new BaseResponseDto<bool>
+                    {
+                        Status = 500,
+                        Message = "Failed to delete category: Handler returned null.",
+                        ResponseData = false
+                    };
+                }
+                return result;
             }
             catch (Exception ex)
             {
