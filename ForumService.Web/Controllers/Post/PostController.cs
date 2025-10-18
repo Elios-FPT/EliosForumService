@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using ForumService.Contract.Shared;
+using ForumService.Contract.TransferObjects;
 using ForumService.Contract.TransferObjects.Post;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -27,37 +28,55 @@ namespace ForumService.Web.Controllers.Post
         }
 
         /// <summary>
-        /// Creates a new post.
+        /// Creates a new post with optional file attachments.
         /// </summary>
         /// <remarks>
         /// <pre>
         /// Description:
-        /// This endpoint allows authenticated users with the `post:write` permission to create a new post.
+        /// This endpoint allows creating a new post. It accepts post data via form fields
+        /// and any accompanying files as part of a multipart/form-data request.
         /// </pre>
         /// </remarks>
-        /// <param name="request">A <see cref="CreatePostRequest"/> object containing the properties for the new post.</param>
+        /// <param name="request">A <see cref="CreatePostRequest"/> object containing the properties for the new post, sent as form data.</param>
+        /// <param name="files">A list of files to be attached to the post.</param>
         /// <returns>
         /// → <seealso cref="CreatePostCommand" /><br/>
         /// → <seealso cref="CreatePostCommandHandler" /><br/>
-        /// → A <see cref="Result{TValue}"/> containing a boolean indicating success.<br/>
+        /// → A boolean indicating success.<br/>
         /// </returns>
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-        public async Task<BaseResponseDto<bool>> CreatePost([FromBody] CreatePostRequest request)
-        {
-            // map attachments nếu có
-            List<CreateAttachmentCommand>? attachments = request.Attachments?
-                .Select(a => new CreateAttachmentCommand(
-                    a.Filename,
-                    a.Url,
-                    a.ContentType,
-                    a.SizeBytes
-                ))
-                .ToList();
+        // ... các response type khác
+        public async Task<BaseResponseDto<bool>> CreatePost(
+            // THAY ĐỔI 1: Sử dụng [FromForm] để nhận dữ liệu từ form-data
+            [FromForm] CreatePostRequest request,
 
+            // THAY ĐỔI 2: Nhận danh sách file dưới dạng một tham số riêng
+            List<IFormFile> files)
+        {
+            // THAY ĐỔI 3: Logic mới để chuyển đổi IFormFile sang DTO
+            var filesToUpload = new List<FileToUploadDto>();
+            if (files is not null)
+            {
+                foreach (var file in files)
+                {
+                    if (file.Length > 0)
+                    {
+                        using var memoryStream = new MemoryStream();
+                        await file.CopyToAsync(memoryStream);
+
+                        filesToUpload.Add(new FileToUploadDto
+                        {
+                            FileName = file.FileName,
+                            ContentType = file.ContentType,
+                            Content = memoryStream.ToArray()
+                        });
+                    }
+                }
+            }
+
+            // THAY ĐỔI 4: Tạo command với cấu trúc mới
             var command = new CreatePostCommand(
                 AuthorId: request.AuthorId,
                 CategoryId: request.CategoryId,
@@ -65,14 +84,13 @@ namespace ForumService.Web.Controllers.Post
                 Summary: request.Summary,
                 Content: request.Content,
                 PostType: request.PostType,
-                Status: request.Status,
-                Attachments: attachments
+                FilesToUpload: filesToUpload // Gửi dữ liệu file thô đến handler
             );
 
             return await Sender.Send(command);
         }
 
-       
+
         /// <summary>
         /// Updates an existing post.
         /// </summary>
@@ -112,8 +130,57 @@ namespace ForumService.Web.Controllers.Post
             return await Sender.Send(command);
         }
 
-        /*
        /// <summary>
+       /// Retrieves a paginated list of posts with optional filters.
+       /// </summary>
+       [HttpGet]
+       [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+       public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetPublicViewPosts([FromQuery] GetPublicViewPostsRequest request)
+       {
+            try
+            {
+                // Ánh xạ toàn bộ các trường từ request sang query
+                var query = new GetPublicViewPostsQuery(
+                    AuthorId: request.AuthorId,
+                    CategoryId: request.CategoryId,
+                    SearchKeyword: request.SearchKeyword,
+                    Limit: request.Limit,
+                    Offset: request.Offset,
+                    // --- Ánh xạ các trường Sort ---
+                    Tags: request.Tags,
+                    SortBy: request.SortBy,
+                    SortOrder: request.SortOrder
+                );
+
+                return await Sender.Send(query);
+            }
+            catch (Exception ex)
+            {
+                // Phần xử lý lỗi vẫn giữ nguyên
+                return new BaseResponseDto<IEnumerable<PostViewDto>>
+                {
+                    Status = 500,
+                    Message = $"Failed to retrieve posts: {ex.Message}",
+                    ResponseData = Enumerable.Empty<PostViewDto>()
+                };
+            }
+        }
+       /*
+
+       /// <summary>
+       /// Retrieves a single post by its ID.
+       /// </summary>
+       [HttpGet("{postId}")]
+       [ProducesResponseType(typeof(BaseResponseDto<PostDto>), StatusCodes.Status200OK)]
+       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+       public async Task<BaseResponseDto<PostDto>> GetPostById([FromRoute] GetPostByIdRequest request)
+       {
+           var query = new GetPostByIdQuery(PostId: request.PostId);
+           return await Sender.Send(query);
+       }
+
+        /// <summary>
        /// Deletes a post by its ID.
        /// </summary>
        [HttpDelete("{postId}")]
@@ -126,38 +193,6 @@ namespace ForumService.Web.Controllers.Post
        {
            var command = new DeletePostCommand(PostId: request.PostId);
            return await Sender.Send(command);
-       }
-
-       /// <summary>
-       /// Retrieves a paginated list of posts with optional filters.
-       /// </summary>
-       [HttpGet]
-       [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostDto>>), StatusCodes.Status200OK)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-       public async Task<BaseResponseDto<IEnumerable<PostDto>>> GetPosts([FromQuery] GetPostsRequest request)
-       {
-           var query = new GetPostsQuery(
-               AuthorId: request.AuthorId,
-               CategoryId: request.CategoryId,
-               Status: request.Status,
-               SearchKeyword: request.SearchKeyword,
-               Limit: request.Limit,
-               Offset: request.Offset
-           );
-
-           return await Sender.Send(query);
-       }
-
-       /// <summary>
-       /// Retrieves a single post by its ID.
-       /// </summary>
-       [HttpGet("{postId}")]
-       [ProducesResponseType(typeof(BaseResponseDto<PostDto>), StatusCodes.Status200OK)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-       public async Task<BaseResponseDto<PostDto>> GetPostById([FromRoute] GetPostByIdRequest request)
-       {
-           var query = new GetPostByIdQuery(PostId: request.PostId);
-           return await Sender.Send(query);
        }
 
        /// <summary>

@@ -1,5 +1,6 @@
 ﻿using ForumService.Contract.Message;
 using ForumService.Contract.Shared;
+using ForumService.Contract.TransferObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,15 +14,19 @@ namespace ForumService.Contract.UseCases.Post
         /// <summary>
         /// Command to create a new post.
         /// </summary>
+        /// <summary>
+        /// Command để tạo một bài viết mới, bao gồm cả các file cần upload.
+        /// </summary>
         public record CreatePostCommand(
             Guid AuthorId,
             Guid? CategoryId,
             string Title,
             string? Summary,
             string Content,
-            string PostType,
-            string Status,
-            List<CreateAttachmentCommand>? Attachments = null
+            string? PostType,
+            // THAY ĐỔI TẠI ĐÂY:
+            // Thay thế list Attachment cũ bằng một list chứa dữ liệu file thô.
+            List<FileToUploadDto>? FilesToUpload
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>

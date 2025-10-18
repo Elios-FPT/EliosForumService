@@ -21,14 +21,29 @@ namespace ForumService.Contract.UseCases.Post
             string? SearchKeyword = null,
             int Limit = 20,
             int Offset = 0
-        ) : IQuery<BaseResponseDto<IEnumerable<PostDto>>>;
+        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
+
+        /// <summary>
+        /// Query để lấy danh sách bài viết công khai có phân trang, bộ lọc, và tùy chọn sắp xếp.
+        /// </summary>
+        public record GetPublicViewPostsQuery(
+            Guid? AuthorId = null,
+            Guid? CategoryId = null,
+            string? SearchKeyword = null,
+            int Limit = 20,
+            int Offset = 0,
+            // --- Các trường mới được thêm vào ---
+            List<string>? Tags = null,
+            string? SortBy = null,
+            string? SortOrder = null
+        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
 
         /// <summary>
         /// Query để lấy thông tin chi tiết của một bài viết theo ID.
         /// </summary>
         public record GetPostByIdQuery(
             Guid PostId
-        ) : IQuery<BaseResponseDto<PostDto>>;
+        ) : IQuery<BaseResponseDto<PostViewDto>>;
 
         /// <summary>
         /// Query để lấy tổng số bài viết của một tác giả.
@@ -43,7 +58,7 @@ namespace ForumService.Contract.UseCases.Post
         public record GetFeaturedPostsQuery(
             int Limit = 10,
             int Offset = 0
-        ) : IQuery<BaseResponseDto<IEnumerable<PostDto>>>;
+        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
 
         /// <summary>
         /// Query để lấy danh sách bài viết theo category.
@@ -52,6 +67,6 @@ namespace ForumService.Contract.UseCases.Post
             Guid CategoryId,
             int Limit = 20,
             int Offset = 0
-        ) : IQuery<BaseResponseDto<IEnumerable<PostDto>>>;
+        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
     }
 }

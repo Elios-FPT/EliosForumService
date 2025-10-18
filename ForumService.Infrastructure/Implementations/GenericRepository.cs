@@ -116,6 +116,7 @@ namespace ForumService.Infrastructure.Implementations
             Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? orderBy = null,
             Expression<Func<T, TResult>>? selector = null,
             Expression<Func<IQueryable<T>, IQueryable<T>>>? include = null,
+            string[]? includeProperties = null,
             int? pageSize = null,
             int? pageNumber = null)
         {
@@ -134,6 +135,15 @@ namespace ForumService.Infrastructure.Implementations
             if (orderBy != null)
             {
                 query = orderBy.Compile()(query);
+            }
+
+            // Xử lý includeProperties
+            if (includeProperties != null)
+            {
+                foreach (var includeProperty in includeProperties)
+                {
+                    query = query.Include(includeProperty);
+                }
             }
 
             if (pageSize.HasValue && pageNumber.HasValue)

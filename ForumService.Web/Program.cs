@@ -8,6 +8,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Redis;
 using Microsoft.OpenApi.Models;
+using Polly;
+using Polly.Extensions.Http;
 using SUtility.Infrastructure.Implementations;
 using ZiggyCreatures.Caching.Fusion;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
@@ -44,6 +46,28 @@ builder.Services.AddScoped<IKafkaProducer, KafkaProducer>();
 builder.Services.AddScoped(typeof(IKafkaRepository<>), typeof(KafkaRepository<>));
 builder.Services.AddScoped<IKafkaTransaction, KafkaTransaction>();
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+
+// >>> THÊM VÀO: Đăng ký HTTP Client cho SUtilityService <<<
+builder.Services.AddHttpClient<ISUtilityServiceClient, SUtilityServiceClient>(client =>
+{
+    // Lấy URL của SUtilityService từ file appsettings.json
+    string? serviceUrl = builder.Configuration["ServiceUrls:SUtilityService"];
+    if (string.IsNullOrEmpty(serviceUrl))
+    {
+        throw new InvalidOperationException("SUtilityService URL is not configured in appsettings.json.");
+    }
+    client.BaseAddress = new Uri(serviceUrl);
+});
+
+// Hàm tạo chính sách Polly
+static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+{
+    // Cấu hình này sẽ thử lại tối đa 3 lần với thời gian chờ tăng dần theo cấp số nhân (2, 4, 8 giây)
+    // nếu gặp lỗi mạng, lỗi server (5xx), hoặc lỗi request timeout (408).
+    return HttpPolicyExtensions
+        .HandleTransientHttpError() // Xử lý các lỗi HTTP tạm thời
+        .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+}
 
 builder.Services.AddFusionCache()
     .WithSerializer(new FusionCacheSystemTextJsonSerializer())

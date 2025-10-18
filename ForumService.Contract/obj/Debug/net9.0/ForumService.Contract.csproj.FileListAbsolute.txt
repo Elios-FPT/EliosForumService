@@ -24,3 +24,16 @@ C:\Users\User\Desktop\Check\EliosForumService\ForumService.Contract\obj\Debug\ne
 C:\Users\User\Desktop\Check\EliosForumService\ForumService.Contract\obj\Debug\net9.0\refint\ForumService.Contract.dll
 C:\Users\User\Desktop\Check\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.pdb
 C:\Users\User\Desktop\Check\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ref\ForumService.Contract.dll
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\bin\Debug\net9.0\ForumService.Contract.deps.json
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\bin\Debug\net9.0\ForumService.Contract.dll
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\bin\Debug\net9.0\ForumService.Contract.pdb
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.csproj.AssemblyReference.cache
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.AssemblyInfoInputs.cache
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.AssemblyInfo.cs
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.csproj.CoreCompileInputs.cache
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.sourcelink.json
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.dll
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\obj\Debug\net9.0\refint\ForumService.Contract.dll
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ForumService.Contract.pdb
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Contract\obj\Debug\net9.0\ref\ForumService.Contract.dll
