@@ -19,7 +19,7 @@ namespace ForumService.Core.Extensions
         public MappingProfile()
         {
             // Map 2 chiều giữa Entity và DTO
-            CreateMap<Post, PostDto>().ReverseMap();
+            CreateMap<Post, PostViewDto>().ReverseMap();
 
             // Mapping Category
             CreateMap<Category, CategoryDto>().ReverseMap();
@@ -27,9 +27,7 @@ namespace ForumService.Core.Extensions
             CreateMap<UpdateCategoryRequest, UpdateCategoryCommand>();
 
 
-            CreateMap<CreatePostRequest, CreatePostCommand>()
-           // map Attachments list tự động nếu map từng item đã khai báo
-           .ForMember(dest => dest.Attachments, opt => opt.MapFrom(src => src.Attachments));
+          
         }
     }
 }

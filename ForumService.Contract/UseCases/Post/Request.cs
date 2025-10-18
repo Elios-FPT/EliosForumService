@@ -19,9 +19,7 @@ namespace ForumService.Contract.UseCases.Post
             [Required, MaxLength(255)] string Title,
             string? Summary,
             [Required] string Content,
-            List<CreateAttachmentRequest>? Attachments = null,
-            string PostType = "Post",   // "Post" | "Solution"
-            string Status = "Draft"     // "Draft" | "PendingReview" | "Rejected" | "Published"
+            string PostType = "Post"   // "Post" | "Solution"
         );
 
         /// <summary>
@@ -54,14 +52,22 @@ namespace ForumService.Contract.UseCases.Post
         /// <summary>
         /// Request to get paginated posts with optional filters.
         /// </summary>
-        public record GetPostsRequest(
-            Guid? AuthorId = null,
-            Guid? CategoryId = null,
-            string? Status = null,
-            string? SearchKeyword = null,
-            int Limit = 20,
-            int Offset = 0
-        );
+        public record GetPublicViewPostsRequest(
+             // Các trường lọc cũ
+             Guid? AuthorId = null,
+             Guid? CategoryId = null,
+             string? PostType = null,
+             string? SearchKeyword = null,
+
+             // Phân trang
+             int Limit = 20,
+             int Offset = 0,
+
+             // Các trường mới thêm vào
+             List<string>? Tags = null,      // ✨ Lọc theo danh sách tags
+             string? SortBy = null,          // ✨ Sắp xếp theo trường nào (vd: "ViewsCount")
+             string? SortOrder = null        // ✨ Thứ tự sắp xếp (vd: "ASC" hoặc "DESC")
+         );
 
         /// <summary>
         /// Request to increment view count for a post.
