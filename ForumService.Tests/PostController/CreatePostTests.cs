@@ -214,7 +214,7 @@ namespace ForumService.Tests.PostController
             // Arrange
             var authorId = Guid.NewGuid();
             var categoryId = Guid.NewGuid();
-            var request = new CreatePostRequest(authorId, categoryId, "Mapping Test", "Summary text", "Content text", "Solution", "Published");
+            var request = new CreatePostRequest(authorId, categoryId, "Mapping Test", "Summary text", "Content text", "Solution");
             var mockFile = CreateMockFormFile("mapping.txt", "map content");
             var files = new List<IFormFile> { mockFile };
 

@@ -20,11 +20,11 @@ namespace ForumService.Web.Controllers.Post
     [Route("api/v1/[controller]")]
     public class PostController : ControllerBase
     {
-        protected readonly ISender Sender;
+        protected readonly ISender _sender;
 
         public PostController(ISender sender)
         {
-            Sender = sender;
+            _sender = sender;
         }
 
         /// <summary>
@@ -87,53 +87,69 @@ namespace ForumService.Web.Controllers.Post
                 FilesToUpload: filesToUpload // Gửi dữ liệu file thô đến handler
             );
 
-            return await Sender.Send(command);
+            return await _sender.Send(command);
         }
 
 
         /// <summary>
-        /// Updates an existing post.
+        /// Updates an existing post and its file attachments.
         /// </summary>
-        /// <param name="request">A <see cref="UpdatePostRequest"/> object containing the post ID and updated fields.</param>
-        /// <returns>
-        /// → <seealso cref="UpdatePostCommand" /><br/>
-        /// → <seealso cref="UpdatePostCommandHandler" /><br/>
-        /// </returns>
+        /// <remarks>
+        /// This endpoint handles updating a post's text content, adding new files, and deleting existing files.
+        /// It uses a multipart/form-data request.
+        /// </remarks>
+        /// <param name="postId">The ID of the post to update.</param>
+        /// <param name="request">The post's updated metadata, sent as form data. Include 'attachmentIdsToDelete' to remove existing files.</param>
+        /// <param name="files">A list of NEW files to be attached to the post.</param>
+        /// <returns>A boolean indicating success.</returns>
         [HttpPut("{postId}")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<BaseResponseDto<bool>> UpdatePost([FromRoute] Guid postId, [FromBody] UpdatePostRequest request)
+        public async Task<BaseResponseDto<bool>> UpdatePost(
+            [FromRoute] Guid postId,
+            [FromForm] UpdatePostRequest request,
+            List<IFormFile> files)
         {
-            // map attachments nếu có
-            List<CreateAttachmentCommand>? attachments = request.Attachments?
-                .Select(a => new CreateAttachmentCommand(
-                    a.Filename,
-                    a.Url,
-                    a.ContentType,
-                    a.SizeBytes
-                ))
-                .ToList();
+            // Chuyển đổi các file mới (nếu có) sang DTO
+            var newFilesToUpload = new List<FileToUploadDto>();
+            if (files is not null)
+            {
+                foreach (var file in files)
+                {
+                    if (file.Length > 0)
+                    {
+                        using var memoryStream = new MemoryStream();
+                        await file.CopyToAsync(memoryStream);
 
+                        newFilesToUpload.Add(new FileToUploadDto
+                        {
+                            FileName = file.FileName,
+                            ContentType = file.ContentType,
+                            Content = memoryStream.ToArray()
+                        });
+                    }
+                }
+            }
+
+            // Tạo command với cấu trúc mới, bao gồm cả file mới và file cần xóa
             var command = new UpdatePostCommand(
                 PostId: postId,
                 Title: request.Title,
                 Summary: request.Summary,
                 Content: request.Content,
                 CategoryId: request.CategoryId,
-                Status: request.Status,
-                Attachments: attachments
+                NewFilesToUpload: newFilesToUpload,
+                AttachmentIdsToDelete: request.AttachmentIdsToDelete
             );
 
-            return await Sender.Send(command);
+            return await _sender.Send(command);
         }
 
-       /// <summary>
-       /// Retrieves a paginated list of posts with optional filters.
-       /// </summary>
-       [HttpGet]
+        /// <summary>
+        /// Retrieves a paginated list of posts with optional filters.
+        /// </summary>
+        [HttpGet]
        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
        public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetPublicViewPosts([FromQuery] GetPublicViewPostsRequest request)
@@ -153,7 +169,7 @@ namespace ForumService.Web.Controllers.Post
                     SortOrder: request.SortOrder
                 );
 
-                return await Sender.Send(query);
+                return await _sender.Send(query);
             }
             catch (Exception ex)
             {
