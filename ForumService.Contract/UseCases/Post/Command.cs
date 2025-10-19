@@ -30,7 +30,7 @@ namespace ForumService.Contract.UseCases.Post
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>
-        /// Command to update an existing post.
+        /// Command to update an existing post, including handling of file attachments.
         /// </summary>
         public record UpdatePostCommand(
             Guid PostId,
@@ -38,8 +38,12 @@ namespace ForumService.Contract.UseCases.Post
             string? Summary,
             string Content,
             Guid? CategoryId,
-            List<CreateAttachmentCommand>? Attachments,
-            string Status
+
+            // THAY ĐỔI: Dữ liệu file thô cho các file MỚI cần upload.
+            List<FileToUploadDto>? NewFilesToUpload,
+
+            // THAY ĐỔI: Danh sách ID của các file đính kèm CŨ cần xóa.
+            List<Guid>? AttachmentIdsToDelete
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>

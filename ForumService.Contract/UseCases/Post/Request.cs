@@ -23,16 +23,16 @@ namespace ForumService.Contract.UseCases.Post
         );
 
         /// <summary>
-        /// Request to update an existing post.
+        /// Request để cập nhật một bài viết.
         /// </summary>
         public record UpdatePostRequest(
-            Guid PostId,
+            // PostId đã được xóa khỏi đây vì nó được lấy từ URL route.
             [Required, MaxLength(255)] string Title,
             string? Summary,
             [Required] string Content,
             Guid? CategoryId,
-            string Status,
-            List<CreateAttachmentRequest>? Attachments = null
+            // THÊM VÀO: Một danh sách các ID của file đính kèm cần xóa.
+            List<Guid>? AttachmentIdsToDelete = null
         );
 
         /// <summary>
