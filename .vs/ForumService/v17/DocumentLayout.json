@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}|ForumService.Tests\\ForumService.Tests.csproj|c:\\users\\user\\desktop\\forumservice\\eliosforumservice\\forumservice.tests\\postcontroller\\getmypoststests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}|ForumService.Tests\\ForumService.Tests.csproj|solutionrelative:forumservice.tests\\postcontroller\\getmypoststests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|c:\\users\\user\\desktop\\forumservice\\eliosforumservice\\forumservice.web\\controllers\\post\\postcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|solutionrelative:forumservice.web\\controllers\\post\\postcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -22,7 +26,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 104,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -30,15 +34,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "GetPostDetailsByIdTests.cs",
-              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\GetPostDetailsByIdTests.cs",
-              "RelativeDocumentMoniker": "ForumService.Tests\\PostController\\GetPostDetailsByIdTests.cs",
-              "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\GetPostDetailsByIdTests.cs",
-              "RelativeToolTip": "ForumService.Tests\\PostController\\GetPostDetailsByIdTests.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAAAQwOgAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "GetMyPostsTests.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\GetMyPostsTests.cs",
+              "RelativeDocumentMoniker": "ForumService.Tests\\PostController\\GetMyPostsTests.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\GetMyPostsTests.cs",
+              "RelativeToolTip": "ForumService.Tests\\PostController\\GetMyPostsTests.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACoBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-23T13:56:39.973Z",
+              "WhenOpened": "2025-10-23T14:49:47.021Z",
               "EditorCaption": ""
             },
             {
@@ -451,20 +455,32 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
+              "Title": "GetPostDetailsByIdTests.cs",
+              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\GetPostDetailsByIdTests.cs",
+              "RelativeDocumentMoniker": "ForumService.Tests\\PostController\\GetPostDetailsByIdTests.cs",
+              "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\GetPostDetailsByIdTests.cs",
+              "RelativeToolTip": "ForumService.Tests\\PostController\\GetPostDetailsByIdTests.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAQwOgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-23T13:56:39.973Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "PostController.cs",
               "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Web\\Controllers\\Post\\PostController.cs",
               "RelativeDocumentMoniker": "ForumService.Web\\Controllers\\Post\\PostController.cs",
               "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Web\\Controllers\\Post\\PostController.cs",
               "RelativeToolTip": "ForumService.Web\\Controllers\\Post\\PostController.cs",
-              "ViewState": "AgIAAIIAAAAAAAAAAAAkwJkAAAA8AAAAAAAAAA==",
+              "ViewState": "AgIAAKUAAAAAAAAAAAAowLcAAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-10-23T02:28:28.36Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "GetPublicViewPostsTests.cs",
               "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\GetPublicViewPostsTests.cs",
               "RelativeDocumentMoniker": "ForumService.Tests\\PostController\\GetPublicViewPostsTests.cs",
