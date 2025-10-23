@@ -202,11 +202,13 @@ namespace ForumService.Web.Controllers.Post
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<bool>> DeletePost([FromRoute] Guid postId)
         {
-            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
-            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
-            {
-                return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
-            }
+            //var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            //if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            //{
+            //    return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
+            //}
+
+            var userId = new Guid("3ea1d8be-846d-47eb-9961-7f7d32f37333");
 
             var command = new DeletePostCommand(PostId: postId, RequesterId: userId);
             return await _sender.Send(command);
