@@ -4,7 +4,8 @@ namespace ForumService.Core.Interfaces
 {
     public interface IAppConfiguration
     {
-        EmailConfiguration GetEmailConfiguration();
+ 
         string GetKafkaBootstrapServers();
+        string GetCurrentServiceName();
     }
 }

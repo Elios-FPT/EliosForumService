@@ -192,7 +192,7 @@
           "System.Drawing": "4.0.0.0",
           "System.Drawing.Primitives": "9.0.0.0",
           "System.Dynamic.Runtime": "9.0.0.0",
-          "System.Formats.Asn1.Reference": "9.0.0.0",
+          "System.Formats.Asn1": "9.0.0.0",
           "System.Formats.Tar": "9.0.0.0",
           "System.Globalization.Calendars.Reference": "9.0.0.0",
           "System.Globalization.Reference": "9.0.0.0",
@@ -411,17 +411,6 @@
           "lib/netstandard2.1/AutoMapper.Extensions.Microsoft.DependencyInjection.dll": {}
         }
       },
-      "BouncyCastle.Cryptography/2.6.1": {
-        "runtime": {
-          "lib/net6.0/BouncyCastle.Cryptography.dll": {
-            "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.6.1.59591"
-          }
-        },
-        "compile": {
-          "lib/net6.0/BouncyCastle.Cryptography.dll": {}
-        }
-      },
       "Castle.Core/5.1.1": {
         "dependencies": {
           "System.Diagnostics.EventLog": "9.0.10"
@@ -451,6 +440,17 @@
         }
       },
       "coverlet.collector/6.0.2": {},
+      "Dapper/2.1.66": {
+        "runtime": {
+          "lib/net8.0/Dapper.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.1.66.48463"
+          }
+        },
+        "compile": {
+          "lib/net8.0/Dapper.dll": {}
+        }
+      },
       "librdkafka.redist/2.11.1": {
         "runtimeTargets": {
           "runtimes/linux-arm64/native/librdkafka.so": {
@@ -573,21 +573,6 @@
             "assetType": "native",
             "fileVersion": "1.5.6.0"
           }
-        }
-      },
-      "MailKit/4.14.0": {
-        "dependencies": {
-          "MimeKit": "4.14.0",
-          "System.Formats.Asn1": "8.0.1"
-        },
-        "runtime": {
-          "lib/net8.0/MailKit.dll": {
-            "assemblyVersion": "4.14.0.0",
-            "fileVersion": "4.14.0.0"
-          }
-        },
-        "compile": {
-          "lib/net8.0/MailKit.dll": {}
         }
       },
       "MediatR/13.0.0": {
@@ -1600,21 +1585,6 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "MimeKit/4.14.0": {
-        "dependencies": {
-          "BouncyCastle.Cryptography": "2.6.1",
-          "System.Security.Cryptography.Pkcs": "8.0.1"
-        },
-        "runtime": {
-          "lib/net8.0/MimeKit.dll": {
-            "assemblyVersion": "4.14.0.0",
-            "fileVersion": "4.14.0.0"
-          }
-        },
-        "compile": {
-          "lib/net8.0/MimeKit.dll": {}
-        }
-      },
       "Moq/4.20.72": {
         "dependencies": {
           "Castle.Core": "5.1.1"
@@ -2013,7 +1983,6 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "System.Formats.Asn1/8.0.1": {},
       "System.Globalization/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
@@ -2442,11 +2411,6 @@
           "runtime.native.System.Security.Cryptography.OpenSsl": "4.3.0"
         }
       },
-      "System.Security.Cryptography.Pkcs/8.0.1": {
-        "compile": {
-          "lib/net8.0/System.Security.Cryptography.Pkcs.dll": {}
-        }
-      },
       "System.Security.Cryptography.Primitives/4.3.0": {
         "dependencies": {
           "System.Diagnostics.Debug": "4.3.0",
@@ -2746,8 +2710,8 @@
       "ForumService.Infrastructure/1.0.0": {
         "dependencies": {
           "Confluent.Kafka": "2.11.1",
+          "Dapper": "2.1.66",
           "ForumService.Core": "1.0.0",
-          "MailKit": "4.14.0",
           "Microsoft.EntityFrameworkCore": "9.0.9",
           "Microsoft.Extensions.Caching.Redis": "2.3.0",
           "Microsoft.Extensions.Caching.StackExchangeRedis": "9.0.9",
@@ -3675,7 +3639,7 @@
         },
         "compileOnly": true
       },
-      "System.Formats.Asn1.Reference/9.0.0.0": {
+      "System.Formats.Asn1/9.0.0.0": {
         "compile": {
           "System.Formats.Asn1.dll": {}
         },
@@ -4481,13 +4445,6 @@
       "path": "automapper.extensions.microsoft.dependencyinjection/12.0.0",
       "hashPath": "automapper.extensions.microsoft.dependencyinjection.12.0.0.nupkg.sha512"
     },
-    "BouncyCastle.Cryptography/2.6.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-vZsG2YILhthgRqO+ZVgRff4ZFKKTl0v7kqaVBLCtRvpREhfBP33pcWrdA3PRYgWuFL1RxiUFvjMUHTdBZlJcoA==",
-      "path": "bouncycastle.cryptography/2.6.1",
-      "hashPath": "bouncycastle.cryptography.2.6.1.nupkg.sha512"
-    },
     "Castle.Core/5.1.1": {
       "type": "package",
       "serviceable": true,
@@ -4509,19 +4466,19 @@
       "path": "coverlet.collector/6.0.2",
       "hashPath": "coverlet.collector.6.0.2.nupkg.sha512"
     },
+    "Dapper/2.1.66": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/q77jUgDOS+bzkmk3Vy9SiWMaetTw+NOoPAV0xPBsGVAyljd5S6P+4RUW7R3ZUGGr9lDRyPKgAMj2UAOwvqZYw==",
+      "path": "dapper/2.1.66",
+      "hashPath": "dapper.2.1.66.nupkg.sha512"
+    },
     "librdkafka.redist/2.11.1": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-fgzBgvnvDPyQ+VbGDs4piz7TYv2Gaz9niYv/ztwMoAQ+uyk0wTYR1NmyIKSN8JsE4hr5JHhDccSSNnbAFZQhBA==",
       "path": "librdkafka.redist/2.11.1",
       "hashPath": "librdkafka.redist.2.11.1.nupkg.sha512"
-    },
-    "MailKit/4.14.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-x1J8KIXGP8bWiiLox9g/hSdecqdDcOr9mZa4lumPjT1rvd+mnVm2pOOB4sYgABYcwW2uI7mAQMk7M+4OBD9iiA==",
-      "path": "mailkit/4.14.0",
-      "hashPath": "mailkit.4.14.0.nupkg.sha512"
     },
     "MediatR/13.0.0": {
       "type": "package",
@@ -4922,13 +4879,6 @@
       "path": "microsoft.win32.primitives/4.3.0",
       "hashPath": "microsoft.win32.primitives.4.3.0.nupkg.sha512"
     },
-    "MimeKit/4.14.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-g0LtsMC8DCTkc030C3UgVqbltOJmV5cz4AX8ASowz2ZA+lxopXSYtC1XXYmenxy606aWFLwi5Xy4cC/zyYjbjQ==",
-      "path": "mimekit/4.14.0",
-      "hashPath": "mimekit.4.14.0.nupkg.sha512"
-    },
     "Moq/4.20.72": {
       "type": "package",
       "serviceable": true,
@@ -5230,13 +5180,6 @@
       "path": "system.diagnostics.tracing/4.3.0",
       "hashPath": "system.diagnostics.tracing.4.3.0.nupkg.sha512"
     },
-    "System.Formats.Asn1/8.0.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-XqKba7Mm/koKSjKMfW82olQdmfbI5yqeoLV/tidRp7fbh5rmHAQ5raDI/7SU0swTzv+jgqtUGkzmFxuUg0it1A==",
-      "path": "system.formats.asn1/8.0.1",
-      "hashPath": "system.formats.asn1.8.0.1.nupkg.sha512"
-    },
     "System.Globalization/4.3.0": {
       "type": "package",
       "serviceable": true,
@@ -5502,13 +5445,6 @@
       "sha512": "sha512-h4CEgOgv5PKVF/HwaHzJRiVboL2THYCou97zpmhjghx5frc7fIvlkY1jL+lnIQyChrJDMNEXS6r7byGif8Cy4w==",
       "path": "system.security.cryptography.openssl/4.3.0",
       "hashPath": "system.security.cryptography.openssl.4.3.0.nupkg.sha512"
-    },
-    "System.Security.Cryptography.Pkcs/8.0.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-CoCRHFym33aUSf/NtWSVSZa99dkd0Hm7OCZUxORBjRB16LNhIEOf8THPqzIYlvKM0nNDAPTRBa1FxEECrgaxxA==",
-      "path": "system.security.cryptography.pkcs/8.0.1",
-      "hashPath": "system.security.cryptography.pkcs.8.0.1.nupkg.sha512"
     },
     "System.Security.Cryptography.Primitives/4.3.0": {
       "type": "package",
@@ -6457,7 +6393,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "System.Formats.Asn1.Reference/9.0.0.0": {
+    "System.Formats.Asn1/9.0.0.0": {
       "type": "referenceassembly",
       "serviceable": false,
       "sha512": ""

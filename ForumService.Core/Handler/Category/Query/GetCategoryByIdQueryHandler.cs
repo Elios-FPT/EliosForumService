@@ -29,7 +29,7 @@ namespace ForumService.Core.Handler.Category.Query
         {
             try
             {
-                // Kiểm tra CategoryId hợp lệ
+               
                 if (request.CategoryId == Guid.Empty)
                 {
                     return new BaseResponseDto<CategoryDto>
@@ -40,7 +40,7 @@ namespace ForumService.Core.Handler.Category.Query
                     };
                 }
 
-                // Lấy thể loại từ repository
+               
                 var category = await _categoryRepository.GetByIdAsync(request.CategoryId);
                 if (category == null)
                 {
@@ -52,7 +52,7 @@ namespace ForumService.Core.Handler.Category.Query
                     };
                 }
 
-                // Ánh xạ sang CategoryDto
+               
                 var categoryDto = _mapper.Map<CategoryDto>(category);
 
                 return new BaseResponseDto<CategoryDto>

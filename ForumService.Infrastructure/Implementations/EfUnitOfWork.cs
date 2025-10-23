@@ -1,6 +1,7 @@
-﻿using ForumService.Core.Interfaces;
-using ForumService.Infrastructure.Data;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using ForumService.Core.Interfaces;
+using ForumService.Infrastructure.Data;
 using System;
 using System.Threading.Tasks;
 

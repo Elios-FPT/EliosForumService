@@ -31,7 +31,7 @@ namespace ForumService.Core.Handler.Post.Command
 
         public async Task<BaseResponseDto<bool>> Handle(UpdatePostCommand request, CancellationToken cancellationToken)
         {
-            // 1️⃣ Validate input
+            // 1️ Validate input
             if (request.PostId == Guid.Empty || string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.Content))
             {
                 return new BaseResponseDto<bool> { Status = 400, Message = "PostId, Title, and Content cannot be empty.", ResponseData = false };
@@ -40,7 +40,7 @@ namespace ForumService.Core.Handler.Post.Command
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                // 2️⃣ Lấy post hiện có
+                // 2️ Get the existing post
                 var post = await _postRepository.GetByIdAsync(request.PostId);
                 if (post == null)
                 {
@@ -48,7 +48,7 @@ namespace ForumService.Core.Handler.Post.Command
                     return new BaseResponseDto<bool> { Status = 404, Message = $"Post with ID {request.PostId} not found.", ResponseData = false };
                 }
 
-                // 3️⃣ Xử lý xóa attachments cũ
+                // 3️ Handle deletion of old attachments
                 if (request.AttachmentIdsToDelete is not null && request.AttachmentIdsToDelete.Any())
                 {
                     var attachmentsToDelete = await _attachmentRepository.GetListAsync(
@@ -57,15 +57,11 @@ namespace ForumService.Core.Handler.Post.Command
 
                     if (attachmentsToDelete.Any())
                     {
-                        // TODO: Gọi SUtilityService để xóa file vật lý trên storage.
-                        // Việc này quan trọng để tránh file rác. Bạn sẽ cần một endpoint DeleteFile trong SUtilityService.
-                        // foreach (var attachment in attachmentsToDelete) { ... await _utilityServiceClient.DeleteFileAsync(...); }
-
                         await _attachmentRepository.DeleteRangeAsync(attachmentsToDelete);
                     }
                 }
 
-                // 4️⃣ Xử lý upload attachments mới
+                // 4️ Handle upload of new attachments
                 if (request.NewFilesToUpload is not null && request.NewFilesToUpload.Any())
                 {
                     var newAttachments = new List<Domain.Models.Attachment>();
@@ -89,25 +85,25 @@ namespace ForumService.Core.Handler.Post.Command
                             Url = uploadedUrl,
                             ContentType = file.ContentType,
                             SizeBytes = file.Content.Length,
-                            UploadedBy = post.AuthorId, // Hoặc người dùng đang thực hiện request
+                            UploadedBy = post.AuthorId, // Or the current user performing the request
                             UploadedAt = DateTime.UtcNow
                         });
                     }
                     await _attachmentRepository.AddRangeAsync(newAttachments);
                 }
 
-                // 5️⃣ Cập nhật thông tin bài viết
+                // 5️ Update post information
                 post.Title = request.Title;
                 post.Summary = request.Summary;
                 post.Content = request.Content;
                 post.CategoryId = request.CategoryId;
-                post.Status = "Draw";
+                post.Status = "Draft";
                 post.UpdatedAt = DateTime.UtcNow;
-                // post.UpdatedBy = ... ; // Lấy từ thông tin user hiện tại
+                // post.UpdatedBy = ... ; // Get from the current user information
 
                 await _postRepository.UpdateAsync(post);
 
-                // 6️⃣ Commit transaction
+                // 6️ Commit transaction
                 await _unitOfWork.CommitAsync();
 
                 return new BaseResponseDto<bool> { Status = 200, Message = "Post updated successfully.", ResponseData = true };

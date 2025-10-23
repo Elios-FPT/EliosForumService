@@ -39,7 +39,7 @@ namespace ForumService.Core.Handler.Category.Command
                 };
             }
 
-            // Kiểm tra các bài viết có IsDeleted = false thuộc thể loại này
+            
             var activePostsCount = await _postRepository.GetCountAsync(p =>
                 p.CategoryId == request.CategoryId && !p.IsDeleted);
 
