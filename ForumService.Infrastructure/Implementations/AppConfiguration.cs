@@ -18,12 +18,13 @@ namespace ForumService.Infrastructure.Implementations
             _config = config;
         }
 
-        public EmailConfiguration GetEmailConfiguration()
-            => _config.GetSection("EmailConfiguration").Get<EmailConfiguration>()
-               ?? throw new InvalidOperationException("Missing EmailConfiguration section.");
 
         public string GetKafkaBootstrapServers()
             => _config.GetValue<string>("Kafka:BootstrapServers")
                ?? throw new InvalidOperationException("Missing Kafka BootstrapServers configuration.");
+
+        public string? GetCurrentServiceName()
+            => _config.GetValue<string>("Kafka:CurrentService")
+            ?? throw new InvalidOperationException("Missing Kafka CurrentService configuration.");
     }
 }

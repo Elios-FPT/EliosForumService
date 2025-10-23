@@ -11,49 +11,81 @@ namespace ForumService.Contract.UseCases.Post
 {
     public static class Query
     {
-        /// <summary>
-        /// Query để lấy danh sách bài viết có phân trang và bộ lọc tùy chọn.
-        /// </summary>
-        public record GetPostsQuery(
-            Guid? AuthorId = null,
-            Guid? CategoryId = null,
-            string? Status = null,
-            string? SearchKeyword = null,
-            int Limit = 20,
-            int Offset = 0
-        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
+        // --- Queries for public users (Public API) ---
 
         /// <summary>
-        /// Query để lấy danh sách bài viết công khai có phân trang, bộ lọc, và tùy chọn sắp xếp.
+        /// Query to get a paginated list of PUBLISHED posts for public view.
+        /// This is the most complex query, offering full filtering, sorting, and pagination.
         /// </summary>
         public record GetPublicViewPostsQuery(
             Guid? AuthorId = null,
             Guid? CategoryId = null,
+            string? PostType = null,
             string? SearchKeyword = null,
+            List<string>? Tags = null,
             int Limit = 20,
             int Offset = 0,
-            // --- Các trường mới được thêm vào ---
-            List<string>? Tags = null,
+            string? SortBy = null,
+            string? SortOrder = null
+        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
+
+
+        // --- Queries for moderators (Moderator API) ---
+
+        /// <summary>
+        /// Query for moderators to get a paginated list of posts with 'PendingReview' status.
+        /// This query is simpler, focusing on basic pagination.
+        /// </summary>
+        public record GetPendingPostsQuery(
+            int Limit = 20,
+            int Offset = 0,
+            string? SearchKeyword = null, // Optional: Allows searching within the review queue
+            string? PostType = null // Added: Filter by post type ("Post" or "Solution")
+        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
+
+        /// <summary>
+        /// Query for moderators to get a paginated list of 'Rejected' or soft-deleted posts.
+        /// </summary>
+        public record GetArchivedPostsQuery(
+            int Limit = 20,
+            int Offset = 0,
+            string? SearchKeyword = null, // Optional: Allows searching for a specific archived post
+            string? PostType = null // Added: Filter by post type ("Post" or "Solution")
+        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
+
+        /// <summary>
+        /// Query to get all posts belonging to a specific user (the requester).
+        /// </summary>
+        public record GetMyPostsQuery(
+            Guid RequesterId, // <-- ID of the currently logged-in user
+                              // Filtering
+            string? Status = null,
+            Guid? CategoryId = null,
+            string? PostType = null,
+            string? SearchKeyword = null,
+            // Pagination & Sorting
+            int Limit = 20,
+            int Offset = 0,
             string? SortBy = null,
             string? SortOrder = null
         ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
 
         /// <summary>
-        /// Query để lấy thông tin chi tiết của một bài viết theo ID.
+        /// Query to get the detailed view of a single published post.
         /// </summary>
-        public record GetPostByIdQuery(
+        public record GetPostDetailsByIdQuery(
             Guid PostId
-        ) : IQuery<BaseResponseDto<PostViewDto>>;
+        ) : IQuery<BaseResponseDto<PostViewDetailDto>>;
 
         /// <summary>
-        /// Query để lấy tổng số bài viết của một tác giả.
+        /// Query to get the total number of posts created by a specific author.
         /// </summary>
         public record GetPostCountByAuthorQuery(
             Guid AuthorId
         ) : IQuery<BaseResponseDto<int>>;
 
         /// <summary>
-        /// Query để lấy danh sách bài viết nổi bật (featured).
+        /// Query to get a list of featured posts.
         /// </summary>
         public record GetFeaturedPostsQuery(
             int Limit = 10,
@@ -61,7 +93,7 @@ namespace ForumService.Contract.UseCases.Post
         ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
 
         /// <summary>
-        /// Query để lấy danh sách bài viết theo category.
+        /// Query to get a list of posts by category.
         /// </summary>
         public record GetPostsByCategoryQuery(
             Guid CategoryId,

@@ -11,7 +11,7 @@ namespace ForumService.Contract.UseCases.Category
     public static class Command
     {
         /// <summary>
-        /// Command để tạo mới Category.
+        /// Command for creating a new Category.
         /// </summary>
         public record CreateCategoryCommand(
             string Name,
@@ -20,7 +20,7 @@ namespace ForumService.Contract.UseCases.Category
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>
-        /// Command để cập nhật Category.
+        /// Command for updating an existing Category.
         /// </summary>
         public record UpdateCategoryCommand(
             Guid CategoryId,
@@ -30,7 +30,7 @@ namespace ForumService.Contract.UseCases.Category
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>
-        /// Command để xóa Category.
+        /// Command for deleting a Category.
         /// </summary>
         public record DeleteCategoryCommand(
             Guid CategoryId

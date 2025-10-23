@@ -18,7 +18,6 @@ namespace ForumService.Core.Extensions
     {
         public MappingProfile()
         {
-            // Map 2 chiều giữa Entity và DTO
             CreateMap<Post, PostViewDto>().ReverseMap();
 
             // Mapping Category

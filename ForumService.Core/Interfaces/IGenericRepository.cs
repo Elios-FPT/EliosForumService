@@ -30,7 +30,6 @@ namespace ForumService.Core.Interfaces
             Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? orderBy = null,
             Expression<Func<T, TResult>>? selector = null,
             Expression<Func<IQueryable<T>, IQueryable<T>>>? include = null,
-            string[]? includeProperties = null,
             int? pageSize = null,
             int? pageNumber = null);
         Task<int> GetCountAsync(Expression<Func<T, bool>>? filter = null);

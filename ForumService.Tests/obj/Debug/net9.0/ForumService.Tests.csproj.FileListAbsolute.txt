@@ -954,10 +954,8 @@ C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debu
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Asp.Versioning.Mvc.ApiExplorer.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\AutoMapper.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
-C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\BouncyCastle.Cryptography.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Castle.Core.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Confluent.Kafka.dll
-C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\MailKit.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\MediatR.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\MediatR.Contracts.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Microsoft.AspNetCore.Mvc.Testing.dll
@@ -1013,7 +1011,6 @@ C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debu
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Microsoft.TestPlatform.CrossPlatEngine.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Microsoft.TestPlatform.Utilities.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Microsoft.VisualStudio.TestPlatform.Common.dll
-C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\MimeKit.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Moq.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Newtonsoft.Json.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Npgsql.dll
@@ -1146,3 +1143,5 @@ C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\obj\Debu
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\obj\Debug\net9.0\ForumService.Tests.pdb
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\obj\Debug\net9.0\ForumService.Tests.genruntimeconfig.cache
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\obj\Debug\net9.0\ref\ForumService.Tests.dll
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\appsettings.Local.json
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Tests\bin\Debug\net9.0\Dapper.dll

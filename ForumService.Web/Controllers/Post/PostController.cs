@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using static ForumService.Contract.UseCases.Post.Command;
 using static ForumService.Contract.UseCases.Post.Query;
 using static ForumService.Contract.UseCases.Post.Request;
+using System.IO; 
 
 namespace ForumService.Web.Controllers.Post
 {
@@ -17,7 +18,7 @@ namespace ForumService.Web.Controllers.Post
     [ApiVersion(1)]
     [Produces("application/json")]
     [ControllerName("Post")]
-    [Route("api/v1/[controller]")]
+    [Route("api/v1/posts")] 
     public class PostController : ControllerBase
     {
         protected readonly ISender _sender;
@@ -30,32 +31,17 @@ namespace ForumService.Web.Controllers.Post
         /// <summary>
         /// Creates a new post with optional file attachments.
         /// </summary>
-        /// <remarks>
-        /// <pre>
-        /// Description:
-        /// This endpoint allows creating a new post. It accepts post data via form fields
-        /// and any accompanying files as part of a multipart/form-data request.
-        /// </pre>
-        /// </remarks>
-        /// <param name="request">A <see cref="CreatePostRequest"/> object containing the properties for the new post, sent as form data.</param>
-        /// <param name="files">A list of files to be attached to the post.</param>
-        /// <returns>
-        /// → <seealso cref="CreatePostCommand" /><br/>
-        /// → <seealso cref="CreatePostCommandHandler" /><br/>
-        /// → A boolean indicating success.<br/>
-        /// </returns>
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        // ... các response type khác
-        public async Task<BaseResponseDto<bool>> CreatePost(
-            // THAY ĐỔI 1: Sử dụng [FromForm] để nhận dữ liệu từ form-data
-            [FromForm] CreatePostRequest request,
-
-            // THAY ĐỔI 2: Nhận danh sách file dưới dạng một tham số riêng
-            List<IFormFile> files)
+        public async Task<BaseResponseDto<bool>> CreatePost([FromForm] CreatePostRequest request, List<IFormFile> files)
         {
-            // THAY ĐỔI 3: Logic mới để chuyển đổi IFormFile sang DTO
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
+            }
+
             var filesToUpload = new List<FileToUploadDto>();
             if (files is not null)
             {
@@ -65,7 +51,6 @@ namespace ForumService.Web.Controllers.Post
                     {
                         using var memoryStream = new MemoryStream();
                         await file.CopyToAsync(memoryStream);
-
                         filesToUpload.Add(new FileToUploadDto
                         {
                             FileName = file.FileName,
@@ -76,42 +61,32 @@ namespace ForumService.Web.Controllers.Post
                 }
             }
 
-            // THAY ĐỔI 4: Tạo command với cấu trúc mới
             var command = new CreatePostCommand(
-                AuthorId: request.AuthorId,
+                AuthorId: userId,
                 CategoryId: request.CategoryId,
                 Title: request.Title,
                 Summary: request.Summary,
                 Content: request.Content,
                 PostType: request.PostType,
-                FilesToUpload: filesToUpload // Gửi dữ liệu file thô đến handler
+                FilesToUpload: filesToUpload
             );
-
             return await _sender.Send(command);
         }
-
 
         /// <summary>
         /// Updates an existing post and its file attachments.
         /// </summary>
-        /// <remarks>
-        /// This endpoint handles updating a post's text content, adding new files, and deleting existing files.
-        /// It uses a multipart/form-data request.
-        /// </remarks>
-        /// <param name="postId">The ID of the post to update.</param>
-        /// <param name="request">The post's updated metadata, sent as form data. Include 'attachmentIdsToDelete' to remove existing files.</param>
-        /// <param name="files">A list of NEW files to be attached to the post.</param>
-        /// <returns>A boolean indicating success.</returns>
         [HttpPut("{postId}")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<BaseResponseDto<bool>> UpdatePost(
-            [FromRoute] Guid postId,
-            [FromForm] UpdatePostRequest request,
-            List<IFormFile> files)
+        public async Task<BaseResponseDto<bool>> UpdatePost([FromRoute] Guid postId, [FromForm] UpdatePostRequest request, List<IFormFile> files)
         {
-            // Chuyển đổi các file mới (nếu có) sang DTO
+          
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
+            }
+       
             var newFilesToUpload = new List<FileToUploadDto>();
             if (files is not null)
             {
@@ -121,7 +96,6 @@ namespace ForumService.Web.Controllers.Post
                     {
                         using var memoryStream = new MemoryStream();
                         await file.CopyToAsync(memoryStream);
-
                         newFilesToUpload.Add(new FileToUploadDto
                         {
                             FileName = file.FileName,
@@ -131,10 +105,9 @@ namespace ForumService.Web.Controllers.Post
                     }
                 }
             }
-
-            // Tạo command với cấu trúc mới, bao gồm cả file mới và file cần xóa
             var command = new UpdatePostCommand(
                 PostId: postId,
+                RequesterId: userId, 
                 Title: request.Title,
                 Summary: request.Summary,
                 Content: request.Content,
@@ -142,110 +115,119 @@ namespace ForumService.Web.Controllers.Post
                 NewFilesToUpload: newFilesToUpload,
                 AttachmentIdsToDelete: request.AttachmentIdsToDelete
             );
-
             return await _sender.Send(command);
         }
 
         /// <summary>
-        /// Retrieves a paginated list of posts with optional filters.
+        /// Retrieves a paginated list of PUBLISHED posts.
         /// </summary>
         [HttpGet]
-       [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-       public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetPublicViewPosts([FromQuery] GetPublicViewPostsRequest request)
-       {
-            try
-            {
-                // Ánh xạ toàn bộ các trường từ request sang query
-                var query = new GetPublicViewPostsQuery(
-                    AuthorId: request.AuthorId,
-                    CategoryId: request.CategoryId,
-                    SearchKeyword: request.SearchKeyword,
-                    Limit: request.Limit,
-                    Offset: request.Offset,
-                    // --- Ánh xạ các trường Sort ---
-                    Tags: request.Tags,
-                    SortBy: request.SortBy,
-                    SortOrder: request.SortOrder
-                );
+        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
+        public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetPublicViewPosts([FromQuery] GetPublishedPostsRequest request)
+        {
 
-                return await _sender.Send(query);
-            }
-            catch (Exception ex)
+            var query = new GetPublicViewPostsQuery(
+                AuthorId: request.AuthorId,
+                CategoryId: request.CategoryId,
+                PostType: request.PostType,
+                SearchKeyword: request.SearchKeyword,
+                Limit: request.Limit,
+                Offset: request.Offset,
+                Tags: request.Tags,
+                SortBy: request.SortBy,
+                SortOrder: request.SortOrder
+            );
+            return await _sender.Send(query);
+        }
+
+        /// <summary>
+        /// Retrieves the detailed view of a single published post by its ID.
+        /// </summary>
+        /// <param name="postId">The ID of the post to retrieve.</param>
+        /// <returns>The detailed information of the post.</returns>
+        [HttpGet("{postId}")]
+        [ProducesResponseType(typeof(BaseResponseDto<PostViewDetailDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<BaseResponseDto<PostViewDetailDto>> GetPostDetailsById([FromRoute] Guid postId)
+        {
+           
+            var query = new GetPostDetailsByIdQuery(postId);
+            return await _sender.Send(query);
+        }
+
+        /// <summary>
+        /// Retrieves all posts created by the current authenticated user (excluding soft-deleted posts).
+        /// </summary>
+        /// <remarks>
+        /// This endpoint allows users to see their own posts across all statuses (Draft, PendingReview, Published, Rejected).
+        /// It supports filtering and pagination.
+        /// </remarks>
+        [HttpGet("my-posts")]
+        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetMyPosts([FromQuery] GetMyPostsRequest request)
+        {
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
             {
-                // Phần xử lý lỗi vẫn giữ nguyên
                 return new BaseResponseDto<IEnumerable<PostViewDto>>
                 {
-                    Status = 500,
-                    Message = $"Failed to retrieve posts: {ex.Message}",
+                    Status = 401,
+                    Message = "User not authenticated or invalid/missing X-Auth-Request-User header",
                     ResponseData = Enumerable.Empty<PostViewDto>()
                 };
             }
-        }
-       /*
 
-       /// <summary>
-       /// Retrieves a single post by its ID.
-       /// </summary>
-       [HttpGet("{postId}")]
-       [ProducesResponseType(typeof(BaseResponseDto<PostDto>), StatusCodes.Status200OK)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-       public async Task<BaseResponseDto<PostDto>> GetPostById([FromRoute] GetPostByIdRequest request)
-       {
-           var query = new GetPostByIdQuery(PostId: request.PostId);
-           return await Sender.Send(query);
-       }
+            //var testuserId = new Guid("3ea1d8be-846d-47eb-9961-7f7d32f37333");
+
+            var query = new GetMyPostsQuery(
+                RequesterId: userId,
+                Status: request.Status,
+                CategoryId: request.CategoryId,
+                PostType: request.PostType,
+                SearchKeyword: request.SearchKeyword,
+                Limit: request.Limit,
+                Offset: request.Offset,
+                SortBy: request.SortBy,
+                SortOrder: request.SortOrder
+            );
+
+            return await _sender.Send(query);
+        }
+    
+        /// <summary>
+        /// Deletes a post by its ID. (Soft delete)
+        /// </summary>
+        [HttpDelete("{postId}")]
+        [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
+        public async Task<BaseResponseDto<bool>> DeletePost([FromRoute] Guid postId)
+        {
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
+            }
+
+            var command = new DeletePostCommand(PostId: postId, RequesterId: userId);
+            return await _sender.Send(command);
+        }
 
         /// <summary>
-       /// Deletes a post by its ID.
-       /// </summary>
-       [HttpDelete("{postId}")]
-       [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-       public async Task<BaseResponseDto<bool>> DeletePost([FromRoute] DeletePostRequest request)
-       {
-           var command = new DeletePostCommand(PostId: request.PostId);
-           return await Sender.Send(command);
-       }
+        /// Submits a draft post for review and associates tags with it.
+        /// </summary>
+        [HttpPut("{postId}/submit")]
+        [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
+        public async Task<BaseResponseDto<bool>> SubmitPostForReview([FromRoute] Guid postId, [FromBody] SubmitPostForReviewRequest request)
+        {
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
+            }
 
-       /// <summary>
-       /// Increments the view count of a post.
-       /// </summary>
-       [HttpPut("{postId}/view")]
-       [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-       public async Task<BaseResponseDto<bool>> IncrementViewCount([FromRoute] IncrementViewCountRequest request)
-       {
-           var command = new IncrementViewCountCommand(PostId: request.PostId);
-           return await Sender.Send(command);
-       }
-
-       /// <summary>
-       /// Marks or unmarks a post as featured.
-       /// </summary>
-       [HttpPut("{postId}/feature")]
-       [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-       public async Task<BaseResponseDto<bool>> ToggleFeatured([FromRoute] Guid postId, [FromBody] ToggleFeaturedRequest request)
-       {
-           var command = new ToggleFeaturedCommand(PostId: postId, IsFeatured: request.IsFeatured);
-           return await Sender.Send(command);
-       }
-
-       /// <summary>
-       /// Retrieves the total number of posts by a specific author.
-       /// </summary>
-       [HttpGet("count/by-author")]
-       [ProducesResponseType(typeof(BaseResponseDto<int>), StatusCodes.Status200OK)]
-       [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-       public async Task<BaseResponseDto<int>> GetPostCountByAuthor([FromQuery] GetPostCountByAuthorRequest request)
-       {
-           var query = new GetPostCountByAuthorQuery(AuthorId: request.AuthorId);
-           return await Sender.Send(query);
-       }
-       */
+            var command = new SubmitPostForReviewCommand(postId, userId, request.Tags);
+            return await _sender.Send(command);
+        }
     }
 }
+

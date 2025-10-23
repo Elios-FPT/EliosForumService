@@ -1,56 +1,68 @@
-﻿
+﻿using ForumService.Contract.Message;
+using ForumService.Contract.Models;
 using ForumService.Core.Extensions;
 using ForumService.Core.Interfaces;
+using ForumService.Core.Interfaces.Post;
+using ForumService.Domain.Models;
 using ForumService.Infrastructure.Data;
 using ForumService.Infrastructure.Implementations;
 using ForumService.Infrastructure.Kafka;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Redis;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Polly;
 using Polly.Extensions.Http;
-using SUtility.Infrastructure.Implementations;
+using System;
+using System.Linq;
 using ZiggyCreatures.Caching.Fusion;
 using ZiggyCreatures.Caching.Fusion.Serialization.SystemTextJson;
 
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = Directory.GetCurrentDirectory(),
+    EnvironmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"
+});
 
-// Add DbContext
-builder.Services.AddDbContext<ForumDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("ForumDb")));
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables();
 
-// Add services to the container
 builder.Services.AddControllers();
-
-// Configure Swagger/OpenAPI
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "ForumService API",
         Version = "v1",
-        Description = "API forum operations"
+        Description = "API utility operations"
     });
     c.AddServer(new OpenApiServer { Url = "/" });
 });
 
+// Services Registration
+
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
-builder.Services.AddScoped<IAppCacheService, AppCacheService>();
 builder.Services.AddScoped<IAppConfiguration, AppConfiguration>();
 builder.Services.AddScoped<ICombinedTransaction, CombinedTransaction>();
-builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IKafkaProducer, KafkaProducer>();
-builder.Services.AddScoped(typeof(IKafkaRepository<>), typeof(KafkaRepository<>));
+builder.Services.AddScoped(typeof(IKafkaProducerRepository<>), typeof(KafkaProducerRepository<>));
+builder.Services.AddScoped(typeof(IKafkaConsumerRepository<>), typeof(KafkaConsumerRepository<>));
+builder.Services.AddScoped(typeof(IKafkaConsumerFactory<>), typeof(KafkaConsumerFactory<>));
+builder.Services.AddScoped(typeof(IKafkaResponseHandler<>), typeof(KafkaResponseHandler<>));
 builder.Services.AddScoped<IKafkaTransaction, KafkaTransaction>();
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
-// >>> THÊM VÀO: Đăng ký HTTP Client cho SUtilityService <<<
 builder.Services.AddHttpClient<ISUtilityServiceClient, SUtilityServiceClient>(client =>
 {
-    // Lấy URL của SUtilityService từ file appsettings.json
     string? serviceUrl = builder.Configuration["ServiceUrls:SUtilityService"];
     if (string.IsNullOrEmpty(serviceUrl))
     {
@@ -59,15 +71,14 @@ builder.Services.AddHttpClient<ISUtilityServiceClient, SUtilityServiceClient>(cl
     client.BaseAddress = new Uri(serviceUrl);
 });
 
-// Hàm tạo chính sách Polly
 static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
 {
-    // Cấu hình này sẽ thử lại tối đa 3 lần với thời gian chờ tăng dần theo cấp số nhân (2, 4, 8 giây)
-    // nếu gặp lỗi mạng, lỗi server (5xx), hoặc lỗi request timeout (408).
     return HttpPolicyExtensions
-        .HandleTransientHttpError() // Xử lý các lỗi HTTP tạm thời
+        .HandleTransientHttpError() 
         .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
 }
+
+builder.Services.AddScoped<IPostQueryRepository, PostQueryRepository>();
 
 builder.Services.AddFusionCache()
     .WithSerializer(new FusionCacheSystemTextJsonSerializer())
@@ -87,29 +98,65 @@ if (!string.IsNullOrEmpty(redisConnection))
     }));
 }
 
+// Database Context
+builder.Services.AddDbContext<ForumDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("ForumDb")));
+
+
+
+// MediatR
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(ForumService.Core.AssemblyReference).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(ForumService.Contract.AssemblyReference).Assembly);
 });
 
-var app = builder.Build();
+// Kafka Consumers
+var sourceServices = builder.Configuration.GetSection("Kafka:SourceServices").Get<string[]>() ?? [];
 
-// Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
+Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] Registering {sourceServices.Length} Kafka consumers for sources: [{string.Join(", ", sourceServices)}]");
+
+
+foreach (var sourceService in sourceServices)
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
+    var currentSource = sourceService;
+
+    builder.Services.AddSingleton<IHostedService>(sp =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ForumService API v1");
-        c.DocumentTitle = "ForumService API Documentation";
-        c.RoutePrefix = "swagger";
+        var scopeFactory = sp.GetRequiredService<IServiceScopeFactory>();
+
+        return ActivatorUtilities.CreateInstance<KafkaConsumerHostedService<Post>>(
+            sp,
+            scopeFactory,
+            currentSource
+        );
     });
 }
 
-app.UseHttpsRedirection();
-app.UseRouting(); // Thêm UseRouting để tối ưu middleware
+
+var app = builder.Build();
+
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    using var scope = app.Services.CreateScope();
+    var appConfiguration = scope.ServiceProvider.GetRequiredService<IAppConfiguration>();
+    KafkaResponseConsumer.Initialize(appConfiguration);
+    Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] KafkaResponseConsumer initialized");
+});
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SUtility API v1");
+    c.DocumentTitle = "SUtility API Documentation";
+    c.RoutePrefix = "swagger";
+});
+
 app.UseAuthorization();
 app.MapControllers();
+
+var currentService = builder.Configuration["KafkaCommunication:CurrentService"];
+Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] {currentService} Service Started!");
+Console.WriteLine($"[{DateTime.UtcNow:HH:mm:ss}] Kafka Consumers registered for: [{string.Join(", ", sourceServices)}]");
 
 app.Run();

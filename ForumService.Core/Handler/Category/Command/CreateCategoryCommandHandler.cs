@@ -80,7 +80,6 @@ namespace ForumService.Core.Handler.Category.Command
             if (string.IsNullOrWhiteSpace(name))
                 return string.Empty;
 
-            // Chuẩn hóa và loại bỏ dấu tiếng Việt
             var normalized = name.Normalize(NormalizationForm.FormD);
             var builder = new StringBuilder();
 
@@ -93,16 +92,16 @@ namespace ForumService.Core.Handler.Category.Command
                 }
             }
 
-            // Kết quả sau khi bỏ dấu
+            
             var slug = builder.ToString().Normalize(NormalizationForm.FormC)
                 .ToLower()
-                .Replace("đ", "d") // đặc biệt cho tiếng Việt
+                .Replace("đ", "d") 
                 .Replace(" ", "-");
 
-            // Loại bỏ ký tự đặc biệt
+            
             slug = new string(slug.Where(c => char.IsLetterOrDigit(c) || c == '-').ToArray());
 
-            // Loại bỏ dấu '-' thừa
+            
             while (slug.Contains("--"))
                 slug = slug.Replace("--", "-");
 

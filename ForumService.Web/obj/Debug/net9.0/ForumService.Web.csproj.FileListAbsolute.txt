@@ -410,10 +410,8 @@ C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Asp.Versioning.Mvc.ApiExplorer.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\AutoMapper.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
-C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\BouncyCastle.Cryptography.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Confluent.Kafka.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Humanizer.dll
-C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\MailKit.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\MediatR.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\MediatR.Contracts.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
@@ -455,7 +453,6 @@ C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Microsoft.OpenApi.dll
-C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\MimeKit.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Mono.TextTemplating.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Npgsql.dll
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Npgsql.EntityFrameworkCore.PostgreSQL.dll
@@ -584,3 +581,5 @@ C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\obj\Debug\
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\obj\Debug\net9.0\ForumSer.78F28373.Up2Date
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\obj\Debug\net9.0\ForumService.Web.genruntimeconfig.cache
 C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\obj\Debug\net9.0\ref\ForumService.Web.dll
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\appsettings.Local.json
+C:\Users\User\Desktop\ForumService\EliosForumService\ForumService.Web\bin\Debug\net9.0\Dapper.dll

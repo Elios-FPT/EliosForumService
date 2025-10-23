@@ -12,7 +12,7 @@ namespace ForumService.Contract.UseCases.Category
     public static class Query
     {
         /// <summary>
-        /// Query để lấy danh sách Category (có phân trang và lọc).
+        /// Query to retrieve a list of categories (with pagination and filtering).
         /// </summary>
         public record GetCategoryListQuery(
             string? SearchKeyword = null,
@@ -22,14 +22,14 @@ namespace ForumService.Contract.UseCases.Category
         ) : IQuery<BaseResponseDto<IEnumerable<CategoryDto>>>;
 
         /// <summary>
-        /// Query để lấy chi tiết Category theo ID.
+        /// Query to get category details by ID.
         /// </summary>
         public record GetCategoryByIdQuery(
             Guid CategoryId
         ) : IQuery<BaseResponseDto<CategoryDto>>;
 
         /// <summary>
-        /// Query để lấy danh sách các category đang active.
+        /// Query to retrieve all active categories.
         /// </summary>
         public record GetActiveCategoriesQuery()
             : IQuery<BaseResponseDto<IEnumerable<CategoryDto>>>;

@@ -1,14 +1,15 @@
-﻿namespace ForumService.Core.Interfaces;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
-/// <summary>
-/// Interface for Kafka producer repository handling message production.
-/// </summary>
-public interface IKafkaProducerRepository<T> where T : class
+namespace ForumService.Core.Interfaces
 {
-    Task<string> ProduceCreateAsync(T entity, string? correlationId = null, CancellationToken cancellationToken = default);
-    Task<string> ProduceUpdateAsync(T entity, string? correlationId = null, CancellationToken cancellationToken = default);
-    Task<string> ProduceDeleteAsync(Guid id, string? correlationId = null, CancellationToken cancellationToken = default);
-    Task ProduceGetAllAsync(string correlationId, CancellationToken cancellationToken = default);
-    Task ProduceGetByIdAsync(Guid id, string correlationId, CancellationToken cancellationToken = default);
-    void Dispose();
+    public interface IKafkaProducerRepository<T> where T : class
+    {
+        Task<T> ProduceCreateAsync(T entity, string destinationServiceName, string responseTopic, string? correlationId = null, CancellationToken cancellationToken = default);
+        Task<T> ProduceUpdateAsync(T entity, string destinationServiceName, string responseTopic, string? correlationId = null, CancellationToken cancellationToken = default);
+        Task<Guid> ProduceDeleteAsync(Guid id, string destinationServiceName, string responseTopic, string? correlationId = null, CancellationToken cancellationToken = default);
+        Task<IEnumerable<T>> ProduceGetAllAsync(string destinationServiceName, string responseTopic, string? correlationId = null, CancellationToken cancellationToken = default);
+        Task<T?> ProduceGetByIdAsync(Guid id, string destinationServiceName, string responseTopic, string? correlationId = null, CancellationToken cancellationToken = default);
+        void Dispose();
+    }
 }

@@ -1,36 +1,7 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\",
-  "Documents": [
-    {
-      "AbsoluteMoniker": "D:0:0:{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}|ForumService.Tests\\ForumService.Tests.csproj|c:\\users\\user\\desktop\\forumservice\\eliosforumservice\\forumservice.tests\\postcontroller\\updateposttests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}|ForumService.Tests\\ForumService.Tests.csproj|solutionrelative:forumservice.tests\\postcontroller\\updateposttests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}|ForumService.Tests\\ForumService.Tests.csproj|c:\\users\\user\\desktop\\forumservice\\eliosforumservice\\forumservice.tests\\postcontroller\\createposttests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E0871967-EBF4-4AC3-A59E-56A6CFCC71EE}|ForumService.Tests\\ForumService.Tests.csproj|solutionrelative:forumservice.tests\\postcontroller\\createposttests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{95DA071B-5291-4007-8F29-8C3AC08AEFAB}|ForumService.Contract\\ForumService.Contract.csproj|c:\\users\\user\\desktop\\forumservice\\eliosforumservice\\forumservice.contract\\usecases\\post\\command.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{95DA071B-5291-4007-8F29-8C3AC08AEFAB}|ForumService.Contract\\ForumService.Contract.csproj|solutionrelative:forumservice.contract\\usecases\\post\\command.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|c:\\users\\user\\desktop\\forumservice\\eliosforumservice\\forumservice.web\\controllers\\post\\postcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|solutionrelative:forumservice.web\\controllers\\post\\postcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{95DA071B-5291-4007-8F29-8C3AC08AEFAB}|ForumService.Contract\\ForumService.Contract.csproj|c:\\users\\user\\desktop\\forumservice\\eliosforumservice\\forumservice.contract\\usecases\\post\\request.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{95DA071B-5291-4007-8F29-8C3AC08AEFAB}|ForumService.Contract\\ForumService.Contract.csproj|solutionrelative:forumservice.contract\\usecases\\post\\request.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}|ForumService.Core\\ForumService.Core.csproj|c:\\users\\user\\desktop\\forumservice\\eliosforumservice\\forumservice.core\\handler\\post\\command\\updatepostcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{867C93E5-DB43-4A28-8E3D-3C2C7B44BC2F}|ForumService.Core\\ForumService.Core.csproj|solutionrelative:forumservice.core\\handler\\post\\command\\updatepostcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|c:\\users\\user\\desktop\\forumservice\\eliosforumservice\\forumservice.web\\controllers\\category\\categorycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{150F7754-EA40-4317-B50C-058E3B659AF5}|ForumService.Web\\ForumService.Web.csproj|solutionrelative:forumservice.web\\controllers\\category\\categorycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    }
-  ],
+  "Documents": [],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -38,59 +9,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": -1,
           "Children": [
             {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "CreatePostTests.cs",
-              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\CreatePostTests.cs",
-              "RelativeDocumentMoniker": "ForumService.Tests\\PostController\\CreatePostTests.cs",
-              "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\CreatePostTests.cs",
-              "RelativeToolTip": "ForumService.Tests\\PostController\\CreatePostTests.cs",
-              "ViewState": "AgIAAC8AAAAAAAAAAAAgwNkAAABMAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-19T10:30:02.163Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "UpdatePostTests.cs",
-              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\UpdatePostTests.cs",
-              "RelativeDocumentMoniker": "ForumService.Tests\\PostController\\UpdatePostTests.cs",
-              "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Tests\\PostController\\UpdatePostTests.cs",
-              "RelativeToolTip": "ForumService.Tests\\PostController\\UpdatePostTests.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-19T10:25:11.251Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Request.cs",
-              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\UseCases\\Post\\Request.cs",
-              "RelativeDocumentMoniker": "ForumService.Contract\\UseCases\\Post\\Request.cs",
-              "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\UseCases\\Post\\Request.cs",
-              "RelativeToolTip": "ForumService.Contract\\UseCases\\Post\\Request.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA8AAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-18T23:17:57.454Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "CategoryController.cs",
-              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Web\\Controllers\\Category\\CategoryController.cs",
-              "RelativeDocumentMoniker": "ForumService.Web\\Controllers\\Category\\CategoryController.cs",
-              "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Web\\Controllers\\Category\\CategoryController.cs",
-              "RelativeToolTip": "ForumService.Web\\Controllers\\Category\\CategoryController.cs",
-              "ViewState": "AgIAAE0AAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-19T10:01:09.556Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e1b7d1f8-9b3c-49b1-8f4f-bfc63a88835d}"
             },
             {
               "$type": "Bookmark",
@@ -499,49 +422,6 @@
             {
               "$type": "Bookmark",
               "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "UpdatePostCommandHandler.cs",
-              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Core\\Handler\\Post\\Command\\UpdatePostCommandHandler.cs",
-              "RelativeDocumentMoniker": "ForumService.Core\\Handler\\Post\\Command\\UpdatePostCommandHandler.cs",
-              "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Core\\Handler\\Post\\Command\\UpdatePostCommandHandler.cs",
-              "RelativeToolTip": "ForumService.Core\\Handler\\Post\\Command\\UpdatePostCommandHandler.cs",
-              "ViewState": "AgIAAFcAAAAAAAAAAAAYwGkAAABLAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-19T09:22:21.256Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Command.cs",
-              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\UseCases\\Post\\Command.cs",
-              "RelativeDocumentMoniker": "ForumService.Contract\\UseCases\\Post\\Command.cs",
-              "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\UseCases\\Post\\Command.cs",
-              "RelativeToolTip": "ForumService.Contract\\UseCases\\Post\\Command.cs",
-              "ViewState": "AgIAABMAAAAAAAAAAAAzwCgAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-19T09:21:56.655Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "PostController.cs",
-              "DocumentMoniker": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Web\\Controllers\\Post\\PostController.cs",
-              "RelativeDocumentMoniker": "ForumService.Web\\Controllers\\Post\\PostController.cs",
-              "ToolTip": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Web\\Controllers\\Post\\PostController.cs",
-              "RelativeToolTip": "ForumService.Web\\Controllers\\Post\\PostController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAIcAAAAvAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-16T14:03:20.238Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{e1b7d1f8-9b3c-49b1-8f4f-bfc63a88835d}"
             }
           ]
         },
@@ -618,10 +498,6 @@
             {
               "$type": "Bookmark",
               "Name": "ST:133:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{a80febb4-e7e0-4147-b476-21aaf2453969}"
             },
             {
               "$type": "Bookmark",

@@ -14,7 +14,6 @@ namespace ForumService.Contract.UseCases.Post
         /// Request to create a new post.
         /// </summary>
         public record CreatePostRequest(
-            Guid AuthorId,
             Guid? CategoryId,
             [Required, MaxLength(255)] string Title,
             string? Summary,
@@ -23,15 +22,15 @@ namespace ForumService.Contract.UseCases.Post
         );
 
         /// <summary>
-        /// Request để cập nhật một bài viết.
+        /// Request to update an existing post.
         /// </summary>
         public record UpdatePostRequest(
-            // PostId đã được xóa khỏi đây vì nó được lấy từ URL route.
+            // PostId has been removed because it will be taken from the URL route.
             [Required, MaxLength(255)] string Title,
             string? Summary,
             [Required] string Content,
             Guid? CategoryId,
-            // THÊM VÀO: Một danh sách các ID của file đính kèm cần xóa.
+            // ADDED: A list of attachment IDs that need to be deleted.
             List<Guid>? AttachmentIdsToDelete = null
         );
 
@@ -50,45 +49,77 @@ namespace ForumService.Contract.UseCases.Post
         );
 
         /// <summary>
-        /// Request to get paginated posts with optional filters.
+        /// Request to get a paginated list of published posts with optional filters for public view.
         /// </summary>
-        public record GetPublicViewPostsRequest(
-             // Các trường lọc cũ
-             Guid? AuthorId = null,
-             Guid? CategoryId = null,
-             string? PostType = null,
-             string? SearchKeyword = null,
+        public record GetPublishedPostsRequest(
+            // Filtering
+            Guid? AuthorId = null,
+            Guid? CategoryId = null,
+            string? PostType = null,
+            string? SearchKeyword = null,
+            List<string>? Tags = null,
 
-             // Phân trang
-             int Limit = 20,
-             int Offset = 0,
+            // Pagination
+            int Limit = 20,
+            int Offset = 0,
 
-             // Các trường mới thêm vào
-             List<string>? Tags = null,      // ✨ Lọc theo danh sách tags
-             string? SortBy = null,          // ✨ Sắp xếp theo trường nào (vd: "ViewsCount")
-             string? SortOrder = null        // ✨ Thứ tự sắp xếp (vd: "ASC" hoặc "DESC")
-         );
+            // Sorting
+            string? SortBy = null,     // e.g., "ViewsCount", "CreatedAt"
+            string? SortOrder = null   // e.g., "ASC", "DESC"
+        );
 
         /// <summary>
-        /// Request to increment view count for a post.
+        /// Request to get all posts for the currently authenticated user.
+        /// </summary>
+        public record GetMyPostsRequest(
+            // Filtering
+            string? Status = null, // Allows filtering by Draft, PendingReview, etc.
+            Guid? CategoryId = null,
+            string? PostType = null,
+            string? SearchKeyword = null,
+
+            // Pagination
+            int Limit = 20,
+            int Offset = 0,
+
+            // Sorting
+            string? SortBy = null,
+            string? SortOrder = null
+        );
+
+        /// <summary>
+        /// Request for moderators to get a paginated list of posts pending review.
+        /// </summary>
+        public record GetPendingPostsRequest(
+            int Limit = 20,
+            int Offset = 0,
+            string? SearchKeyword = null,
+            string? PostType = null
+        );
+
+        /// <summary>
+        /// Request for moderators to get a paginated list of archived posts.
+        /// </summary>
+        public record GetArchivedPostsRequest(
+            int Limit = 20,
+            int Offset = 0,
+            string? SearchKeyword = null,
+            string? PostType = null
+        );
+
+        /// <summary>
+        /// Request to increment the view count of a post.
         /// </summary>
         public record IncrementViewCountRequest(
             Guid PostId
         );
 
         /// <summary>
-        /// Request to toggle featured status of a post.
+        /// Request to toggle the featured status of a post.
         /// </summary>
         public record ToggleFeaturedRequest(
             Guid PostId,
             bool IsFeatured
-        );
-
-        /// <summary>
-        /// Request to get total post count by author.
-        /// </summary>
-        public record GetPostCountByAuthorRequest(
-            Guid AuthorId
         );
 
         /// <summary>
@@ -101,5 +132,18 @@ namespace ForumService.Contract.UseCases.Post
             long? SizeBytes
         );
 
+        /// <summary>
+        /// Request to submit a post for review, including its tags.
+        /// </summary>
+        public record SubmitPostForReviewRequest(
+            [Required] List<string> Tags
+        );
+
+        /// <summary>
+        /// Request to reject a post, with an optional reason.
+        /// </summary>
+        public record RejectPostRequest(
+            string? Reason
+        );
     }
 }

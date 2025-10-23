@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace ForumService.Core.Interfaces
 {
-    public interface IKafkaProducer : IDisposable
+    public interface IKafkaProducer
     {
-        Task ProduceAsync(string topic, string key, string value);
+        Task ProduceAsync(string topic, string key, string value, CancellationToken cancellationToken = default);
         void BeginTransaction();
         void CommitTransaction();
         void AbortTransaction();
         void Flush(TimeSpan timeout);
+        void Dispose();
     }
 }

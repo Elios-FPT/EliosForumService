@@ -130,7 +130,7 @@ namespace ForumService.Tests.Controllers.CategoryController
         public async Task UpdateCategory_NameTooLong_ReturnsBadRequest()
         {
             // Arrange
-            var longName = new string('A', 101); // Vượt quá giới hạn 100 ký tự
+            var longName = new string('A', 101); 
             var request = new UpdateCategoryRequest(_validCategoryId, longName, "Updated Description", false);
             var command = new UpdateCategoryCommand(_validCategoryId, request.Name, request.Description, request.IsActive);
             var expectedResponse = new BaseResponseDto<bool> { Status = 400, Message = "Category name is too long.", ResponseData = false };
@@ -151,7 +151,7 @@ namespace ForumService.Tests.Controllers.CategoryController
         public async Task UpdateCategory_DescriptionTooLong_ReturnsBadRequest()
         {
             // Arrange
-            var longDescription = new string('A', 1001); // Giả sử giới hạn là 1000 ký tự
+            var longDescription = new string('A', 1001); 
             var request = new UpdateCategoryRequest(_validCategoryId, "Updated Category", longDescription, false);
             var command = new UpdateCategoryCommand(_validCategoryId, request.Name, request.Description, request.IsActive);
             var expectedResponse = new BaseResponseDto<bool> { Status = 400, Message = "Description is too long.", ResponseData = false };

@@ -13,6 +13,7 @@ namespace ForumService.Contract.TransferObjects.Post
         public string Title { get; set; } = null!;
         public string? Summary { get; set; }
         public string PostType { get; set; }
+        public string Status { get; set; }
         public long ViewsCount { get; set; }
         public int CommentCount { get; set; }
         public int UpvoteCount { get; set; }
@@ -20,8 +21,12 @@ namespace ForumService.Contract.TransferObjects.Post
         public bool IsFeatured { get; set; }
         public DateTime CreatedAt { get; set; }
 
-        // thêm những trường tiện lợi cho client
         public string? CategoryName { get; set; }
         public List<string>? Tags { get; set; } = new();
+
+        public string? AuthorFirstName { get; set; }
+        public string? AuthorLastName { get; set; }
+        public string? AuthorAvatarUrl { get; set; }
+        public string AuthorFullName => $"{AuthorFirstName} {AuthorLastName}".Trim();
     }
 }
