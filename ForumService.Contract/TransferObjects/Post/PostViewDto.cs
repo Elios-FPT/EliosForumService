@@ -9,9 +9,10 @@ namespace ForumService.Contract.TransferObjects.Post
     public class PostViewDto
     {
         public Guid PostId { get; set; }
-        public Guid AuthorId { get; set; }
+        public Guid AuthorId { get; set; } = Guid.Empty;
+        public Guid? CategoryId { get; set; }
         public string Title { get; set; } = null!;
-        public string? Summary { get; set; }
+        public string Content { get; set; }
         public string PostType { get; set; }
         public string Status { get; set; }
         public long ViewsCount { get; set; }

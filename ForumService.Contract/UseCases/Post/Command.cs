@@ -18,7 +18,6 @@ namespace ForumService.Contract.UseCases.Post
             Guid AuthorId,
             Guid? CategoryId,
             string Title,
-            string? Summary,
             string Content,
             string? PostType,
             // CHANGE HERE:

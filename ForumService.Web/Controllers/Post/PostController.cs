@@ -42,6 +42,8 @@ namespace ForumService.Web.Controllers.Post
                 return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
             }
 
+            //var userId = new Guid("3ea1d8be-846d-47eb-9961-7f7d32f37333");
+
             var filesToUpload = new List<FileToUploadDto>();
             if (files is not null)
             {
@@ -65,7 +67,6 @@ namespace ForumService.Web.Controllers.Post
                 AuthorId: userId,
                 CategoryId: request.CategoryId,
                 Title: request.Title,
-                Summary: request.Summary,
                 Content: request.Content,
                 PostType: request.PostType,
                 FilesToUpload: filesToUpload
@@ -167,18 +168,18 @@ namespace ForumService.Web.Controllers.Post
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetMyPosts([FromQuery] GetMyPostsRequest request)
         {
-            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
-            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
-            {
-                return new BaseResponseDto<IEnumerable<PostViewDto>>
-                {
-                    Status = 401,
-                    Message = "User not authenticated or invalid/missing X-Auth-Request-User header",
-                    ResponseData = Enumerable.Empty<PostViewDto>()
-                };
-            }
+            //var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            //if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            //{
+            //    return new BaseResponseDto<IEnumerable<PostViewDto>>
+            //    {
+            //        Status = 401,
+            //        Message = "User not authenticated or invalid/missing X-Auth-Request-User header",
+            //        ResponseData = Enumerable.Empty<PostViewDto>()
+            //    };
+            //}
 
-            //var testuserId = new Guid("3ea1d8be-846d-47eb-9961-7f7d32f37333");
+            var userId = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa9");
 
             var query = new GetMyPostsQuery(
                 RequesterId: userId,
@@ -202,13 +203,13 @@ namespace ForumService.Web.Controllers.Post
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<bool>> DeletePost([FromRoute] Guid postId)
         {
-            //var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
-            //if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
-            //{
-            //    return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
-            //}
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
+            }
 
-            var userId = new Guid("3ea1d8be-846d-47eb-9961-7f7d32f37333");
+            //var userId = new Guid("3ea1d8be-846d-47eb-9961-7f7d32f37333");
 
             var command = new DeletePostCommand(PostId: postId, RequesterId: userId);
             return await _sender.Send(command);
@@ -226,6 +227,8 @@ namespace ForumService.Web.Controllers.Post
             {
                 return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
             }
+
+            //var userId = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa9");
 
             var command = new SubmitPostForReviewCommand(postId, userId, request.Tags);
             return await _sender.Send(command);

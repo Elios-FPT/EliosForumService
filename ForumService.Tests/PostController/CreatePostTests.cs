@@ -59,7 +59,7 @@ namespace ForumService.Tests.PostController
         public async Task CreatePost_WithValidDataAndNoFiles_ReturnsSuccess()
         {
             // Arrange
-            var request = new CreatePostRequest(CategoryId: null, Title: "Valid Title", Summary: "Summary", Content: "Valid Content", PostType: "Post");
+            var request = new CreatePostRequest(CategoryId: null, Title: "Valid Title", Content: "Valid Content", PostType: "Post");
             var files = new List<IFormFile>();
             var expectedResponse = new BaseResponseDto<bool> { Status = 200, ResponseData = true };
 
@@ -85,7 +85,7 @@ namespace ForumService.Tests.PostController
         public async Task CreatePost_WithValidDataAndOneFile_ReturnsSuccess()
         {
             // Arrange
-            var request = new CreatePostRequest(null, "Post With File", "Summary", "Content", "Post");
+            var request = new CreatePostRequest(null, "Post With File", "Content", "Post");
             var mockFile = CreateMockFormFile("test.txt", "file content");
             var files = new List<IFormFile> { mockFile };
             var expectedResponse = new BaseResponseDto<bool> { Status = 200, ResponseData = true };
@@ -111,7 +111,7 @@ namespace ForumService.Tests.PostController
         public async Task CreatePost_WithValidDataAndMultipleFiles_ReturnsSuccess()
         {
             // Arrange
-            var request = new CreatePostRequest(null, "Post With Multiple Files", "Summary", "Content", "Post");
+            var request = new CreatePostRequest(null, "Post With Multiple Files", "Content", "Post");
             var files = new List<IFormFile>
             {
                 CreateMockFormFile("file1.txt", "content1"),
@@ -143,7 +143,7 @@ namespace ForumService.Tests.PostController
             var httpContextWithoutHeader = new DefaultHttpContext();
             _controller.ControllerContext = new ControllerContext() { HttpContext = httpContextWithoutHeader };
 
-            var request = new CreatePostRequest(null, "Title", "Summary", "Content", "Post");
+            var request = new CreatePostRequest(null, "Title", "Content", "Post");
             var files = new List<IFormFile>();
 
             // Act
@@ -166,7 +166,7 @@ namespace ForumService.Tests.PostController
             httpContextInvalidHeader.Request.Headers["X-Auth-Request-User"] = "not-a-guid";
             _controller.ControllerContext = new ControllerContext() { HttpContext = httpContextInvalidHeader };
 
-            var request = new CreatePostRequest(null, "Title", "Summary", "Content", "Post");
+            var request = new CreatePostRequest(null, "Title", "Content", "Post");
             var files = new List<IFormFile>();
 
             // Act
@@ -185,7 +185,7 @@ namespace ForumService.Tests.PostController
         public async Task CreatePost_WithZeroLengthFile_ShouldIgnoreTheFile()
         {
             // Arrange
-            var request = new CreatePostRequest(null, "Post With Empty File", "Summary", "Content", "Post");
+            var request = new CreatePostRequest(null, "Post With Empty File", "Content", "Post");
             var emptyFile = new FormFile(new MemoryStream(), 0, 0, "files", "empty.txt");
             var files = new List<IFormFile> { emptyFile };
             var expectedResponse = new BaseResponseDto<bool> { Status = 200, ResponseData = true };
@@ -209,7 +209,7 @@ namespace ForumService.Tests.PostController
         public async Task CreatePost_WithNullFileList_ShouldSucceedWithoutFiles()
         {
             // Arrange
-            var request = new CreatePostRequest(null, "Post With Null Files", "Summary", "Content", "Post");
+            var request = new CreatePostRequest(null, "Post With Null Files", "Content", "Post");
             var expectedResponse = new BaseResponseDto<bool> { Status = 200, ResponseData = true };
 
             _senderMock.Setup(s => s.Send(It.IsAny<CreatePostCommand>(), It.IsAny<CancellationToken>()))
@@ -231,7 +231,7 @@ namespace ForumService.Tests.PostController
         public async Task CreatePost_HandlerReturnsBadRequest_ControllerReturnsSameResponse()
         {
             // Arrange
-            var request = new CreatePostRequest(null, "Invalid Post", "Summary", "Content", "Post");
+            var request = new CreatePostRequest(null, "Invalid Post", "Content", "Post");
             var files = new List<IFormFile>();
             var expectedResponse = new BaseResponseDto<bool> { Status = 400, Message = "Handler validation failed.", ResponseData = false };
 
@@ -253,7 +253,7 @@ namespace ForumService.Tests.PostController
         public async Task CreatePost_HandlerReturnsInternalError_ControllerReturnsSameResponse()
         {
             // Arrange
-            var request = new CreatePostRequest(null, "Post that fails", "Summary", "Content", "Post");
+            var request = new CreatePostRequest(null, "Post that fails", "Content", "Post");
             var mockFile = CreateMockFormFile("fail.txt", "content");
             var files = new List<IFormFile> { mockFile };
             var expectedResponse = new BaseResponseDto<bool> { Status = 500, Message = "Failed to upload file: fail.txt. Post creation cancelled.", ResponseData = false };
@@ -276,7 +276,7 @@ namespace ForumService.Tests.PostController
         public async Task CreatePost_SenderThrowsException_ShouldPropagateException()
         {
             // Arrange
-            var request = new CreatePostRequest(null, "Exception Post", "Summary", "Content", "Post");
+            var request = new CreatePostRequest(null, "Exception Post", "Content", "Post");
             var files = new List<IFormFile>();
             _senderMock.Setup(s => s.Send(It.IsAny<CreatePostCommand>(), It.IsAny<CancellationToken>()))
                        .ThrowsAsync(new System.InvalidOperationException("Database connection failed"));
@@ -292,7 +292,7 @@ namespace ForumService.Tests.PostController
         {
             // Arrange
             var categoryId = Guid.NewGuid();
-            var request = new CreatePostRequest(categoryId, "Mapping Test", "Summary text", "Content text", "Solution");
+            var request = new CreatePostRequest(categoryId, "Mapping Test", "Content text", "Solution");
             var mockFile = CreateMockFormFile("mapping.txt", "map content");
             var files = new List<IFormFile> { mockFile };
 
@@ -309,7 +309,6 @@ namespace ForumService.Tests.PostController
             Assert.Equal(_testUserId, capturedCommand.AuthorId);
             Assert.Equal(request.CategoryId, capturedCommand.CategoryId);
             Assert.Equal(request.Title, capturedCommand.Title);
-            Assert.Equal(request.Summary, capturedCommand.Summary);
             Assert.Equal(request.Content, capturedCommand.Content);
             Assert.Equal(request.PostType, capturedCommand.PostType);
             Assert.NotNull(capturedCommand.FilesToUpload);
@@ -324,7 +323,7 @@ namespace ForumService.Tests.PostController
         public async Task CreatePost_WithNullSummaryAndCategory_ShouldMapCorrectly()
         {
             // Arrange
-            var request = new CreatePostRequest(null, "Title", null, "Content", "Post");
+            var request = new CreatePostRequest(null, "Title", "Content", "Post");
             var files = new List<IFormFile>();
 
             CreatePostCommand capturedCommand = null;
@@ -339,7 +338,6 @@ namespace ForumService.Tests.PostController
             Assert.NotNull(capturedCommand);
             Assert.Equal(_testUserId, capturedCommand.AuthorId); 
             Assert.Null(capturedCommand.CategoryId);
-            Assert.Null(capturedCommand.Summary);
             Assert.Equal(request.Title, capturedCommand.Title);
             Assert.Equal(request.Content, capturedCommand.Content);
             Assert.Equal("Post", capturedCommand.PostType); 

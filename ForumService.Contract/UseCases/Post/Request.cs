@@ -16,7 +16,6 @@ namespace ForumService.Contract.UseCases.Post
         public record CreatePostRequest(
             Guid? CategoryId,
             [Required, MaxLength(255)] string Title,
-            string? Summary,
             [Required] string Content,
             string PostType = "Post"   // "Post" | "Solution"
         );
