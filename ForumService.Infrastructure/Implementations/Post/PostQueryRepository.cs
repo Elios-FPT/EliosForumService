@@ -33,7 +33,7 @@ namespace ForumService.Infrastructure.Implementations
 
             sqlBuilder.AppendLine(@"
 SELECT
-    p.""PostId"", p.""AuthorId"", p.""Title"", p.""Summary"", p.""Content"",
+    p.""PostId"", p.""AuthorId"", p.""CategoryId"", p.""Title"", p.""Summary"", p.""Content"",
     p.""ViewsCount"", p.""CommentCount"", p.""UpvoteCount"", p.""DownvoteCount"", p.""CreatedAt"",
     c.""Name"" AS CategoryName,
     (SELECT STRING_AGG(t.""Name"", ',') FROM ""Tags"" t JOIN ""PostTags"" pt ON t.""TagId"" = pt.""TagId"" WHERE pt.""PostId"" = p.""PostId"") AS Tags

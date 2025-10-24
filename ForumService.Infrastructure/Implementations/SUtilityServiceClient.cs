@@ -32,7 +32,7 @@ namespace ForumService.Infrastructure.Implementations
 
                 content.Add(fileContent, "file", file.FileName);
 
-                var requestUri = $"api/v1/Storage/upload?keyPrefix={Uri.EscapeDataString(keyPrefix)}&fileName={Uri.EscapeDataString(file.FileName)}";
+                var requestUri = $"api/v1/Storage?keyPrefix={Uri.EscapeDataString(keyPrefix)}&fileName={Uri.EscapeDataString(file.FileName)}";
                 var response = await _httpClient.PostAsync(requestUri, content, cancellationToken);
 
                 if (!response.IsSuccessStatusCode)

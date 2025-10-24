@@ -49,7 +49,6 @@ namespace ForumService.Core.Handler.Post.Command
                     AuthorId = request.AuthorId,
                     CategoryId = request.CategoryId,
                     Title = request.Title,
-                    Summary = request.Summary,
                     Content = request.Content,
                     PostType = request.PostType ?? "Post",
                     Status = "Draft",
