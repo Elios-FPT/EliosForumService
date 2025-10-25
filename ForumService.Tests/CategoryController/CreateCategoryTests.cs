@@ -13,7 +13,7 @@ using static ForumService.Contract.UseCases.Category.Command;
 using static ForumService.Contract.UseCases.Category.Request;
 using static ForumService.Contract.UseCases.Category.Query;
 
-namespace ForumService.Tests.CategoryController
+namespace ForumService.Tests.Controllers.CategoryController
 {
     public class CreateCategoryTests
     {

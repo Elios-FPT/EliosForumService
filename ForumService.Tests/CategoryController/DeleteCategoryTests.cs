@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Xunit;
 using static ForumService.Contract.UseCases.Category.Request;
 using static ForumService.Contract.UseCases.Category.Command;
-using static ForumService.Contract.UseCases.Category.Request;
 
 namespace ForumService.Tests.Controllers.CategoryController
 {
