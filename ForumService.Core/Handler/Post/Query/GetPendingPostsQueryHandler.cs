@@ -16,16 +16,20 @@ namespace ForumService.Core.Handler.Post.Query
 {
     public class GetPendingPostsQueryHandler : IQueryHandler<GetPendingPostsQuery, BaseResponseDto<IEnumerable<PostViewDto>>>
     {
-
         private readonly IPostQueryRepository _postQueryRepository;
         private readonly IKafkaProducerRepository<User> _producerRepository;
+        private readonly IGenericRepository<Domain.Models.Category> _categoryRepository;
         private const string ResponseTopic = "user-forum-user";
         private const string DestinationService = "user";
 
-        public GetPendingPostsQueryHandler(IPostQueryRepository postQueryRepository, IKafkaProducerRepository<User> producerRepository)
+        public GetPendingPostsQueryHandler(
+            IPostQueryRepository postQueryRepository,
+            IKafkaProducerRepository<User> producerRepository,
+            IGenericRepository<Domain.Models.Category> categoryRepository)
         {
             _postQueryRepository = postQueryRepository ?? throw new ArgumentNullException(nameof(postQueryRepository));
             _producerRepository = producerRepository ?? throw new ArgumentNullException(nameof(producerRepository));
+            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
         public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> Handle(GetPendingPostsQuery request, CancellationToken cancellationToken)
@@ -42,49 +46,64 @@ namespace ForumService.Core.Handler.Post.Query
 
             try
             {
+                var posts = (await _postQueryRepository.GetPendingPostsAsync(request)).ToList();
 
-                var postDtos = (await _postQueryRepository.GetPendingPostsAsync(request)).ToList();
-
-                if (!postDtos.Any())
+                if (!posts.Any())
                 {
                     return new BaseResponseDto<IEnumerable<PostViewDto>>
                     {
                         Status = 200,
                         Message = "No pending posts found.",
-                        ResponseData = postDtos
+                        ResponseData = Enumerable.Empty<PostViewDto>()
                     };
                 }
 
+                Dictionary<Guid, User> userProfilesDict;
 
                 try
                 {
-                    var authorIds = postDtos.Select(p => p.AuthorId).Distinct().ToList();
-                    if (authorIds.Any())
-                    {
+                    var userProfilesList = await _producerRepository.ProduceGetAllAsync(
+                        DestinationService,
+                        ResponseTopic);
 
-                        var userProfilesList = await _producerRepository.ProduceGetAllAsync(
-                            DestinationService,
-                            ResponseTopic);
-
-                        var userProfilesDict = userProfilesList.ToDictionary(u => u.id);
-
-
-                        foreach (var post in postDtos)
-                        {
-                            if (userProfilesDict.TryGetValue(post.AuthorId, out var author))
-                            {
-                                post.AuthorFirstName = author.firstName;
-                                post.AuthorLastName = author.lastName;
-                                post.AuthorAvatarUrl = author.avatarUrl;
-                            }
-                        }
-                    }
+                    userProfilesDict = userProfilesList.ToDictionary(u => u.id);
                 }
-                catch (Exception userEx)
+                catch (Exception)
                 {
-
+                    userProfilesDict = new Dictionary<Guid, User>();
                 }
 
+                var postDtos = new List<PostViewDto>();
+
+                foreach (var post in posts)
+                {
+                    userProfilesDict.TryGetValue(post.AuthorId, out var authorProfile);
+
+                    var postDto = new PostViewDto
+                    {
+                        PostId = post.PostId,
+                        AuthorId = post.AuthorId,
+                        CategoryId = post.CategoryId,
+                        Title = post.Title,
+                        Content = post.Content,
+                        PostType = post.PostType,
+                        Status = post.Status,
+                        ViewsCount = post.ViewsCount,
+                        CommentCount = post.CommentCount,
+                        UpvoteCount = post.UpvoteCount,
+                        DownvoteCount = post.DownvoteCount,
+                        IsFeatured = post.IsFeatured,
+                        CreatedAt = post.CreatedAt,
+                        AuthorFirstName = authorProfile?.firstName,
+                        AuthorLastName = authorProfile?.lastName,
+                        AuthorAvatarUrl = authorProfile?.avatarUrl
+                    };
+
+                    var category = await _categoryRepository.GetByIdAsync(post.CategoryId);
+                    postDto.CategoryName = category?.Name;
+
+                    postDtos.Add(postDto);
+                }
 
                 return new BaseResponseDto<IEnumerable<PostViewDto>>
                 {
@@ -105,4 +124,3 @@ namespace ForumService.Core.Handler.Post.Query
         }
     }
 }
-

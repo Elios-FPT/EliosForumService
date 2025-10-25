@@ -21,10 +21,7 @@ namespace ForumService.Contract.TransferObjects.Post
         public int DownvoteCount { get; set; }
         public bool IsFeatured { get; set; }
         public DateTime CreatedAt { get; set; }
-
         public string? CategoryName { get; set; }
-        public List<string>? Tags { get; set; } = new();
-
         public string? AuthorFirstName { get; set; }
         public string? AuthorLastName { get; set; }
         public string? AuthorAvatarUrl { get; set; }

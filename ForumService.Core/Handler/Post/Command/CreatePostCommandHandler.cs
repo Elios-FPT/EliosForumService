@@ -75,7 +75,7 @@ namespace ForumService.Core.Handler.Post.Command
                         if (string.IsNullOrEmpty(uploadedUrl))
                         {
                             await _unitOfWork.RollbackAsync();
-                            return new BaseResponseDto<bool> { Status = 500, Message = $"Failed to upload file: {file.FileName}. Post creation cancelled.", ResponseData = false };
+                            return new BaseResponseDto<bool> { Status = 400, Message = $"Failed to upload file: {file.FileName}. Post creation cancelled.", ResponseData = false };
                         }
 
                         attachments.Add(new Domain.Models.Attachment
