@@ -94,7 +94,6 @@ namespace ForumService.Tests.PostController
                 CategoryId: categoryId,
                 PostType: "Solution",
                 SearchKeyword: "search",
-                Tags: tags,
                 Limit: 10,
                 Offset: 5,
                 SortBy: "ViewsCount",
@@ -117,7 +116,6 @@ namespace ForumService.Tests.PostController
             Assert.Equal(request.SearchKeyword, capturedQuery.SearchKeyword);
             Assert.Equal(request.Limit, capturedQuery.Limit);
             Assert.Equal(request.Offset, capturedQuery.Offset);
-            Assert.Equal(request.Tags, capturedQuery.Tags);
             Assert.Equal(request.SortBy, capturedQuery.SortBy);
             Assert.Equal(request.SortOrder, capturedQuery.SortOrder);
         }
@@ -185,7 +183,6 @@ namespace ForumService.Tests.PostController
             Assert.Null(capturedQuery.SearchKeyword);
             Assert.Equal(20, capturedQuery.Limit); // Default value from record
             Assert.Equal(0, capturedQuery.Offset);  // Default value from record
-            Assert.Null(capturedQuery.Tags);
             Assert.Null(capturedQuery.SortBy);     // Default value from record
             Assert.Null(capturedQuery.SortOrder);  // Default value from record
         }
@@ -267,7 +264,6 @@ namespace ForumService.Tests.PostController
                 CategoryId: null,
                 PostType: null,
                 SearchKeyword: "", // Empty string
-                Tags: new List<string>(), // Empty list
                 SortBy: null,
                 SortOrder: null
             );
@@ -286,7 +282,6 @@ namespace ForumService.Tests.PostController
             Assert.Null(capturedQuery.CategoryId);
             Assert.Null(capturedQuery.PostType);
             Assert.Equal("", capturedQuery.SearchKeyword); // Empty string mapped correctly
-            Assert.Empty(capturedQuery.Tags); // Empty list mapped correctly
             Assert.Null(capturedQuery.SortBy);
             Assert.Null(capturedQuery.SortOrder);
         }

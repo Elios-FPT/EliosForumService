@@ -1,8 +1,6 @@
 ﻿using Dapper;
-using ForumService.Contract.TransferObjects.Comment;
-using ForumService.Contract.TransferObjects.Post;
-using ForumService.Core.Interfaces;
 using ForumService.Core.Interfaces.Post;
+using ForumService.Domain.Models;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 using System;
@@ -12,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Post.Query;
 
-namespace ForumService.Infrastructure.Implementations
+namespace ForumService.Infrastructure.Implementations.Post
 {
     public class PostQueryRepository : IPostQueryRepository
     {
@@ -24,7 +22,7 @@ namespace ForumService.Infrastructure.Implementations
                 ?? throw new InvalidOperationException("Connection string 'ForumDb' not found.");
         }
 
-        public async Task<IEnumerable<PostViewDto>> GetPublicViewPostsAsync(GetPublicViewPostsQuery request)
+        public async Task<IEnumerable<Domain.Models.Post>> GetPublicViewPostsAsync(GetPublicViewPostsQuery request)
         {
             await using var connection = new NpgsqlConnection(_connectionString);
 
@@ -67,11 +65,6 @@ LEFT JOIN ""Categories"" c ON p.""CategoryId"" = c.""CategoryId""
                 whereClauses.Add(@"(p.""Title"" ILIKE @SearchKeyword OR p.""Summary"" ILIKE @SearchKeyword)");
                 parameters.Add("SearchKeyword", $"%{request.SearchKeyword}%");
             }
-            if (request.Tags != null && request.Tags.Any())
-            {
-                whereClauses.Add(@"p.""PostId"" IN (SELECT pt_inner.""PostId"" FROM ""PostTags"" pt_inner JOIN ""Tags"" t_inner ON pt_inner.""TagId"" = t_inner.""TagId"" WHERE t_inner.""Name"" = ANY(@Tags))");
-                parameters.Add("Tags", request.Tags);
-            }
 
             sqlBuilder.Append("WHERE ").AppendLine(string.Join(" AND ", whereClauses));
 
@@ -89,11 +82,11 @@ LEFT JOIN ""Categories"" c ON p.""CategoryId"" = c.""CategoryId""
             parameters.Add("Limit", request.Limit);
             parameters.Add("Offset", request.Offset);
 
-            return await connection.QueryAsync<PostViewDto>(sqlBuilder.ToString(), parameters);
+            return await connection.QueryAsync<Domain.Models.Post>(sqlBuilder.ToString(), parameters);
         }
 
 
-        public async Task<IEnumerable<PostViewDto>> GetPendingPostsAsync(GetPendingPostsQuery request)
+        public async Task<IEnumerable<Domain.Models.Post>> GetPendingPostsAsync(GetPendingPostsQuery request)
         {
             await using var connection = new NpgsqlConnection(_connectionString);
             var sqlBuilder = new StringBuilder();
@@ -130,10 +123,10 @@ LEFT JOIN ""Categories"" c ON p.""CategoryId"" = c.""CategoryId""
             parameters.Add("Limit", request.Limit);
             parameters.Add("Offset", request.Offset);
 
-            return await connection.QueryAsync<PostViewDto>(sqlBuilder.ToString(), parameters);
+            return await connection.QueryAsync<Domain.Models.Post>(sqlBuilder.ToString(), parameters);
         }
 
-        public async Task<IEnumerable<PostViewDto>> GetArchivedPostsAsync(GetArchivedPostsQuery request)
+        public async Task<IEnumerable<Domain.Models.Post>> GetArchivedPostsAsync(GetArchivedPostsQuery request)
         {
             await using var connection = new NpgsqlConnection(_connectionString);
             var sqlBuilder = new StringBuilder();
@@ -169,10 +162,10 @@ LEFT JOIN ""Categories"" c ON p.""CategoryId"" = c.""CategoryId""
             parameters.Add("Limit", request.Limit);
             parameters.Add("Offset", request.Offset);
 
-            return await connection.QueryAsync<PostViewDto>(sqlBuilder.ToString(), parameters);
+            return await connection.QueryAsync<Domain.Models.Post>(sqlBuilder.ToString(), parameters);
         }
 
-        public async Task<IEnumerable<PostViewDto>> GetMyPostsAsync(GetMyPostsQuery request)
+        public async Task<IEnumerable<Domain.Models.Post>> GetMyPostsAsync(GetMyPostsQuery request)
         {
             await using var connection = new NpgsqlConnection(_connectionString);
             var sqlBuilder = new StringBuilder();
@@ -229,59 +222,10 @@ LEFT JOIN ""Categories"" c ON p.""CategoryId"" = c.""CategoryId""
             parameters.Add("Limit", request.Limit);
             parameters.Add("Offset", request.Offset);
 
-            return await connection.QueryAsync<PostViewDto>(sqlBuilder.ToString(), parameters);
+            return await connection.QueryAsync<Domain.Models.Post>(sqlBuilder.ToString(), parameters);
         }
 
-        public async Task<(PostViewDetailDto? Post, IEnumerable<CommentDto> Comments)> GetPostDetailsByIdAsync(Guid postId)
-        {
-            await using var connection = new NpgsqlConnection(_connectionString);
-
-            var sql = @"
-                -- Query 1: Get Post Details
-                SELECT
-                    p.""PostId"", p.""AuthorId"", p.""Title"", p.""Summary"", p.""Content"", p.""PostType"",
-                    p.""ViewsCount"", p.""CommentCount"", p.""UpvoteCount"", p.""DownvoteCount"", p.""IsFeatured"", p.""CreatedAt"",
-                    c.""Name"" AS CategoryName
-                FROM ""Posts"" p
-                LEFT JOIN ""Categories"" c ON p.""CategoryId"" = c.""CategoryId""
-                WHERE p.""PostId"" = @PostId AND p.""Status"" = 'Published' AND p.""IsDeleted"" = FALSE;
-
-                -- Query 2: Get Tags
-                SELECT t.""Name""
-                FROM ""Tags"" t
-                JOIN ""PostTags"" pt ON t.""TagId"" = pt.""TagId""
-                WHERE pt.""PostId"" = @PostId;
-
-                -- Query 3: Get Attachment URLs
-                SELECT a.""Url""
-                FROM ""Attachments"" a
-                WHERE a.""TargetId"" = @PostId AND a.""TargetType"" = 'Post';
-                
-                -- Query 4: Get All Comments for the Post (flat list)
-                SELECT 
-                    c.""CommentId"", c.""AuthorId"", c.""ParentCommentId"", c.""Content"", 
-                    c.""UpvoteCount"", c.""DownvoteCount"", c.""CreatedAt""
-                FROM ""Comments"" c
-                WHERE c.""PostId"" = @PostId AND c.""IsDeleted"" = FALSE
-                ORDER BY c.""CreatedAt"" ASC;
-            ";
-
-            using (var multi = await connection.QueryMultipleAsync(sql, new { PostId = postId }))
-            {
-                var post = await multi.ReadSingleOrDefaultAsync<PostViewDetailDto>();
-                if (post == null)
-                {
-                    return (null, Enumerable.Empty<CommentDto>());
-                }
-
-                post.Tags = (await multi.ReadAsync<string>()).ToList();
-                post.Url = (await multi.ReadAsync<string>()).ToList();
-
-                var comments = await multi.ReadAsync<CommentDto>();
-
-                return (post, comments);
-            }
-        }
+       
     }
 }
 

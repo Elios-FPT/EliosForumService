@@ -4,6 +4,8 @@ using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects.Post;
 using ForumService.Core.Interfaces;
 using ForumService.Core.Interfaces.Post;
+using ForumService.Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,18 +18,23 @@ namespace ForumService.Core.Handler.Post.Query
     {
         private readonly IPostQueryRepository _postQueryRepository;
         private readonly IKafkaProducerRepository<User> _producerRepository;
+        private readonly IGenericRepository<Domain.Models.Category> _categoryRepository;
         private const string ResponseTopic = "user-forum-user";
         private const string DestinationService = "user";
 
-        public GetArchivedPostsQueryHandler(IPostQueryRepository postQueryRepository, IKafkaProducerRepository<User> producerRepository)
+        public GetArchivedPostsQueryHandler(
+            IPostQueryRepository postQueryRepository,
+            IKafkaProducerRepository<User> producerRepository,
+            IGenericRepository<Domain.Models.Category> categoryRepository)
         {
             _postQueryRepository = postQueryRepository ?? throw new ArgumentNullException(nameof(postQueryRepository));
             _producerRepository = producerRepository ?? throw new ArgumentNullException(nameof(producerRepository));
+            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
         public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> Handle(GetArchivedPostsQuery request, CancellationToken cancellationToken)
         {
-            // Validate basic input parameters
+           
             if (request.Limit <= 0 || request.Offset < 0)
             {
                 return new BaseResponseDto<IEnumerable<PostViewDto>>
@@ -40,46 +47,61 @@ namespace ForumService.Core.Handler.Post.Query
 
             try
             {
-                // Retrieve archived posts from the database
-                var postDtos = (await _postQueryRepository.GetArchivedPostsAsync(request)).ToList();
+                var posts = (await _postQueryRepository.GetArchivedPostsAsync(request)).ToList();
 
-                if (!postDtos.Any())
+                if (!posts.Any())
                 {
                     return new BaseResponseDto<IEnumerable<PostViewDto>>
                     {
                         Status = 200,
                         Message = "No archived posts found.",
-                        ResponseData = postDtos
+                        ResponseData = Enumerable.Empty<PostViewDto>()
                     };
                 }
 
-                // Enrich posts with author information
+                Dictionary<Guid, User> userProfilesDict;
                 try
                 {
-                    var authorIds = postDtos.Select(p => p.AuthorId).Distinct().ToList();
-                    if (authorIds.Any())
-                    {
-                        var userProfilesList = await _producerRepository.ProduceGetAllAsync(
-                            DestinationService,
-                            ResponseTopic);
-
-                        var userProfilesDict = userProfilesList.ToDictionary(u => u.id);
-
-                        foreach (var post in postDtos)
-                        {
-                            if (userProfilesDict.TryGetValue(post.AuthorId, out var author))
-                            {
-                                post.AuthorFirstName = author.firstName;
-                                post.AuthorLastName = author.lastName;
-                                post.AuthorAvatarUrl = author.avatarUrl;
-                            }
-                        }
-                    }
+                    var userProfilesList = await _producerRepository.ProduceGetAllAsync(
+                        DestinationService,
+                        ResponseTopic);
+                    userProfilesDict = userProfilesList.ToDictionary(u => u.id);
                 }
-                catch (Exception userEx)
+                catch (Exception)
                 {
-                    // Log the error but continue execution to avoid failing the entire request
-                    // _logger.LogError(userEx, "Failed to enrich archived posts with user information.");
+                    userProfilesDict = new Dictionary<Guid, User>();
+                }
+
+                var postDtos = new List<PostViewDto>();
+
+                foreach (var post in posts)
+                {
+                    userProfilesDict.TryGetValue(post.AuthorId, out var authorProfile);
+
+                    var postDto = new PostViewDto
+                    {
+                        PostId = post.PostId,
+                        AuthorId = post.AuthorId,
+                        CategoryId = post.CategoryId,
+                        Title = post.Title,
+                        Content = post.Content,
+                        PostType = post.PostType,
+                        Status = post.Status,
+                        ViewsCount = post.ViewsCount,
+                        CommentCount = post.CommentCount,
+                        UpvoteCount = post.UpvoteCount,
+                        DownvoteCount = post.DownvoteCount,
+                        IsFeatured = post.IsFeatured,
+                        CreatedAt = post.CreatedAt,
+                        AuthorFirstName = authorProfile?.firstName,
+                        AuthorLastName = authorProfile?.lastName,
+                        AuthorAvatarUrl = authorProfile?.avatarUrl
+                    };
+
+                    var category = await _categoryRepository.GetByIdAsync(post.CategoryId);
+                    postDto.CategoryName = category?.Name;
+
+                    postDtos.Add(postDto);
                 }
 
                 return new BaseResponseDto<IEnumerable<PostViewDto>>
@@ -94,7 +116,7 @@ namespace ForumService.Core.Handler.Post.Query
                 return new BaseResponseDto<IEnumerable<PostViewDto>>
                 {
                     Status = 500,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = $"An internal server error occurred: {ex.Message}",
                     ResponseData = Enumerable.Empty<PostViewDto>()
                 };
             }

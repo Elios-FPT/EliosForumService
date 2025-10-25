@@ -4,7 +4,9 @@ using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects.Comment;
 using ForumService.Contract.TransferObjects.Post;
 using ForumService.Core.Interfaces;
-using ForumService.Core.Interfaces.Post;
+using ForumService.Core.Interfaces.Tag;
+using ForumService.Domain.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,25 +18,43 @@ namespace ForumService.Core.Handler.Post.Query
 {
     public class GetPostDetailsByIdQueryHandler : IQueryHandler<GetPostDetailsByIdQuery, BaseResponseDto<PostViewDetailDto>>
     {
-        private readonly IPostQueryRepository _postQueryRepository;
+        private readonly IGenericRepository<Domain.Models.Post> _postRepository;
+        private readonly IGenericRepository<Domain.Models.Comment> _commentRepository;
+        private readonly IGenericRepository<Domain.Models.Category> _categoryRepository;
+        private readonly IGenericRepository<Domain.Models.Attachment> _attachmentRepository;
+        private readonly ITagQueryRepository _tagRepository;
         private readonly IKafkaProducerRepository<User> _producerRepository;
+        private readonly ILogger<GetPostDetailsByIdQueryHandler> _logger;
         private const string ResponseTopic = "user-forum-user";
         private const string DestinationService = "user";
 
-        public GetPostDetailsByIdQueryHandler(IPostQueryRepository postQueryRepository, IKafkaProducerRepository<User> producerRepository)
+        public GetPostDetailsByIdQueryHandler(
+            IGenericRepository<Domain.Models.Post> postRepository,
+            IGenericRepository<Domain.Models.Comment> commentRepository,
+            IGenericRepository<Domain.Models.Category> categoryRepository,
+            IGenericRepository<Domain.Models.Attachment> attachmentRepository,
+            ITagQueryRepository tagRepository,
+            IKafkaProducerRepository<User> producerRepository,
+            ILogger<GetPostDetailsByIdQueryHandler> logger)
         {
-            _postQueryRepository = postQueryRepository ?? throw new ArgumentNullException(nameof(postQueryRepository));
+            _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
+            _commentRepository = commentRepository ?? throw new ArgumentNullException(nameof(commentRepository));
+            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
+            _attachmentRepository = attachmentRepository ?? throw new ArgumentNullException(nameof(attachmentRepository));
+            _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _producerRepository = producerRepository ?? throw new ArgumentNullException(nameof(producerRepository));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<BaseResponseDto<PostViewDetailDto>> Handle(GetPostDetailsByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
-            
-                var (postDetail, flatComments) = await _postQueryRepository.GetPostDetailsByIdAsync(request.PostId);
+                var postEntity = await _postRepository.GetOneAsync(
+                    filter: p => p.PostId == request.PostId && p.Status == "Published" && !p.IsDeleted
+                );
 
-                if (postDetail == null)
+                if (postEntity == null)
                 {
                     return new BaseResponseDto<PostViewDetailDto>
                     {
@@ -44,28 +64,68 @@ namespace ForumService.Core.Handler.Post.Query
                     };
                 }
 
-                var allComments = flatComments.ToList();
+                var tagsTask = _tagRepository.GetTagNamesByPostIdAsync(request.PostId, cancellationToken);
 
-          
+                var allComments = (await _commentRepository.GetListAsyncUntracked(
+                    filter: c => c.PostId == request.PostId && !c.IsDeleted,
+                    selector: c => new CommentDto
+                    {
+                        CommentId = c.CommentId,
+                        AuthorId = c.AuthorId,
+                        ParentCommentId = c.ParentCommentId,
+                        Content = c.Content,
+                        UpvoteCount = c.UpvoteCount,
+                        DownvoteCount = c.DownvoteCount,
+                        CreatedAt = c.CreatedAt
+                    },
+                    orderBy: q => q.OrderBy(c => c.CreatedAt)
+                )).ToList();
+
+                Domain.Models.Category? category = null;
+                if (postEntity.CategoryId.HasValue)
+                {
+                    category = await _categoryRepository.GetByIdAsync(postEntity.CategoryId.Value);
+                }
+
+                var attachmentUrls = (await _attachmentRepository.GetListAsyncUntracked(
+                    filter: a => a.TargetType == "Post" && a.TargetId == postEntity.PostId,
+                    selector: a => a.Url
+                )).ToList();
+
+                var tags = (await tagsTask).ToList();
+
+                var postDetail = new PostViewDetailDto
+                {
+                    PostId = postEntity.PostId,
+                    AuthorId = postEntity.AuthorId,
+                    Title = postEntity.Title,
+                    Summary = postEntity.Summary,
+                    Content = postEntity.Content,
+                    PostType = postEntity.PostType,
+                    ViewsCount = postEntity.ViewsCount,
+                    CommentCount = postEntity.CommentCount,
+                    UpvoteCount = postEntity.UpvoteCount,
+                    DownvoteCount = postEntity.DownvoteCount,
+                    IsFeatured = postEntity.IsFeatured,
+                    CreatedAt = postEntity.CreatedAt,
+                    CategoryName = category?.Name,
+                    Url = attachmentUrls,
+                    Tags = tags.Select(t => t.Name).ToList()
+                };
+
                 try
                 {
-                 
                     var authorIds = new HashSet<Guid> { postDetail.AuthorId };
-                    foreach (var comment in allComments)
-                    {
-                        authorIds.Add(comment.AuthorId);
-                    }
+                    authorIds.UnionWith(allComments.Select(c => c.AuthorId));
 
                     if (authorIds.Any())
                     {
-                      
                         var userProfilesList = await _producerRepository.ProduceGetAllAsync(
-                           DestinationService,
-                           ResponseTopic);
+                            DestinationService,
+                            ResponseTopic);
 
                         var userProfilesDict = userProfilesList.ToDictionary(u => u.id);
 
-                     
                         if (userProfilesDict.TryGetValue(postDetail.AuthorId, out var postAuthor))
                         {
                             postDetail.AuthorFirstName = postAuthor.firstName;
@@ -73,7 +133,6 @@ namespace ForumService.Core.Handler.Post.Query
                             postDetail.AuthorAvatarUrl = postAuthor.avatarUrl;
                         }
 
-                 
                         foreach (var comment in allComments)
                         {
                             if (userProfilesDict.TryGetValue(comment.AuthorId, out var commentAuthor))
@@ -87,13 +146,11 @@ namespace ForumService.Core.Handler.Post.Query
                 }
                 catch (Exception userEx)
                 {
-                  
+                    _logger.LogWarning(userEx, "Failed to enrich post details with user information for PostId {PostId}. Returning data without author details.", request.PostId);
                 }
 
-              
                 postDetail.Comments = BuildCommentTree(allComments);
 
-               
                 return new BaseResponseDto<PostViewDetailDto>
                 {
                     Status = 200,
@@ -103,15 +160,15 @@ namespace ForumService.Core.Handler.Post.Query
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while retrieving details for PostId {PostId}", request.PostId);
                 return new BaseResponseDto<PostViewDetailDto>
                 {
                     Status = 500,
-                    Message = $"An error occurred: {ex.Message}",
+                    Message = "An internal server error occurred.",
                     ResponseData = null
                 };
             }
         }
-
 
         private List<CommentDto> BuildCommentTree(List<CommentDto> flatComments)
         {
@@ -122,18 +179,14 @@ namespace ForumService.Core.Handler.Post.Query
             {
                 if (comment.ParentCommentId.HasValue && commentLookup.TryGetValue(comment.ParentCommentId.Value, out var parentComment))
                 {
-                   
                     parentComment.Replies.Add(comment);
                 }
                 else
                 {
-                   
                     nestedComments.Add(comment);
                 }
             }
-
             return nestedComments;
         }
     }
 }
-

@@ -2,10 +2,15 @@
 using ForumService.Contract.Models;
 using ForumService.Core.Extensions;
 using ForumService.Core.Interfaces;
+using ForumService.Core.Interfaces.Comment;
 using ForumService.Core.Interfaces.Post;
+using ForumService.Core.Interfaces.Tag;
 using ForumService.Domain.Models;
 using ForumService.Infrastructure.Data;
 using ForumService.Infrastructure.Implementations;
+using ForumService.Infrastructure.Implementations.Comment;
+using ForumService.Infrastructure.Implementations.Post;
+using ForumService.Infrastructure.Implementations.Tag;
 using ForumService.Infrastructure.Kafka;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -79,6 +84,8 @@ static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
 }
 
 builder.Services.AddScoped<IPostQueryRepository, PostQueryRepository>();
+builder.Services.AddScoped<ITagQueryRepository, TagQueryRepository>();
+builder.Services.AddScoped<ICommentQueryRepository, CommentQueryRepository>();
 
 builder.Services.AddFusionCache()
     .WithSerializer(new FusionCacheSystemTextJsonSerializer())
@@ -147,8 +154,8 @@ app.Lifetime.ApplicationStarted.Register(() =>
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "SUtility API v1");
-    c.DocumentTitle = "SUtility API Documentation";
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ForumService API v1");
+    c.DocumentTitle = "ForumService API Documentation";
     c.RoutePrefix = "swagger";
 });
 

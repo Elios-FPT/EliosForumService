@@ -608,16 +608,6 @@
             }
           },
           {
-            "name": "Tags",
-            "in": "query",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          {
             "name": "Limit",
             "in": "query",
             "schema": {
@@ -1292,13 +1282,6 @@
           },
           "categoryName": {
             "type": "string",
-            "nullable": true
-          },
-          "tags": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
             "nullable": true
           },
           "authorFirstName": {

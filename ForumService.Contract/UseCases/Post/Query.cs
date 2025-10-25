@@ -22,7 +22,6 @@ namespace ForumService.Contract.UseCases.Post
             Guid? CategoryId = null,
             string? PostType = null,
             string? SearchKeyword = null,
-            List<string>? Tags = null,
             int Limit = 20,
             int Offset = 0,
             string? SortBy = null,

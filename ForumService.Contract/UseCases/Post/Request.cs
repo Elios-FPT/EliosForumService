@@ -56,7 +56,6 @@ namespace ForumService.Contract.UseCases.Post
             Guid? CategoryId = null,
             string? PostType = null,
             string? SearchKeyword = null,
-            List<string>? Tags = null,
 
             // Pagination
             int Limit = 20,
