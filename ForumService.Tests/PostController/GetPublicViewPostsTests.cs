@@ -281,7 +281,7 @@ namespace ForumService.Tests.PostController
             Assert.Null(capturedQuery.AuthorId);
             Assert.Null(capturedQuery.CategoryId);
             Assert.Null(capturedQuery.PostType);
-            Assert.Equal("", capturedQuery.SearchKeyword); // Empty string mapped correctly
+            Assert.Equal("", capturedQuery.SearchKeyword); 
             Assert.Null(capturedQuery.SortBy);
             Assert.Null(capturedQuery.SortOrder);
         }
