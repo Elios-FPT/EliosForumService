@@ -43,7 +43,8 @@ namespace ForumService.Core.Handler.Post.Command
                 post.Status = "Rejected";
                 post.UpdatedAt = DateTime.UtcNow;
                 post.UpdatedBy = request.ModeratorId;
-
+                post.RejectionReason = request.Reason;
+                post.ModeratedBy = request.ModeratorId;
 
                 await _postRepository.UpdateAsync(post);
                 await _unitOfWork.CommitAsync();
