@@ -1,12 +1,12 @@
 ﻿using ForumService.Contract.Message;
 using ForumService.Contract.Shared;
 using ForumService.Core.Interfaces;
-using ForumService.Domain.Models; // <-- Added using for Tag and PostTag
+using ForumService.Domain.Models; 
 using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text.RegularExpressions; 
 using System.Threading;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Post.Command;
@@ -16,20 +16,20 @@ namespace ForumService.Core.Handler.Post.Command
     public class SubmitPostForReviewCommandHandler : ICommandHandler<SubmitPostForReviewCommand, BaseResponseDto<bool>>
     {
         private readonly IGenericRepository<Domain.Models.Post> _postRepository;
-        private readonly IGenericRepository<Tag> _tagRepository;
-        private readonly IGenericRepository<PostTag> _postTagRepository;
+        private readonly IGenericRepository<Domain.Models.Tag> _tagRepository; 
+        private readonly IGenericRepository<Domain.Models.PostTag> _postTagRepository; 
         private readonly IUnitOfWork _unitOfWork;
 
         public SubmitPostForReviewCommandHandler(
             IGenericRepository<Domain.Models.Post> postRepository,
-            IGenericRepository<Tag> tagRepository,
-            IGenericRepository<PostTag> postTagRepository,
+            IGenericRepository<Domain.Models.Tag> tagRepository, 
+            IGenericRepository<Domain.Models.PostTag> postTagRepository, 
             IUnitOfWork unitOfWork)
         {
-            _postRepository = postRepository;
-            _tagRepository = tagRepository;
-            _postTagRepository = postTagRepository;
-            _unitOfWork = unitOfWork;
+            _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
+            _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
+            _postTagRepository = postTagRepository ?? throw new ArgumentNullException(nameof(postTagRepository));
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
         public async Task<BaseResponseDto<bool>> Handle(SubmitPostForReviewCommand request, CancellationToken cancellationToken)
@@ -55,81 +55,95 @@ namespace ForumService.Core.Handler.Post.Command
                 if (post.Status != "Draft")
                 {
                     await _unitOfWork.RollbackAsync();
-                    return new BaseResponseDto<bool> { Status = 400, Message = $"Only posts with 'Draft' status can be submitted. Current status is '{post.Status}'.", ResponseData = false };
+                    return new BaseResponseDto<bool> { Status = 400, Message = $"Post is not in Draft status (current status: {post.Status}).", ResponseData = false };
                 }
 
                 // --- Handle Tags ---
-                // 1. Remove all old PostTag records of this post to refresh them
+                // 1. Remove all old PostTag records of this post
                 var existingPostTags = await _postTagRepository.GetListAsync(pt => pt.PostId == post.PostId);
                 if (existingPostTags.Any())
                 {
                     await _postTagRepository.DeleteRangeAsync(existingPostTags);
                 }
 
-                // 2. Process the new tag list
+                // 2. Process the new tag list (only if not null and not empty)
                 if (request.Tags != null && request.Tags.Any())
                 {
+                    var uniqueTagNames = request.Tags
+                                             .Select(t => t.Trim().ToLower())
+                                             .Where(t => !string.IsNullOrEmpty(t))
+                                             .Distinct()
+                                             .ToList();
+
                     var newPostTags = new List<PostTag>();
-                    // Get distinct tag names, trim whitespace, and convert to lowercase
-                    var distinctTagNames = request.Tags.Select(t => t.Trim().ToLower()).Where(t => !string.IsNullOrEmpty(t)).Distinct();
 
-                    foreach (var tagName in distinctTagNames)
+                    if (uniqueTagNames.Any())
                     {
-                        var existingTag = await _tagRepository.GetOneAsync(filter: t => t.Name == tagName);
+                        // Find existing tags efficiently using a dictionary
+                        var existingTagsDict = (await _tagRepository.GetListAsync(t => uniqueTagNames.Contains(t.Name.ToLower())))
+                                               .ToDictionary(t => t.Name.ToLower(), t => t);
 
-                        Tag tagToAssociate;
-
-                        if (existingTag == null)
+                        foreach (var tagName in uniqueTagNames)
                         {
-                            // If the tag doesn't exist -> create a new one
-                            tagToAssociate = new Tag
+                            Tag tagEntity;
+                            if (existingTagsDict.TryGetValue(tagName, out var foundTag))
                             {
-                                TagId = Guid.NewGuid(),
-                                Name = tagName,
-                                Slug = GenerateSlug(tagName), // Generate slug from name
-                                CreatedAt = DateTime.UtcNow
-                            };
-                            await _tagRepository.AddAsync(tagToAssociate);
+                                // Use existing tag
+                                tagEntity = foundTag;
+                            }
+                            else
+                            {
+                                // Create new tag if it doesn't exist
+                                tagEntity = new Tag
+                                {
+                                    TagId = Guid.NewGuid(),
+                                    Name = tagName, 
+                                    Slug = GenerateSlug(tagName), 
+                                    CreatedAt = DateTime.UtcNow
+                                };
+                                await _tagRepository.AddAsync(tagEntity); 
+                            }
+
+                            // Create new PostTag association
+                            newPostTags.Add(new PostTag { PostId = post.PostId, TagId = tagEntity.TagId });
                         }
-                        else
+
+                        // Add all new associations to the context
+                        if (newPostTags.Any())
                         {
-                            // If the tag exists -> use it
-                            tagToAssociate = existingTag;
+                            await _postTagRepository.AddRangeAsync(newPostTags);
                         }
-
-                        // Create PostTag association
-                        newPostTags.Add(new PostTag { PostId = post.PostId, TagId = tagToAssociate.TagId });
                     }
-                    // Add all new associations to the DB
-                    await _postTagRepository.AddRangeAsync(newPostTags);
                 }
-
+                // If request.Tags is null or empty, no new tags are added (old ones were already removed)
+                
                 // --- Update post status ---
                 post.Status = "PendingReview";
                 post.UpdatedAt = DateTime.UtcNow;
                 post.UpdatedBy = request.RequesterId;
 
-                await _postRepository.UpdateAsync(post);
-                await _unitOfWork.CommitAsync();
+                await _postRepository.UpdateAsync(post); 
 
-                return new BaseResponseDto<bool> { Status = 200, Message = "Post submitted for review successfully with tags.", ResponseData = true };
+                // Commit all changes (Post status, Tag creations, PostTag deletions/creations)
+                await _unitOfWork.CommitAsync();
+                return new BaseResponseDto<bool> { Status = 200, Message = "Post submitted for review successfully.", ResponseData = true };
             }
             catch (Exception ex)
             {
                 await _unitOfWork.RollbackAsync();
-                var errorMessage = ex.InnerException?.Message ?? ex.Message;
-                return new BaseResponseDto<bool> { Status = 500, Message = $"Failed to submit post: {errorMessage}", ResponseData = false };
+                return new BaseResponseDto<bool> { Status = 500, Message = $"An error occurred: {ex.Message}", ResponseData = false };
             }
         }
 
         private static string GenerateSlug(string phrase)
         {
-            string str = phrase.ToLower().Trim();
-            str = Regex.Replace(str, @"[^a-z0-9\s-]", ""); // Remove invalid characters
-            str = Regex.Replace(str, @"\s+", "-").Trim(); // Convert spaces to hyphens
-            str = str.Substring(0, str.Length <= 45 ? str.Length : 45).Trim(); // Trim length
-            str = Regex.Replace(str, @"-+", "-"); // Replace multiple hyphens with a single one
+            string str = phrase.ToLowerInvariant().Trim();
+            str = Regex.Replace(str, @"[^a-z0-9\s-]", "");    
+            str = Regex.Replace(str, @"\s+", "-").Trim();     
+            str = str[..(str.Length <= 45 ? str.Length : 45)]; 
+            str = Regex.Replace(str, @"-+", "-");             
             return str;
         }
     }
 }
+

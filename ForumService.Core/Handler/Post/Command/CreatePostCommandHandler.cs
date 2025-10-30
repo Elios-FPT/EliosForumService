@@ -67,7 +67,7 @@ namespace ForumService.Core.Handler.Post.Command
                     var attachments = new List<Domain.Models.Attachment>();
                     foreach (var file in request.FilesToUpload)
                     {
-      
+
                         var keyPrefix = $"posts/{post.PostId}";
                         var uploadedUrl = await _utilityServiceClient.UploadFileAsync(keyPrefix, file, cancellationToken);
 

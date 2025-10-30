@@ -73,7 +73,7 @@ namespace ForumService.Contract.UseCases.Post
         public record SubmitPostForReviewCommand(
             Guid PostId,
             Guid RequesterId,
-            List<string> Tags // Added tag list here
+            List<string>? Tags
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>

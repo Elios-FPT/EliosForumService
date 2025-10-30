@@ -219,7 +219,13 @@ namespace ForumService.Web.Controllers.Post
         /// </summary>
         [HttpPut("{postId}/submit")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
-        public async Task<BaseResponseDto<bool>> SubmitPostForReview([FromRoute] Guid postId, [FromBody] SubmitPostForReviewRequest request)
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)] 
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<BaseResponseDto<bool>> SubmitPostForReview(
+            [FromRoute] Guid postId,
+            [FromBody] SubmitPostForReviewRequest request)
         {
             var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
             if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
@@ -227,8 +233,18 @@ namespace ForumService.Web.Controllers.Post
                 return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
             }
 
-            //var userId = new Guid("3fa85f64-5717-4562-b3fc-2c963f66afa9");
+            if (request == null)
+            {
+                return new BaseResponseDto<bool>
+                {
+                    Status = 400,
+                    Message = "Invalid request body. Ensure Content-Type is application/json and body matches expected format: { \"tags\": [\"tag1\", \"tag2\"] } or { \"tags\": null } or {}", 
+                    ResponseData = false
+                };
+            }
 
+            //var userId = new Guid("102ea1b3-f664-4617-8f43-fdde557f12b6");
+       
             var command = new SubmitPostForReviewCommand(postId, userId, request.Tags);
             return await _sender.Send(command);
         }

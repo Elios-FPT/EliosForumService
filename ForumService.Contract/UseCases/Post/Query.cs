@@ -32,25 +32,49 @@ namespace ForumService.Contract.UseCases.Post
         // --- Queries for moderators (Moderator API) ---
 
         /// <summary>
+        /// Query specifically for moderators to get a paginated list of 'Published' posts.
+        /// Returns the richer ModeratorPostViewDto.
+        /// </summary>
+        public record GetModeratorPublicPostsQuery(
+             Guid? AuthorId = null,
+             Guid? CategoryId = null,
+             string? PostType = null,
+             string? SearchKeyword = null,
+             int Limit = 20,
+             int Offset = 0,
+             string? SortBy = null, 
+             string? SortOrder = null
+        ) : IQuery<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>>;
+
+
+        /// <summary>
         /// Query for moderators to get a paginated list of posts with 'PendingReview' status.
         /// This query is simpler, focusing on basic pagination.
         /// </summary>
         public record GetPendingPostsQuery(
-            int Limit = 20,
-            int Offset = 0,
-            string? SearchKeyword = null, // Optional: Allows searching within the review queue
-            string? PostType = null // Added: Filter by post type ("Post" or "Solution")
-        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
+             Guid? AuthorId = null,
+             Guid? CategoryId = null,
+             string? PostType = null,
+             string? SearchKeyword = null,
+             int Limit = 20,
+             int Offset = 0,
+             string? SortBy = null,
+             string? SortOrder = null
+        ) : IQuery<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>>;
 
         /// <summary>
         /// Query for moderators to get a paginated list of 'Rejected' or soft-deleted posts.
         /// </summary>
         public record GetArchivedPostsQuery(
-            int Limit = 20,
-            int Offset = 0,
-            string? SearchKeyword = null, // Optional: Allows searching for a specific archived post
-            string? PostType = null // Added: Filter by post type ("Post" or "Solution")
-        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
+             Guid? AuthorId = null,
+             Guid? CategoryId = null,
+             string? PostType = null,
+             string? SearchKeyword = null,
+             int Limit = 20,
+             int Offset = 0,
+             string? SortBy = null,
+             string? SortOrder = null
+        ) : IQuery<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>>;
 
         /// <summary>
         /// Query to get all posts belonging to a specific user (the requester).
