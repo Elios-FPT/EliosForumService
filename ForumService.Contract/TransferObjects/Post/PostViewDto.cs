@@ -20,6 +20,7 @@ namespace ForumService.Contract.TransferObjects.Post
         public int UpvoteCount { get; set; }
         public int DownvoteCount { get; set; }
         public bool IsFeatured { get; set; }
+        public bool IsDeleted { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? CategoryName { get; set; }
         public string? AuthorFirstName { get; set; }

@@ -31,7 +31,9 @@ namespace ForumService.Domain.Models
         public Guid? UpdatedBy { get; set; } // Reference to user ID, fetched from UserService Redis cache
         public DateTime? DeletedAt { get; set; }
         public Guid? DeletedBy { get; set; } // Reference to user ID, fetched from UserService Redis cache
-
+        public Guid? ModeratedBy { get; set; } // ID of the moderator who approved or rejected the post. Null if not moderated yet.
+        public DateTime? ModeratedAt { get; set; }
+        public string? RejectionReason { get; set; } // Optional reason provided by the moderator when rejecting the post.
         // Navigation Properties
         public virtual Category? Category { get; set; }
         public virtual ICollection<PostTag> PostTags { get; set; } = new List<PostTag>();

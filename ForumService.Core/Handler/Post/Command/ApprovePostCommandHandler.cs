@@ -43,6 +43,7 @@ namespace ForumService.Core.Handler.Post.Command
                 post.Status = "Published";
                 post.UpdatedAt = DateTime.UtcNow;
                 post.UpdatedBy = request.ModeratorId;
+                post.ModeratedBy = request.ModeratorId;
 
                 await _postRepository.UpdateAsync(post);
                 await _unitOfWork.CommitAsync();

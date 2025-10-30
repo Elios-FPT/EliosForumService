@@ -66,6 +66,22 @@ namespace ForumService.Contract.UseCases.Post
             string? SortOrder = null   // e.g., "ASC", "DESC"
         );
 
+        public record GetModeratorPublicPostsRequest(
+            // Filtering
+            Guid? AuthorId = null,
+            Guid? CategoryId = null,
+            string? PostType = null,
+            string? SearchKeyword = null,
+
+            // Pagination
+            int Limit = 20,
+            int Offset = 0,
+
+            // Sorting
+            string? SortBy = null,    // e.g., "ViewsCount", "CreatedAt"
+            string? SortOrder = null  // e.g., "ASC", "DESC"
+        );
+
         /// <summary>
         /// Request to get all posts for the currently authenticated user.
         /// </summary>
@@ -89,20 +105,38 @@ namespace ForumService.Contract.UseCases.Post
         /// Request for moderators to get a paginated list of posts pending review.
         /// </summary>
         public record GetPendingPostsRequest(
+            // Filtering
+            Guid? AuthorId = null,
+            Guid? CategoryId = null,
+            string? PostType = null,
+            string? SearchKeyword = null,
+
+            // Pagination
             int Limit = 20,
             int Offset = 0,
-            string? SearchKeyword = null,
-            string? PostType = null
+
+            // Sorting
+            string? SortBy = null,    // e.g., "ViewsCount", "CreatedAt"
+            string? SortOrder = null  // e.g., "ASC", "DESC"
         );
 
         /// <summary>
         /// Request for moderators to get a paginated list of archived posts.
         /// </summary>
         public record GetArchivedPostsRequest(
+            // Filtering
+            Guid? AuthorId = null,
+            Guid? CategoryId = null,
+            string? PostType = null,
+            string? SearchKeyword = null,
+
+            // Pagination
             int Limit = 20,
             int Offset = 0,
-            string? SearchKeyword = null,
-            string? PostType = null
+
+            // Sorting
+            string? SortBy = null,    // e.g., "ViewsCount", "CreatedAt"
+            string? SortOrder = null  // e.g., "ASC", "DESC"
         );
 
         /// <summary>
@@ -134,7 +168,7 @@ namespace ForumService.Contract.UseCases.Post
         /// Request to submit a post for review, including its tags.
         /// </summary>
         public record SubmitPostForReviewRequest(
-            [Required] List<string> Tags
+            List<string>? Tags
         );
 
         /// <summary>

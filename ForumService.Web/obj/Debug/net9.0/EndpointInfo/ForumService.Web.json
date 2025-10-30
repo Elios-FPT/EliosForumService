@@ -333,12 +333,42 @@
         }
       }
     },
-    "/api/v1/moderator/posts/pending": {
+    "/api/v1/moderator/posts/published": {
       "get": {
         "tags": [
           "ModeratorPost"
         ],
         "parameters": [
+          {
+            "name": "AuthorId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "CategoryId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "PostType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "SearchKeyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
           {
             "name": "Limit",
             "in": "query",
@@ -356,14 +386,14 @@
             }
           },
           {
-            "name": "SearchKeyword",
+            "name": "SortBy",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "PostType",
+            "name": "SortOrder",
             "in": "query",
             "schema": {
               "type": "string"
@@ -376,7 +406,98 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostViewDtoIEnumerableBaseResponseDto"
+                  "$ref": "#/components/schemas/ModeratorPostViewDtoIEnumerableBaseResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/moderator/posts/pending": {
+      "get": {
+        "tags": [
+          "ModeratorPost"
+        ],
+        "parameters": [
+          {
+            "name": "AuthorId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "CategoryId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "PostType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "SearchKeyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "SortBy",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "SortOrder",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModeratorPostViewDtoIEnumerableBaseResponseDto"
                 }
               }
             }
@@ -391,6 +512,36 @@
         ],
         "parameters": [
           {
+            "name": "AuthorId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "CategoryId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "PostType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "SearchKeyword",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "Limit",
             "in": "query",
             "schema": {
@@ -407,14 +558,14 @@
             }
           },
           {
-            "name": "SearchKeyword",
+            "name": "SortBy",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "PostType",
+            "name": "SortOrder",
             "in": "query",
             "schema": {
               "type": "string"
@@ -427,7 +578,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PostViewDtoIEnumerableBaseResponseDto"
+                  "$ref": "#/components/schemas/ModeratorPostViewDtoIEnumerableBaseResponseDto"
                 }
               }
             }
@@ -1019,6 +1170,46 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -1228,6 +1419,176 @@
         },
         "additionalProperties": false
       },
+      "ModeratorPostViewDto": {
+        "type": "object",
+        "properties": {
+          "postId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "authorId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "summary": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "postType": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "viewsCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "commentCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "upvoteCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "downvoteCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isFeatured": {
+            "type": "boolean"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "categoryName": {
+            "type": "string",
+            "nullable": true
+          },
+          "authorFirstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "authorLastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "authorAvatarUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "authorFullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "moderatedBy": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "moderatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "rejectionReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "moderatorFirstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "moderatorLastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "moderatorAvatarUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "moderatorFullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          },
+          "deletedBy": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "deletedByFirstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "deletedByLastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "deletedByAvatarUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "deletedByFullName": {
+            "type": "string",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ModeratorPostViewDtoIEnumerableBaseResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string",
+            "nullable": true
+          },
+          "responseData": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModeratorPostViewDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "PostViewDetailDto": {
         "type": "object",
         "properties": {
@@ -1389,6 +1750,9 @@
             "format": "int32"
           },
           "isFeatured": {
+            "type": "boolean"
+          },
+          "isDeleted": {
             "type": "boolean"
           },
           "createdAt": {

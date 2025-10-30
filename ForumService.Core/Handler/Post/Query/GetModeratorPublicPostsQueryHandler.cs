@@ -14,8 +14,8 @@ using static ForumService.Contract.UseCases.Post.Query;
 
 namespace ForumService.Core.Handler.Post.Query
 {
-    public class GetArchivedPostsQueryHandler
-        : IQueryHandler<GetArchivedPostsQuery, BaseResponseDto<IEnumerable<ModeratorPostViewDto>>>
+    public class GetModeratorPublicPostsQueryHandler
+        : IQueryHandler<GetModeratorPublicPostsQuery, BaseResponseDto<IEnumerable<ModeratorPostViewDto>>>
     {
         private readonly IPostQueryRepository _postQueryRepository;
         private readonly IKafkaProducerRepository<User> _producerRepository;
@@ -23,7 +23,7 @@ namespace ForumService.Core.Handler.Post.Query
         private const string ResponseTopic = "user-forum-user";
         private const string DestinationService = "user";
 
-        public GetArchivedPostsQueryHandler(
+        public GetModeratorPublicPostsQueryHandler(
             IPostQueryRepository postQueryRepository,
             IKafkaProducerRepository<User> producerRepository,
             IGenericRepository<Domain.Models.Category> categoryRepository)
@@ -34,7 +34,7 @@ namespace ForumService.Core.Handler.Post.Query
         }
 
         public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> Handle(
-            GetArchivedPostsQuery request,
+            GetModeratorPublicPostsQuery request,
             CancellationToken cancellationToken)
         {
             if (request.Limit <= 0 || request.Offset < 0)
@@ -49,19 +49,20 @@ namespace ForumService.Core.Handler.Post.Query
 
             try
             {
-                var posts = (await _postQueryRepository.GetArchivedPostsAsync(request)).ToList();
+ 
+                var posts = (await _postQueryRepository.GetModeratorPublicViewPostsAsync(request)).ToList();
 
                 if (!posts.Any())
                 {
                     return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
                     {
                         Status = 200,
-                        Message = "No archived posts found.",
+                        Message = "No published posts found.",
                         ResponseData = Enumerable.Empty<ModeratorPostViewDto>()
                     };
                 }
 
-                // --- Load user profiles ---
+
                 Dictionary<Guid, User> userProfilesDict;
                 try
                 {
@@ -74,19 +75,21 @@ namespace ForumService.Core.Handler.Post.Query
                 }
 
                 var postDtos = new List<ModeratorPostViewDto>();
-
                 foreach (var post in posts)
                 {
                     userProfilesDict.TryGetValue(post.AuthorId, out var authorProfile);
                     userProfilesDict.TryGetValue(post.ModeratedBy ?? Guid.Empty, out var moderatorProfile);
                     userProfilesDict.TryGetValue(post.DeletedBy ?? Guid.Empty, out var deleterProfile);
 
+                    
                     string? categoryName = null;
                     if (post.CategoryId.HasValue)
                     {
                         var category = await _categoryRepository.GetByIdAsync(post.CategoryId.Value);
                         categoryName = category?.Name;
                     }
+
+                
 
                     var postDto = new ModeratorPostViewDto
                     {
@@ -106,6 +109,7 @@ namespace ForumService.Core.Handler.Post.Query
                         IsDeleted = post.IsDeleted,
                         CreatedAt = post.CreatedAt,
                         UpdatedAt = post.UpdatedAt,
+
                         CategoryName = categoryName,
 
                         AuthorFirstName = authorProfile?.firstName,
@@ -123,7 +127,7 @@ namespace ForumService.Core.Handler.Post.Query
                         DeletedAt = post.DeletedAt,
                         DeletedByFirstName = deleterProfile?.firstName,
                         DeletedByLastName = deleterProfile?.lastName,
-                        DeletedByAvatarUrl = deleterProfile?.avatarUrl
+                        DeletedByAvatarUrl = deleterProfile?.avatarUrl,
                     };
 
                     postDtos.Add(postDto);
@@ -132,13 +136,13 @@ namespace ForumService.Core.Handler.Post.Query
                 return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
                 {
                     Status = 200,
-                    Message = "Archived posts retrieved successfully.",
+                    Message = "Moderator public posts retrieved successfully.",
                     ResponseData = postDtos
                 };
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] Failed to retrieve archived posts: {ex}");
+                Console.WriteLine($"[ERROR] Failed to retrieve moderator posts: {ex}");
                 return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
                 {
                     Status = 500,

@@ -330,6 +330,26 @@
     "Order": 0,
     "Parameters": [
       {
+        "Name": "AuthorId",
+        "Type": "System.Nullable\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "CategoryId",
+        "Type": "System.Nullable\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PostType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SearchKeyword",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
         "Name": "Limit",
         "Type": "System.Int32",
         "IsRequired": false
@@ -340,19 +360,19 @@
         "IsRequired": false
       },
       {
-        "Name": "SearchKeyword",
+        "Name": "SortBy",
         "Type": "System.String",
         "IsRequired": false
       },
       {
-        "Name": "PostType",
+        "Name": "SortOrder",
         "Type": "System.String",
         "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.PostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.ModeratorPostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
@@ -369,6 +389,26 @@
     "Order": 0,
     "Parameters": [
       {
+        "Name": "AuthorId",
+        "Type": "System.Nullable\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "CategoryId",
+        "Type": "System.Nullable\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PostType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SearchKeyword",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
         "Name": "Limit",
         "Type": "System.Int32",
         "IsRequired": false
@@ -379,23 +419,89 @@
         "IsRequired": false
       },
       {
-        "Name": "SearchKeyword",
+        "Name": "SortBy",
         "Type": "System.String",
         "IsRequired": false
       },
       {
-        "Name": "PostType",
+        "Name": "SortOrder",
         "Type": "System.String",
         "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.PostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.ModeratorPostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
         "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "ForumService.Web.Controllers.Post.ModeratorPostController",
+    "Method": "GetModeratorPublicPosts",
+    "RelativePath": "api/v1/moderator/posts/published",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "AuthorId",
+        "Type": "System.Nullable\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "CategoryId",
+        "Type": "System.Nullable\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "PostType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SearchKeyword",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Offset",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "SortBy",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SortOrder",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.ModeratorPostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 400
       }
     ]
   },
@@ -644,6 +750,34 @@
           "application/json"
         ],
         "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 403
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 404
       }
     ]
   },

@@ -27,17 +27,44 @@ namespace ForumService.Web.Controllers.Post
         }
 
         /// <summary>
+        /// Retrieves a paginated list of PUBLISHED posts for moderator view (includes moderation details).
+        /// </summary>
+        [HttpGet("published")] // New route specific for published posts in moderator view
+        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetModeratorPublicPosts([FromQuery] GetModeratorPublicPostsRequest request)
+        {
+            // Map request to query
+            var query = new GetModeratorPublicPostsQuery(
+                AuthorId: request.AuthorId,
+                CategoryId: request.CategoryId,
+                PostType: request.PostType,
+                SearchKeyword: request.SearchKeyword,
+                Limit: request.Limit,
+                Offset: request.Offset,
+                SortBy: request.SortBy,
+                SortOrder: request.SortOrder
+            );
+            return await _sender.Send(query);
+            
+        }
+
+        /// <summary>
         /// Retrieves a list of posts pending review.
         /// </summary>
         [HttpGet("pending")]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
-        public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetPendingPosts([FromQuery] GetPendingPostsQuery request)
+        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
+        public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetPendingPosts([FromQuery] GetPendingPostsQuery request)
         {
             var query = new GetPendingPostsQuery(
+               AuthorId: request.AuthorId,
+                CategoryId: request.CategoryId,
+                PostType: request.PostType,
+                SearchKeyword: request.SearchKeyword,
                 Limit: request.Limit,
                 Offset: request.Offset,
-                SearchKeyword: request.SearchKeyword,
-                PostType: request.PostType
+                SortBy: request.SortBy,
+                SortOrder: request.SortOrder
             );
             return await _sender.Send(query);
         }
@@ -46,14 +73,18 @@ namespace ForumService.Web.Controllers.Post
         /// Retrieves a list of archived (rejected or soft-deleted) posts.
         /// </summary>
         [HttpGet("archived")]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
-        public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetArchivedPosts([FromQuery] GetArchivedPostsQuery request)
+        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
+        public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetArchivedPosts([FromQuery] GetArchivedPostsQuery request)
         {
             var query = new GetArchivedPostsQuery(
+                AuthorId: request.AuthorId,
+                CategoryId: request.CategoryId,
+                PostType: request.PostType,
+                SearchKeyword: request.SearchKeyword,
                 Limit: request.Limit,
                 Offset: request.Offset,
-                SearchKeyword: request.SearchKeyword,
-                PostType: request.PostType
+                SortBy: request.SortBy,
+                SortOrder: request.SortOrder
             );
             return await _sender.Send(query);
         }
@@ -79,6 +110,7 @@ namespace ForumService.Web.Controllers.Post
             {
                 return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
             }
+            //var moderatorId = new Guid("ac9f879f-5121-45ab-bd47-641e68934105");
 
             var command = new ApprovePostCommand(postId, moderatorId);
             return await _sender.Send(command);
@@ -105,6 +137,8 @@ namespace ForumService.Web.Controllers.Post
             {
                 return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
             }
+
+            //var moderatorId = new Guid("ac9f879f-5121-45ab-bd47-641e68934105");
 
             var command = new RejectPostCommand(postId, moderatorId, request.Reason);
             return await _sender.Send(command);
