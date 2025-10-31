@@ -110,5 +110,21 @@ namespace ForumService.Contract.UseCases.Post
             Guid ModeratorId,
             string? Reason
         ) : ICommand<BaseResponseDto<bool>>;
+
+        /// <summary>
+        /// Command to upvote a post.
+        /// </summary>
+        public record UpvotePostCommand(
+            Guid PostId,
+            Guid RequesterId
+        ) : ICommand<BaseResponseDto<bool>>;
+
+        /// <summary>
+        /// Command to downvote a post.
+        /// </summary>
+        public record DownvotePostCommand(
+            Guid PostId,
+            Guid RequesterId
+        ) : ICommand<BaseResponseDto<bool>>;
     }
 }

@@ -11,7 +11,7 @@ using Xunit;
 using static ForumService.Contract.UseCases.Post.Request;
 using static ForumService.Contract.UseCases.Post.Command;
 
-namespace ForumService.Tests.PostController
+namespace ForumService.Tests.ModeratorPostController
 {
     public class RejectPostTests
     {

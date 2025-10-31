@@ -18,7 +18,7 @@ namespace ForumService.Web.Controllers.Post
     [ApiVersion(1)]
     [Produces("application/json")]
     [ControllerName("Post")]
-    [Route("api/v1/posts")] 
+    [Route("api/forum/posts")] 
     public class PostController : ControllerBase
     {
         protected readonly ISender _sender;
@@ -243,13 +243,63 @@ namespace ForumService.Web.Controllers.Post
                 };
             }
 
-            //var userId = new Guid("102ea1b3-f664-4617-8f43-fdde557f12b6");
-       
+            
+
             var command = new SubmitPostForReviewCommand(postId, userId, request.Tags);
             return await _sender.Send(command);
         }
 
+        /// <summary>
+        /// Upvotes a post.
+        /// </summary>
+        /// <remarks>
+        /// This action allows an authenticated user to cast an upvote on a post.
+        /// If the user has already downvoted, it may switch the vote.
+        /// If the user has already upvoted, it may remove the vote (toggle).
+        /// </remarks>
+        [HttpPost("{postId}/upvote")]
+        [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<BaseResponseDto<bool>> UpvotePost([FromRoute] Guid postId)
+        {
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
+            }
 
+            //var userId = new Guid("3ea1d8be-846d-47eb-9961-7f7d32f37ec1");
+
+            var command = new UpvotePostCommand(PostId: postId, RequesterId: userId);
+            return await _sender.Send(command);
+        }
+
+        /// <summary>
+        /// Downvotes a post.
+        /// </summary>
+        /// <remarks>
+        /// This action allows an authenticated user to cast a downvote on a post.
+        /// If the user has already upvoted, it may switch the vote.
+        /// If the user has already downvoted, it may remove the vote (toggle).
+        /// </remarks>
+        [HttpPost("{postId}/downvote")]
+        [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<BaseResponseDto<bool>> DownvotePost([FromRoute] Guid postId)
+        {
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
+            }
+
+            //var userId = new Guid("3ea1d8be-846d-47eb-9961-7f7d32f37ec1");
+
+            var command = new DownvotePostCommand(PostId: postId, RequesterId: userId);
+            return await _sender.Send(command);
+        }
     }
 }
 

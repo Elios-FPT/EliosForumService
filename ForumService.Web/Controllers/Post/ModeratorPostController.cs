@@ -16,7 +16,7 @@ namespace ForumService.Web.Controllers.Post
     [ApiVersion(1)]
     [Produces("application/json")]
     [ControllerName("ModeratorPost")]
-    [Route("api/v1/moderator/posts")]
+    [Route("api/forum/moderator/posts")]
     public class ModeratorPostController : ControllerBase
     {
         protected readonly ISender _sender;
