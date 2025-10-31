@@ -2,7 +2,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Category.CategoryController",
     "Method": "CreateCategory",
-    "RelativePath": "api/v1/Category",
+    "RelativePath": "api/forum/Category",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -33,7 +33,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Category.CategoryController",
     "Method": "GetCategories",
-    "RelativePath": "api/v1/Category",
+    "RelativePath": "api/forum/Category",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -72,7 +72,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Category.CategoryController",
     "Method": "UpdateCategory",
-    "RelativePath": "api/v1/Category/{categoryId}",
+    "RelativePath": "api/forum/Category/{categoryId}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -115,7 +115,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Category.CategoryController",
     "Method": "DeleteCategory",
-    "RelativePath": "api/v1/Category/{CategoryId}",
+    "RelativePath": "api/forum/Category/{CategoryId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -146,7 +146,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Category.CategoryController",
     "Method": "GetCategoryById",
-    "RelativePath": "api/v1/Category/{CategoryId}",
+    "RelativePath": "api/forum/Category/{CategoryId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -177,7 +177,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Comment.CommentController",
     "Method": "CreateComment",
-    "RelativePath": "api/v1/Comment",
+    "RelativePath": "api/forum/Comment",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -229,7 +229,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Post.ModeratorPostController",
     "Method": "ApprovePost",
-    "RelativePath": "api/v1/moderator/posts/{postId}/approve",
+    "RelativePath": "api/forum/moderator/posts/{postId}/approve",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -274,7 +274,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Post.ModeratorPostController",
     "Method": "RejectPost",
-    "RelativePath": "api/v1/moderator/posts/{postId}/reject",
+    "RelativePath": "api/forum/moderator/posts/{postId}/reject",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -324,7 +324,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Post.ModeratorPostController",
     "Method": "GetArchivedPosts",
-    "RelativePath": "api/v1/moderator/posts/archived",
+    "RelativePath": "api/forum/moderator/posts/archived",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -383,7 +383,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Post.ModeratorPostController",
     "Method": "GetPendingPosts",
-    "RelativePath": "api/v1/moderator/posts/pending",
+    "RelativePath": "api/forum/moderator/posts/pending",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -442,7 +442,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Post.ModeratorPostController",
     "Method": "GetModeratorPublicPosts",
-    "RelativePath": "api/v1/moderator/posts/published",
+    "RelativePath": "api/forum/moderator/posts/published",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -508,7 +508,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Post.PostController",
     "Method": "CreatePost",
-    "RelativePath": "api/v1/posts",
+    "RelativePath": "api/forum/posts",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -559,7 +559,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Post.PostController",
     "Method": "GetPublicViewPosts",
-    "RelativePath": "api/v1/posts",
+    "RelativePath": "api/forum/posts",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -618,7 +618,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Post.PostController",
     "Method": "UpdatePost",
-    "RelativePath": "api/v1/posts/{postId}",
+    "RelativePath": "api/forum/posts/{postId}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -672,7 +672,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Post.PostController",
     "Method": "GetPostDetailsById",
-    "RelativePath": "api/v1/posts/{postId}",
+    "RelativePath": "api/forum/posts/{postId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -703,7 +703,7 @@
   {
     "ContainingType": "ForumService.Web.Controllers.Post.PostController",
     "Method": "DeletePost",
-    "RelativePath": "api/v1/posts/{postId}",
+    "RelativePath": "api/forum/posts/{postId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -726,8 +726,46 @@
   },
   {
     "ContainingType": "ForumService.Web.Controllers.Post.PostController",
+    "Method": "DownvotePost",
+    "RelativePath": "api/forum/posts/{postId}/downvote",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "postId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Boolean, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "ForumService.Web.Controllers.Post.PostController",
     "Method": "SubmitPostForReview",
-    "RelativePath": "api/v1/posts/{postId}/submit",
+    "RelativePath": "api/forum/posts/{postId}/submit",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -783,8 +821,46 @@
   },
   {
     "ContainingType": "ForumService.Web.Controllers.Post.PostController",
+    "Method": "UpvotePost",
+    "RelativePath": "api/forum/posts/{postId}/upvote",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "postId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Boolean, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "ForumService.Web.Controllers.Post.PostController",
     "Method": "GetMyPosts",
-    "RelativePath": "api/v1/posts/my-posts",
+    "RelativePath": "api/forum/posts/my-posts",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

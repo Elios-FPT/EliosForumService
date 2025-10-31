@@ -17,7 +17,7 @@ namespace ForumService.Web.Controllers.Category
     [ApiVersion(1)]
     [Produces("application/json")]
     [ControllerName("Category")]
-    [Route("api/v1/[controller]")]
+    [Route("api/forum/[controller]")]
     public class CategoryController : ControllerBase
     {
         protected readonly ISender Sender;

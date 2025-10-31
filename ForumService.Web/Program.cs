@@ -43,10 +43,10 @@ builder.Configuration
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo
+    c.SwaggerDoc("forum", new OpenApiInfo
     {
         Title = "ForumService API",
-        Version = "v1",
+        Version = "forum",
         Description = "API utility operations"
     });
     c.AddServer(new OpenApiServer { Url = "/" });
@@ -154,7 +154,7 @@ app.Lifetime.ApplicationStarted.Register(() =>
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ForumService API v1");
+    c.SwaggerEndpoint("/swagger/forum/swagger.json", "ForumService API forum");
     c.DocumentTitle = "ForumService API Documentation";
     c.RoutePrefix = "swagger";
 });

@@ -9,7 +9,7 @@ using static ForumService.Contract.UseCases.Comment.Request;
 namespace ForumService.Web.Controllers.Comment
 {
     [ApiVersion(1)]
-    [Route("api/v1/[controller]")]
+    [Route("api/forum/[controller]")]
     [ApiController]
     [Produces("application/json")]
     [ControllerName("Comment")]
