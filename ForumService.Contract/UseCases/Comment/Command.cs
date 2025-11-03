@@ -19,5 +19,22 @@ namespace ForumService.Contract.UseCases.Comment
             Guid AuthorId, // ID of the user creating the comment
             string Content
         ) : ICommand<BaseResponseDto<Guid>>; // Return the ID of the newly created comment
+
+        /// <summary>
+        /// Command to update an existing comment.
+        /// </summary>
+        public record UpdateCommentCommand(
+            Guid CommentId,
+            Guid RequesterId,
+            string Content
+        ) : ICommand<BaseResponseDto<bool>>;
+
+        /// <summary>
+        /// Command to delete a comment.
+        /// </summary>
+        public record DeleteCommentCommand(
+            Guid CommentId,
+            Guid RequesterId
+        ) : ICommand<BaseResponseDto<bool>>;
     }
 }

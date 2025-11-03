@@ -24,6 +24,7 @@ namespace ForumService.Core.Handler.Post.Query
         private readonly IGenericRepository<Domain.Models.Attachment> _attachmentRepository;
         private readonly ITagQueryRepository _tagRepository;
         private readonly IKafkaProducerRepository<User> _producerRepository;
+        private readonly IUnitOfWork _unitOfWork; 
         private readonly ILogger<GetPostDetailsByIdQueryHandler> _logger;
         private const string ResponseTopic = "user-forum-user";
         private const string DestinationService = "user";
@@ -35,6 +36,7 @@ namespace ForumService.Core.Handler.Post.Query
             IGenericRepository<Domain.Models.Attachment> attachmentRepository,
             ITagQueryRepository tagRepository,
             IKafkaProducerRepository<User> producerRepository,
+            IUnitOfWork unitOfWork, 
             ILogger<GetPostDetailsByIdQueryHandler> logger)
         {
             _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
@@ -43,6 +45,7 @@ namespace ForumService.Core.Handler.Post.Query
             _attachmentRepository = attachmentRepository ?? throw new ArgumentNullException(nameof(attachmentRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _producerRepository = producerRepository ?? throw new ArgumentNullException(nameof(producerRepository));
+            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); 
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -62,6 +65,21 @@ namespace ForumService.Core.Handler.Post.Query
                         Message = $"Post with ID {request.PostId} not found or is not published.",
                         ResponseData = null
                     };
+                }
+
+                // Increment the view count. This is a write operation (side-effect) within a query handler.
+                try
+                {
+                    await _unitOfWork.BeginTransactionAsync();
+                    postEntity.ViewsCount++;
+                    await _postRepository.UpdateAsync(postEntity);
+                    await _unitOfWork.CommitAsync();
+                }
+                catch (Exception viewEx)
+                {
+                    
+                    _logger.LogWarning(viewEx, "Failed to increment view count for PostId {PostId}. Continuing to retrieve post details.", request.PostId);
+                    await _unitOfWork.RollbackAsync();
                 }
 
                 var tagsTask = _tagRepository.GetTagNamesByPostIdAsync(request.PostId, cancellationToken);
