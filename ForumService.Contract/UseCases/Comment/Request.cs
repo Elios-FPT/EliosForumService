@@ -17,5 +17,12 @@ namespace ForumService.Contract.UseCases.Comment
             Guid? ParentCommentId, // Optional: ID of the comment being replied to
             [Required, MinLength(1)] string Content // The content of the comment
         );
+
+        /// <summary>
+        /// Request to update an existing comment's content.
+        /// </summary>
+        public record UpdateCommentRequest(
+            [Required, MinLength(1)] string Content // The new content of the comment
+        );
     }
 }
