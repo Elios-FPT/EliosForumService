@@ -26,6 +26,19 @@ namespace ForumService.Contract.UseCases.Post
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>
+        /// Command to create a new post, upload files, and submit for review. (Saves as PendingReview)
+        /// </summary>
+        public record CreateAndSubmitPostCommand(
+            Guid AuthorId,
+            Guid? CategoryId,
+            string Title,
+            string Content,
+            string? PostType,
+            List<FileToUploadDto>? FilesToUpload,
+            List<string>? Tags
+        ) : ICommand<BaseResponseDto<bool>>;
+
+        /// <summary>
         /// Command to update an existing post, including file attachment handling.
         /// </summary>
         public record UpdatePostCommand(
