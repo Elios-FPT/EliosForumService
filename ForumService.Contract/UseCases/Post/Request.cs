@@ -21,6 +21,17 @@ namespace ForumService.Contract.UseCases.Post
         );
 
         /// <summary>
+        /// Request to create a new post and submit it for review immediately.
+        /// </summary>
+        public record CreateAndSubmitPostRequest(
+            Guid? CategoryId,
+            [Required, MaxLength(255)] string Title,
+            [Required] string Content,
+            List<string>? Tags, // Tags are required by logic in handler
+            string PostType = "Post"    // "Post" | "Solution"
+        );
+
+        /// <summary>
         /// Request to update an existing post.
         /// </summary>
         public record UpdatePostRequest(
