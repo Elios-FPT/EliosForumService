@@ -35,17 +35,17 @@ namespace ForumService.Web.Controllers.Comment
         [ProducesResponseType(typeof(BaseResponseDto<Guid>), StatusCodes.Status500InternalServerError)] 
         public async Task<BaseResponseDto<Guid>> CreateComment([FromBody] CreateCommentRequest request)
         {
-            //var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
-            //if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
-            //{
-            //    return new BaseResponseDto<Guid>
-            //    {
-            //        Status = 401,
-            //        Message = "User not authenticated or invalid/missing X-Auth-Request-User header",
-            //        ResponseData = Guid.Empty
-            //    };
-            //}
-            var userId = new Guid("cc51ccca-fa67-4cbe-91df-122e8ea33ac9");
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<Guid>
+                {
+                    Status = 401,
+                    Message = "User not authenticated or invalid/missing X-Auth-Request-User header",
+                    ResponseData = Guid.Empty
+                };
+            }
+            //var userId = new Guid("cc51ccca-fa67-4cbe-91df-122e8ea33ac9");
             try
             {
                 var command = new CreateCommentCommand(
