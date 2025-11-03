@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ForumService.Contract.TransferObjects.Post
 {
-    public class PostViewDetailDto
+    public class  PostViewDetailDto
     {
         public Guid PostId { get; set; }
         public Guid AuthorId { get; set; }
@@ -15,6 +15,7 @@ namespace ForumService.Contract.TransferObjects.Post
         public string? Summary { get; set; }
         public string Content { get; set; } = null!;
         public string PostType { get; set; }
+        public string Status { get; set; }
         public long ViewsCount { get; set; }
         public int CommentCount { get; set; }
         public int UpvoteCount { get; set; }

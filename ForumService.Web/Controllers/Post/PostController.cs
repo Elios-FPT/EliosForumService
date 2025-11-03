@@ -194,7 +194,38 @@ namespace ForumService.Web.Controllers.Post
 
             return await _sender.Send(query);
         }
-    
+
+        /// <summary>
+        /// Retrieves the detailed view of a single post owned by the current authenticated user.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint allows a user to retrieve their own post regardless of its status (Draft, PendingReview, etc.),
+        /// primarily for viewing or editing purposes.
+        /// </remarks>
+        /// <param name="postId">The ID of the post to retrieve.</param>
+        /// <returns>The detailed information of the post.</returns>
+        [HttpGet("my-posts/{postId}")]
+        [ProducesResponseType(typeof(BaseResponseDto<PostViewDetailDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<BaseResponseDto<PostViewDetailDto>> GetMyPostById([FromRoute] Guid postId)
+        {
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<PostViewDetailDto>
+                {
+                    Status = 401,
+                    Message = "User not authenticated or invalid/missing X-Auth-Request-User header",
+                    ResponseData = null
+                };
+            }
+
+            var query = new GetMyPostByIdQuery(postId, userId);
+            return await _sender.Send(query);
+        }
+
+
         /// <summary>
         /// Deletes a post by its ID. (Soft delete)
         /// </summary>

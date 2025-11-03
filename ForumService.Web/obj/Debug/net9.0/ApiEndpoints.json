@@ -1026,6 +1026,44 @@
     ]
   },
   {
+    "ContainingType": "ForumService.Web.Controllers.Post.PostController",
+    "Method": "GetMyPostById",
+    "RelativePath": "api/forum/posts/my-posts/{postId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "postId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[ForumService.Contract.TransferObjects.Post.PostViewDetailDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
     "ContainingType": "ForumService.Web.Controllers.Report.ReportController",
     "Method": "CreateReport",
     "RelativePath": "api/forum/reports",

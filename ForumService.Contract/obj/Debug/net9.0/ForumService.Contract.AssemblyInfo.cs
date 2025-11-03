@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ForumService.Contract")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7d6753a22fb62730ed1c73813d6db396a5e61596")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+925179709500ba5d547d31fda5ba939432d87e81")]
 [assembly: System.Reflection.AssemblyProductAttribute("ForumService.Contract")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ForumService.Contract")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

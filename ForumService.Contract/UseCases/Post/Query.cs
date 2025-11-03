@@ -94,6 +94,14 @@ namespace ForumService.Contract.UseCases.Post
         ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
 
         /// <summary>
+        /// Query to get a single post by its ID, scoped to the requester.
+        /// </summary>
+        public record GetMyPostByIdQuery(
+            Guid PostId,
+            Guid RequesterId
+        ) : IQuery<BaseResponseDto<PostViewDetailDto>>;
+
+        /// <summary>
         /// Query to get the detailed view of a single published post.
         /// </summary>
         public record GetPostDetailsByIdQuery(
