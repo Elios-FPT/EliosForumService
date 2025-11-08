@@ -12,7 +12,7 @@ namespace ForumService.Contract.UseCases.Post
     public static class Command
     {
         /// <summary>
-        /// Command to create a new post, including file uploads.
+        /// Unified Command to create a new post.
         /// </summary>
         public record CreatePostCommand(
             Guid AuthorId,
@@ -20,22 +20,9 @@ namespace ForumService.Contract.UseCases.Post
             string Title,
             string Content,
             string? PostType,
-            // CHANGE HERE:
-            // Replace the old Attachment list with a list containing raw file data.
-            List<FileToUploadDto>? FilesToUpload
-        ) : ICommand<BaseResponseDto<bool>>;
-
-        /// <summary>
-        /// Command to create a new post, upload files, and submit for review. (Saves as PendingReview)
-        /// </summary>
-        public record CreateAndSubmitPostCommand(
-            Guid AuthorId,
-            Guid? CategoryId,
-            string Title,
-            string Content,
-            string? PostType,
-            List<FileToUploadDto>? FilesToUpload,
-            List<string>? Tags
+            Guid? ReferenceId,
+            List<string>? Tags,
+            bool SubmitForReview // True = PendingReview, False = Draft
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>
@@ -48,12 +35,8 @@ namespace ForumService.Contract.UseCases.Post
             string? Summary,
             string Content,
             Guid? CategoryId,
-
-            // CHANGE: Raw file data for NEW files to be uploaded.
-            List<FileToUploadDto>? NewFilesToUpload,
-
-            // CHANGE: List of IDs of OLD attachments to be deleted.
-            List<Guid>? AttachmentIdsToDelete
+            List<string>? Tags,
+            Guid? ReferenceId
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>
@@ -139,5 +122,13 @@ namespace ForumService.Contract.UseCases.Post
             Guid PostId,
             Guid RequesterId
         ) : ICommand<BaseResponseDto<bool>>;
+
+        
+        public record ModeratorDeletePostCommand(
+            Guid PostId,
+            Guid ModeratorId, 
+            string Reason     
+        ) : ICommand<BaseResponseDto<bool>>;
+
     }
 }

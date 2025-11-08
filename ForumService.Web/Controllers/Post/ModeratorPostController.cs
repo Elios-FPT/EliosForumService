@@ -143,5 +143,34 @@ namespace ForumService.Web.Controllers.Post
             var command = new RejectPostCommand(postId, moderatorId, request.Reason);
             return await _sender.Send(command);
         }
+
+        /// <summary>
+        /// (Moderator) Soft-deletes a post.
+        /// </summary>
+        /// <remarks>
+        /// Sets the IsDeleted flag to true. Can delete posts in any status.
+        /// Requires a reason in the request body.
+        /// </remarks>
+        /// <param name="postId">The ID of the post to delete.</param>
+        /// <param name="request">An object containing the reason for deletion.</param>
+        /// <returns>A boolean indicating success.</returns>
+        [HttpDelete("{postId}")]
+        [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<BaseResponseDto<bool>> ModeratorDeletePost([FromRoute] Guid postId, [FromBody] ModeratorDeletePostRequest request)
+        {
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var moderatorId))
+            {
+                return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
+            }
+
+            //var moderatorId = new Guid("ac9f879f-5121-45ab-bd47-641e68934105");
+
+            var command = new ModeratorDeletePostCommand(postId, moderatorId, request.Reason);
+            return await _sender.Send(command);
+        }
     }
 }

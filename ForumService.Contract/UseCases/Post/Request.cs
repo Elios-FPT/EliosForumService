@@ -10,38 +10,30 @@ namespace ForumService.Contract.UseCases.Post
 {
     public static class Request
     {
+     
         /// <summary>
-        /// Request to create a new post.
+        /// Unified Request to create a new post (Draft or PendingReview).
         /// </summary>
         public record CreatePostRequest(
             Guid? CategoryId,
             [Required, MaxLength(255)] string Title,
             [Required] string Content,
-            string PostType = "Post"   // "Post" | "Solution"
+            string PostType = "Post",      // "Post" | "Solution"
+            Guid? ReferenceId = null,
+            List<string>? Tags = null,     // Optional: Tags defined at creation time
+            bool SubmitForReview = false   // FALSE = Draft (default), TRUE = PendingReview
         );
 
         /// <summary>
-        /// Request to create a new post and submit it for review immediately.
-        /// </summary>
-        public record CreateAndSubmitPostRequest(
-            Guid? CategoryId,
-            [Required, MaxLength(255)] string Title,
-            [Required] string Content,
-            List<string>? Tags, // Tags are required by logic in handler
-            string PostType = "Post"    // "Post" | "Solution"
-        );
-
-        /// <summary>
-        /// Request to update an existing post.
+        /// Request to update an existing post. (Uses JSON [FromBody])
         /// </summary>
         public record UpdatePostRequest(
-            // PostId has been removed because it will be taken from the URL route.
             [Required, MaxLength(255)] string Title,
-            string? Summary,
+            string? Summary, 
             [Required] string Content,
             Guid? CategoryId,
-            // ADDED: A list of attachment IDs that need to be deleted.
-            List<Guid>? AttachmentIdsToDelete = null
+            Guid? ReferenceId = null,
+            List<string>? Tags = null
         );
 
         /// <summary>
@@ -189,5 +181,12 @@ namespace ForumService.Contract.UseCases.Post
         public record RejectPostRequest(
             string? Reason
         );
+
+        public record ModeratorDeletePostRequest
+    (
+        [Required(ErrorMessage = "A reason for deletion is required.")]
+        [MinLength(10, ErrorMessage = "Reason must be at least 10 characters long.")]
+        string Reason
+    );
     }
 }

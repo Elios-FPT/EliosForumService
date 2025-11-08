@@ -2,6 +2,7 @@
 using ForumService.Core.Handler.Comment.Command;
 using ForumService.Core.Interfaces;
 using ForumService.Domain.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Linq.Expressions;
@@ -17,6 +18,8 @@ namespace ForumService.Tests.Handler.Comment.Command
         private readonly Mock<IGenericRepository<Domain.Models.Comment>> _commentRepositoryMock;
         private readonly Mock<IGenericRepository<Domain.Models.Post>> _postRepositoryMock;
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+        private readonly Mock<ISUtilityServiceClient> _utilityServiceClientMock;
+        private readonly Mock<ILogger<CreateCommentCommandHandler>> _loggerMock;
         private readonly CreateCommentCommandHandler _handler;
 
         public CreateCommentCommandHandlerTests()
@@ -24,10 +27,15 @@ namespace ForumService.Tests.Handler.Comment.Command
             _commentRepositoryMock = new Mock<IGenericRepository<Domain.Models.Comment>>();
             _postRepositoryMock = new Mock<IGenericRepository<Domain.Models.Post>>();
             _unitOfWorkMock = new Mock<IUnitOfWork>();
+            _utilityServiceClientMock = new Mock<ISUtilityServiceClient>();
+            _loggerMock = new Mock<ILogger<CreateCommentCommandHandler>>();
+
             _handler = new CreateCommentCommandHandler(
                 _commentRepositoryMock.Object,
                 _postRepositoryMock.Object,
-                _unitOfWorkMock.Object);
+                _unitOfWorkMock.Object,
+                _utilityServiceClientMock.Object,
+                _loggerMock.Object);
         }
 
         [Fact]
