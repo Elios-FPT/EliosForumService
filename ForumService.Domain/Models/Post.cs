@@ -17,7 +17,16 @@ namespace ForumService.Domain.Models
         public string Title { get; set; } = null!;
         public string? Summary { get; set; }
         public string Content { get; set; } = null!;
-        public string PostType { get; set; } = "Post"; // "Post" | "Solution"
+        public string PostType { get; set; } = "Post"; // "Post" | "Solution" | "Project"
+
+        /// <summary>
+        /// ID referencing an external entity depending on the PostType.
+        /// - If PostType == "Solution" -> ReferenceId is the ChallengeId (Coding Test).
+        /// - If PostType == "Project" -> ReferenceId is the ProjectId (Mock Project).
+        /// - If PostType == "Post" -> ReferenceId is usually null.
+        /// </summary>
+        public Guid? ReferenceId { get; set; }
+
         public string Status { get; set; } = "Draft"; // "Draft" | "PendingReview" | "Rejected" | "Published" |
         public long ViewsCount { get; set; } = 0;
         public int CommentCount { get; set; } = 0;

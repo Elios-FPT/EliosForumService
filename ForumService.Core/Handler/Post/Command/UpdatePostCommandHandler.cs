@@ -4,7 +4,7 @@ using ForumService.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions; 
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Post.Command;
 
@@ -14,19 +14,27 @@ namespace ForumService.Core.Handler.Post.Command
     {
         private readonly IGenericRepository<Domain.Models.Post> _postRepository;
         private readonly IGenericRepository<Domain.Models.Attachment> _attachmentRepository;
+        // THAY ĐỔI: Thêm 2 repo cho Tags
+        private readonly IGenericRepository<Domain.Models.Tag> _tagRepository;
+        private readonly IGenericRepository<Domain.Models.PostTag> _postTagRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ISUtilityServiceClient _utilityServiceClient;
+        // THAY ĐỔI: Bỏ utility service
+        // private readonly ISUtilityServiceClient _utilityServiceClient;
 
         public UpdatePostCommandHandler(
             IGenericRepository<Domain.Models.Post> postRepository,
             IGenericRepository<Domain.Models.Attachment> attachmentRepository,
-            IUnitOfWork unitOfWork,
-            ISUtilityServiceClient utilityServiceClient)
+            // Thêm 2 repo
+            IGenericRepository<Domain.Models.Tag> tagRepository,
+            IGenericRepository<Domain.Models.PostTag> postTagRepository,
+            IUnitOfWork unitOfWork)
+        // Bỏ ISUtilityServiceClient
         {
             _postRepository = postRepository;
             _attachmentRepository = attachmentRepository;
+            _tagRepository = tagRepository; // Thêm
+            _postTagRepository = postTagRepository; // Thêm
             _unitOfWork = unitOfWork;
-            _utilityServiceClient = utilityServiceClient;
         }
 
         public async Task<BaseResponseDto<bool>> Handle(UpdatePostCommand request, CancellationToken cancellationToken)
@@ -40,7 +48,6 @@ namespace ForumService.Core.Handler.Post.Command
             await _unitOfWork.BeginTransactionAsync();
             try
             {
-                // 2️ Get the existing post
                 var post = await _postRepository.GetByIdAsync(request.PostId);
                 if (post == null)
                 {
@@ -48,62 +55,56 @@ namespace ForumService.Core.Handler.Post.Command
                     return new BaseResponseDto<bool> { Status = 404, Message = $"Post with ID {request.PostId} not found.", ResponseData = false };
                 }
 
-                // 3️ Handle deletion of old attachments
-                if (request.AttachmentIdsToDelete is not null && request.AttachmentIdsToDelete.Any())
+              
+                var oldPostTags = await _postTagRepository.GetListAsync(filter: pt => pt.PostId == post.PostId);
+                if (oldPostTags.Any())
                 {
-                    var attachmentsToDelete = await _attachmentRepository.GetListAsync(
-                        filter: a => a.TargetId == post.PostId && request.AttachmentIdsToDelete.Contains(a.AttachmentId)
-                    );
-
-                    if (attachmentsToDelete.Any())
-                    {
-                        await _attachmentRepository.DeleteRangeAsync(attachmentsToDelete);
-                    }
+                    await _postTagRepository.DeleteRangeAsync(oldPostTags);
                 }
 
-                // 4️ Handle upload of new attachments
-                if (request.NewFilesToUpload is not null && request.NewFilesToUpload.Any())
+                if (request.Tags != null && request.Tags.Any())
                 {
-                    var newAttachments = new List<Domain.Models.Attachment>();
-                    foreach (var file in request.NewFilesToUpload)
+                    var postTagsToAdd = new List<Domain.Models.PostTag>();
+                    var uniqueTagNames = request.Tags
+                        .Select(t => t.ToLowerInvariant().Trim())
+                        .Where(t => !string.IsNullOrEmpty(t))
+                        .Distinct();
+
+                    foreach (var tagName in uniqueTagNames)
                     {
-                        var keyPrefix = $"posts/{post.PostId}";
-                        var uploadedUrl = await _utilityServiceClient.UploadFileAsync(keyPrefix, file, cancellationToken);
-
-                        if (string.IsNullOrEmpty(uploadedUrl))
+                        var tagEntity = await _tagRepository.GetOneAsync(t => t.Name == tagName);
+                        if (tagEntity == null)
                         {
-                            await _unitOfWork.RollbackAsync();
-                            return new BaseResponseDto<bool> { Status = 500, Message = $"Failed to upload new file: {file.FileName}. Update cancelled.", ResponseData = false };
+                            tagEntity = new Domain.Models.Tag
+                            {
+                                TagId = Guid.NewGuid(),
+                                Name = tagName,
+                                Slug = GenerateSlug(tagName),
+                                CreatedAt = DateTime.UtcNow
+                            };
+                            await _tagRepository.AddAsync(tagEntity);
                         }
-
-                        newAttachments.Add(new Domain.Models.Attachment
+                        postTagsToAdd.Add(new Domain.Models.PostTag
                         {
-                            AttachmentId = Guid.NewGuid(),
-                            TargetType = "Post",
-                            TargetId = post.PostId,
-                            Filename = file.FileName,
-                            Url = uploadedUrl,
-                            ContentType = file.ContentType,
-                            SizeBytes = file.Content.Length,
-                            UploadedBy = post.AuthorId, // Or the current user performing the request
-                            UploadedAt = DateTime.UtcNow
+                            PostId = post.PostId,
+                            TagId = tagEntity.TagId
                         });
                     }
-                    await _attachmentRepository.AddRangeAsync(newAttachments);
+                    await _postTagRepository.AddRangeAsync(postTagsToAdd);
                 }
 
-                // 5️ Update post information
+                // 6️ Update post information
                 post.Title = request.Title;
                 post.Summary = request.Summary;
                 post.Content = request.Content;
                 post.CategoryId = request.CategoryId;
-                post.Status = "Draft";
+                post.Status = "Draft"; 
                 post.UpdatedAt = DateTime.UtcNow;
-                // post.UpdatedBy = ... ; // Get from the current user information
+                post.UpdatedBy = request.RequesterId;
 
                 await _postRepository.UpdateAsync(post);
 
-                // 6️ Commit transaction
+                // 7️ Commit transaction
                 await _unitOfWork.CommitAsync();
 
                 return new BaseResponseDto<bool> { Status = 200, Message = "Post updated successfully.", ResponseData = true };
@@ -113,6 +114,16 @@ namespace ForumService.Core.Handler.Post.Command
                 await _unitOfWork.RollbackAsync();
                 return new BaseResponseDto<bool> { Status = 500, Message = $"Failed to update post: {ex.Message}", ResponseData = false };
             }
+        }
+
+        private static string GenerateSlug(string phrase)
+        {
+            string str = phrase.ToLowerInvariant().Trim();
+            str = Regex.Replace(str, @"[^a-z0-9\s-]", "");
+            str = Regex.Replace(str, @"\s+", "-").Trim();
+            str = str[..(str.Length <= 45 ? str.Length : 45)];
+            str = Regex.Replace(str, @"-+", "-");
+            return str;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace ForumService.Domain.Models
         [Key]
         public Guid AttachmentId { get; set; }
         public string TargetType { get; set; } = null!;
-        public Guid TargetId { get; set; }
+        public Guid? TargetId { get; set; }
         public string Filename { get; set; } = null!;
         public string Url { get; set; } = null!;
         public string? ContentType { get; set; }

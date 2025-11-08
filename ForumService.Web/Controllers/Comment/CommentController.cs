@@ -45,6 +45,7 @@ namespace ForumService.Web.Controllers.Comment
                     ResponseData = Guid.Empty
                 };
             }
+
             //var userId = new Guid("cc51ccca-fa67-4cbe-91df-122e8ea33ac9");
             try
             {

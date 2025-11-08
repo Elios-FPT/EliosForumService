@@ -38,7 +38,7 @@ namespace ForumService.Infrastructure.Migrations
                     b.Property<long?>("SizeBytes")
                         .HasColumnType("bigint");
 
-                    b.Property<Guid>("TargetId")
+                    b.Property<Guid?>("TargetId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("TargetType")
@@ -186,6 +186,9 @@ namespace ForumService.Infrastructure.Migrations
                     b.Property<string>("PostType")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("ReferenceId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("RejectionReason")
                         .HasColumnType("text");

@@ -5,9 +5,10 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Json;
+using System.Net.Http.Json; 
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading; 
 
 namespace ForumService.Infrastructure.Implementations
 {
@@ -49,6 +50,34 @@ namespace ForumService.Infrastructure.Implementations
             {
                 _logger.LogError(ex, "Exception occurred while uploading file '{FileName}'", file.FileName);
                 return null;
+            }
+        }
+
+
+        /// <summary>
+        /// Implements the interface method to send a notification.
+        /// </summary>
+        public async Task SendNotificationAsync(NotificationDto request, CancellationToken cancellationToken)
+        {
+            const string requestUri = "api/v1/Notification";
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync(requestUri, request, cancellationToken);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                    _logger.LogError("Failed to send notification. Status: {StatusCode}. Response: {ErrorContent}. Payload: {Payload}",
+                        response.StatusCode,
+                        errorContent,
+                        System.Text.Json.JsonSerializer.Serialize(request));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Exception occurred while sending notification to {RequestUri}. Payload: {Payload}",
+                    requestUri,
+                    System.Text.Json.JsonSerializer.Serialize(request));
             }
         }
     }

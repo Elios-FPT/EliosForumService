@@ -27,14 +27,16 @@ namespace ForumService.Web.Controllers.Post
         {
             _sender = sender;
         }
-
         /// <summary>
-        /// Creates a new post with optional file attachments.
+        /// Creates a new post. Can be saved as Draft or submitted for review immediately.
         /// </summary>
+        /// <param name="request">The post creation request.</param>
+        /// <returns>Success status.</returns>
         [HttpPost]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<BaseResponseDto<bool>> CreatePost([FromForm] CreatePostRequest request, List<IFormFile> files)
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+        public async Task<BaseResponseDto<bool>> CreatePost([FromBody] CreatePostRequest request)
         {
             var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
             if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
@@ -43,25 +45,6 @@ namespace ForumService.Web.Controllers.Post
             }
 
             //var userId = new Guid("102ea1b3-f664-4617-8f43-fdde557f12b6");
-
-            var filesToUpload = new List<FileToUploadDto>();
-            if (files is not null)
-            {
-                foreach (var file in files)
-                {
-                    if (file.Length > 0)
-                    {
-                        using var memoryStream = new MemoryStream();
-                        await file.CopyToAsync(memoryStream);
-                        filesToUpload.Add(new FileToUploadDto
-                        {
-                            FileName = file.FileName,
-                            ContentType = file.ContentType,
-                            Content = memoryStream.ToArray()
-                        });
-                    }
-                }
-            }
 
             var command = new CreatePostCommand(
                 AuthorId: userId,
@@ -69,61 +52,9 @@ namespace ForumService.Web.Controllers.Post
                 Title: request.Title,
                 Content: request.Content,
                 PostType: request.PostType,
-                FilesToUpload: filesToUpload
-            );
-            return await _sender.Send(command);
-        }
-
-        /// <summary>
-        /// Creates a new post and immediately submits it for review (Status: PendingReview).
-        /// </summary>
-        /// <remarks>
-        /// This endpoint accepts form-data. Tags must be provided as multiple form fields with the key 'Tags'.
-        /// Example: Tags=dotnet&Tags=csharp
-        /// </remarks>
-        [HttpPost("submit")]
-        [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        public async Task<BaseResponseDto<bool>> CreateAndSubmitPost([FromForm] CreateAndSubmitPostRequest request, List<IFormFile> files)
-        {
-            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
-            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
-            {
-                return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
-            }
-
-            //var userId = new Guid("102ea1b3-f664-4617-8f43-fdde557f12b6");
-
-            // Convert IFormFile to DTO
-            var filesToUpload = new List<FileToUploadDto>();
-            if (files is not null)
-            {
-                foreach (var file in files)
-                {
-                    if (file.Length > 0)
-                    {
-                        using var memoryStream = new MemoryStream();
-                        await file.CopyToAsync(memoryStream);
-                        filesToUpload.Add(new FileToUploadDto
-                        {
-                            FileName = file.FileName,
-                            ContentType = file.ContentType,
-                            Content = memoryStream.ToArray()
-                        });
-                    }
-                }
-            }
-
-            // Create the new combined command
-            var command = new CreateAndSubmitPostCommand(
-                AuthorId: userId,
-                CategoryId: request.CategoryId,
-                Title: request.Title,
-                Content: request.Content,
-                PostType: request.PostType,
-                FilesToUpload: filesToUpload,
-                Tags: request.Tags 
+                ReferenceId: request.ReferenceId,
+                Tags: request.Tags,                     // New: Supports tags even when Draft
+                SubmitForReview: request.SubmitForReview // New: Flag determines status
             );
             return await _sender.Send(command);
         }
@@ -133,42 +64,26 @@ namespace ForumService.Web.Controllers.Post
         /// </summary>
         [HttpPut("{postId}")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
-        public async Task<BaseResponseDto<bool>> UpdatePost([FromRoute] Guid postId, [FromForm] UpdatePostRequest request, List<IFormFile> files)
+        public async Task<BaseResponseDto<bool>> UpdatePost([FromRoute] Guid postId, [FromBody] UpdatePostRequest request)
         {
-          
+
             var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
             if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
             {
                 return new BaseResponseDto<bool> { Status = 401, Message = "User not authenticated", ResponseData = false };
             }
-       
-            var newFilesToUpload = new List<FileToUploadDto>();
-            if (files is not null)
-            {
-                foreach (var file in files)
-                {
-                    if (file.Length > 0)
-                    {
-                        using var memoryStream = new MemoryStream();
-                        await file.CopyToAsync(memoryStream);
-                        newFilesToUpload.Add(new FileToUploadDto
-                        {
-                            FileName = file.FileName,
-                            ContentType = file.ContentType,
-                            Content = memoryStream.ToArray()
-                        });
-                    }
-                }
-            }
+
+            //var userId = new Guid("102ea1b3-f664-4617-8f43-fdde557f12b6");
+
             var command = new UpdatePostCommand(
                 PostId: postId,
-                RequesterId: userId, 
+                RequesterId: userId,
                 Title: request.Title,
                 Summary: request.Summary,
                 Content: request.Content,
                 CategoryId: request.CategoryId,
-                NewFilesToUpload: newFilesToUpload,
-                AttachmentIdsToDelete: request.AttachmentIdsToDelete
+                Tags: request.Tags,
+                ReferenceId: request.ReferenceId
             );
             return await _sender.Send(command);
         }
