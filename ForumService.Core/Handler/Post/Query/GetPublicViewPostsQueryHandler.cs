@@ -3,7 +3,7 @@ using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects.Post;
 using ForumService.Core.Interfaces;
 using ForumService.Core.Interfaces.Post;
-using ForumService.Contract.Models; 
+using ForumService.Contract.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,7 @@ using static ForumService.Contract.UseCases.Post.Query;
 
 namespace ForumService.Core.Handler.Post.Query
 {
+
     public class GetPublicViewPostsQueryHandler : IQueryHandler<GetPublicViewPostsQuery, BaseResponseDto<IEnumerable<PostViewDto>>>
     {
         private readonly IPostQueryRepository _postQueryRepository;
@@ -21,24 +22,25 @@ namespace ForumService.Core.Handler.Post.Query
         private const string ResponseTopic = "user-forum-user";
         private const string DestinationService = "user";
 
-        public GetPublicViewPostsQueryHandler(IPostQueryRepository postQueryRepository, 
+        public GetPublicViewPostsQueryHandler(IPostQueryRepository postQueryRepository,
             IKafkaProducerRepository<User> producerRepository,
             IGenericRepository<Domain.Models.Category> categoryRepository)
         {
             _postQueryRepository = postQueryRepository ?? throw new ArgumentNullException(nameof(postQueryRepository));
             _producerRepository = producerRepository ?? throw new ArgumentNullException(nameof(producerRepository));
-            _categoryRepository = categoryRepository;
+            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
         public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> Handle(GetPublicViewPostsQuery request, CancellationToken cancellationToken)
         {
             if (request.Limit <= 0 || request.Offset < 0)
             {
-                return new BaseResponseDto<IEnumerable<PostViewDto>> { Status = 400 };
+                return new BaseResponseDto<IEnumerable<PostViewDto>> { Status = 400, Message = "Invalid pagination parameters." };
             }
 
             try
             {
+
                 var posts = (await _postQueryRepository.GetPublicViewPostsAsync(request)).ToList();
 
                 if (!posts.Any())
@@ -51,21 +53,28 @@ namespace ForumService.Core.Handler.Post.Query
                     };
                 }
 
+
+                // 1. Get all unique AuthorIds from the posts
+                var authorIds = posts.Select(p => p.AuthorId).Distinct().ToList();
+
+                // 2. Fetch User Profiles
                 Dictionary<Guid, User> userProfilesDict;
                 try
                 {
                     var userProfilesList = await _producerRepository.ProduceGetAllAsync(
-                        DestinationService,
-                        ResponseTopic);
+                           DestinationService,
+                           ResponseTopic);
 
-                    userProfilesDict = userProfilesList.ToDictionary(u => u.id);
+                    userProfilesDict = userProfilesList
+                        .Where(u => authorIds.Contains(u.id))
+                        .ToDictionary(u => u.id);
                 }
                 catch
                 {
                     userProfilesDict = new Dictionary<Guid, User>();
                 }
 
-               
+
                 var postDtos = new List<PostViewDto>();
                 foreach (var post in posts)
                 {
@@ -88,11 +97,9 @@ namespace ForumService.Core.Handler.Post.Query
                         CreatedAt = post.CreatedAt,
                         AuthorFirstName = authorProfile?.firstName,
                         AuthorLastName = authorProfile?.lastName,
-                        AuthorAvatarUrl = authorProfile?.avatarUrl
+                        AuthorAvatarUrl = authorProfile?.avatarUrl,
+                        CategoryName = post.Category?.Name
                     };
-
-                    var category = await _categoryRepository.GetByIdAsync(post.CategoryId);
-                    postDto.CategoryName = category?.Name;
 
                     postDtos.Add(postDto);
                 }
@@ -109,10 +116,9 @@ namespace ForumService.Core.Handler.Post.Query
                 return new BaseResponseDto<IEnumerable<PostViewDto>>
                 {
                     Status = 500,
-                    Message = ex.ToString()
+                    Message = $"An error occurred: {ex.Message}"
                 };
             }
         }
     }
 }
-

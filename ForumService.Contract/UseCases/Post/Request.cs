@@ -18,7 +18,7 @@ namespace ForumService.Contract.UseCases.Post
             Guid? CategoryId,
             [Required, MaxLength(255)] string Title,
             [Required] string Content,
-            string PostType = "Post",      // "Post" | "Solution"
+            string PostType = "Post",      // "Post" | "Solution" | "Project"
             Guid? ReferenceId = null,
             List<string>? Tags = null,     // Optional: Tags defined at creation time
             bool SubmitForReview = false   // FALSE = Draft (default), TRUE = PendingReview
@@ -59,6 +59,7 @@ namespace ForumService.Contract.UseCases.Post
             Guid? CategoryId = null,
             string? PostType = null,
             string? SearchKeyword = null,
+            Guid? ReferenceId = null,
 
             // Pagination
             int Limit = 20,
@@ -75,6 +76,7 @@ namespace ForumService.Contract.UseCases.Post
             Guid? CategoryId = null,
             string? PostType = null,
             string? SearchKeyword = null,
+            Guid? ReferenceId = null,
 
             // Pagination
             int Limit = 20,
@@ -94,6 +96,7 @@ namespace ForumService.Contract.UseCases.Post
             Guid? CategoryId = null,
             string? PostType = null,
             string? SearchKeyword = null,
+            Guid? ReferenceId = null,
 
             // Pagination
             int Limit = 20,
@@ -114,6 +117,7 @@ namespace ForumService.Contract.UseCases.Post
             Guid? CategoryId = null,
             string? PostType = null,
             string? SearchKeyword = null,
+            Guid? ReferenceId = null,
 
             // Pagination
             int Limit = 20,
@@ -133,6 +137,7 @@ namespace ForumService.Contract.UseCases.Post
             Guid? CategoryId = null,
             string? PostType = null,
             string? SearchKeyword = null,
+            Guid? ReferenceId = null,
 
             // Pagination
             int Limit = 20,
