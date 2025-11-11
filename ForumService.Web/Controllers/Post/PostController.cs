@@ -27,6 +27,7 @@ namespace ForumService.Web.Controllers.Post
         {
             _sender = sender;
         }
+
         /// <summary>
         /// Creates a new post. Can be saved as Draft or submitted for review immediately.
         /// </summary>
@@ -101,6 +102,7 @@ namespace ForumService.Web.Controllers.Post
                 CategoryId: request.CategoryId,
                 PostType: request.PostType,
                 SearchKeyword: request.SearchKeyword,
+                ReferenceId: request.ReferenceId,
                 Limit: request.Limit,
                 Offset: request.Offset,
                 SortBy: request.SortBy,

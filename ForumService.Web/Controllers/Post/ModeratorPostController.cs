@@ -29,17 +29,29 @@ namespace ForumService.Web.Controllers.Post
         /// <summary>
         /// Retrieves a paginated list of PUBLISHED posts for moderator view (includes moderation details).
         /// </summary>
-        [HttpGet("published")] // New route specific for published posts in moderator view
+        [HttpGet("published")] 
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetModeratorPublicPosts([FromQuery] GetModeratorPublicPostsRequest request)
         {
-            // Map request to query
+
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var moderatorId))
+            {
+                return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
+                {
+                    Status = 401,
+                    Message = "User not authenticated",
+                    ResponseData = Enumerable.Empty<ModeratorPostViewDto>()
+                };
+            }
+
             var query = new GetModeratorPublicPostsQuery(
                 AuthorId: request.AuthorId,
                 CategoryId: request.CategoryId,
                 PostType: request.PostType,
                 SearchKeyword: request.SearchKeyword,
+                ReferenceId: request.ReferenceId,
                 Limit: request.Limit,
                 Offset: request.Offset,
                 SortBy: request.SortBy,
@@ -56,11 +68,23 @@ namespace ForumService.Web.Controllers.Post
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetPendingPosts([FromQuery] GetPendingPostsQuery request)
         {
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var moderatorId))
+            {
+                return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
+                {
+                    Status = 401,
+                    Message = "User not authenticated",
+                    ResponseData = Enumerable.Empty<ModeratorPostViewDto>()
+                };
+            }
+
             var query = new GetPendingPostsQuery(
                AuthorId: request.AuthorId,
                 CategoryId: request.CategoryId,
                 PostType: request.PostType,
                 SearchKeyword: request.SearchKeyword,
+                ReferenceId: request.ReferenceId,
                 Limit: request.Limit,
                 Offset: request.Offset,
                 SortBy: request.SortBy,
@@ -76,11 +100,22 @@ namespace ForumService.Web.Controllers.Post
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetArchivedPosts([FromQuery] GetArchivedPostsQuery request)
         {
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var moderatorId))
+            {
+                return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>> { 
+                    Status = 401, 
+                    Message = "User not authenticated", 
+                    ResponseData = Enumerable.Empty<ModeratorPostViewDto>()
+                };
+            }
+
             var query = new GetArchivedPostsQuery(
                 AuthorId: request.AuthorId,
                 CategoryId: request.CategoryId,
                 PostType: request.PostType,
                 SearchKeyword: request.SearchKeyword,
+                ReferenceId: request.ReferenceId,
                 Limit: request.Limit,
                 Offset: request.Offset,
                 SortBy: request.SortBy,

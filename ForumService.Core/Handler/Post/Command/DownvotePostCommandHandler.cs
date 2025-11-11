@@ -6,6 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System;
 using static ForumService.Contract.UseCases.Post.Command;
+using Microsoft.Extensions.Logging; // Added
+using ForumService.Contract.TransferObjects; // Added
+using System.Text.Json; // Added
+using System.Collections.Generic; // Added
 
 namespace ForumService.Core.Handler.Post.Command
 {
@@ -14,23 +18,34 @@ namespace ForumService.Core.Handler.Post.Command
         private readonly IGenericRepository<Domain.Models.Post> _postRepository;
         private readonly IGenericRepository<Domain.Models.Vote> _voteRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ISUtilityServiceClient _utilityServiceClient; // Added
+        private readonly ILogger<DownvotePostCommandHandler> _logger; // Added
 
         public DownvotePostCommandHandler(
             IGenericRepository<Domain.Models.Post> postRepository,
             IGenericRepository<Domain.Models.Vote> voteRepository,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            ISUtilityServiceClient utilityServiceClient, // Added
+            ILogger<DownvotePostCommandHandler> logger) // Added
         {
             _postRepository = postRepository;
             _voteRepository = voteRepository;
             _unitOfWork = unitOfWork;
+            _utilityServiceClient = utilityServiceClient ?? throw new ArgumentNullException(nameof(utilityServiceClient)); // Added
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger)); // Added
         }
 
         public async Task<BaseResponseDto<bool>> Handle(DownvotePostCommand request, CancellationToken cancellationToken)
         {
             await _unitOfWork.BeginTransactionAsync();
+
+            Domain.Models.Post post; // Hoist declaration to access it after try-catch
+            string successMessage;
+            bool shouldNotify = false; // Flag to control notification sending
+
             try
             {
-                var post = await _postRepository.GetByIdAsync(request.PostId);
+                post = await _postRepository.GetByIdAsync(request.PostId);
 
                 if (post == null || post.IsDeleted)
                 {
@@ -48,11 +63,11 @@ namespace ForumService.Core.Handler.Post.Command
                 // Find any existing vote by this user on this post.
                 var existingVote = await _voteRepository.GetOneAsync(
                     filter: v => v.TargetId == request.PostId &&
-                                 v.UserId == request.RequesterId &&
-                                 v.TargetType == "Post"
+                                  v.UserId == request.RequesterId &&
+                                  v.TargetType == "Post"
                 );
 
-                string successMessage;
+                // string successMessage; // Hoisted
 
                 if (existingVote == null)
                 {
@@ -69,6 +84,7 @@ namespace ForumService.Core.Handler.Post.Command
                     await _voteRepository.AddAsync(newVote);
                     post.DownvoteCount++;
                     successMessage = "Post downvoted successfully.";
+                    shouldNotify = true; // Send notification
                 }
                 else if (existingVote.VoteType == "Downvote")
                 {
@@ -76,6 +92,7 @@ namespace ForumService.Core.Handler.Post.Command
                     await _voteRepository.DeleteAsync(existingVote);
                     post.DownvoteCount--;
                     successMessage = "Downvote removed.";
+                    // shouldNotify remains false
                 }
                 else // existingVote.VoteType == "Upvote"
                 {
@@ -87,6 +104,7 @@ namespace ForumService.Core.Handler.Post.Command
                     post.UpvoteCount--;
                     post.DownvoteCount++;
                     successMessage = "Vote changed to downvote.";
+                    shouldNotify = true; // Send notification
                 }
 
                 // Update the post's vote count and metadata.
@@ -96,7 +114,6 @@ namespace ForumService.Core.Handler.Post.Command
 
                 await _unitOfWork.CommitAsync();
 
-                return new BaseResponseDto<bool> { Status = 200, Message = successMessage, ResponseData = true };
             }
             catch (Exception ex)
             {
@@ -104,6 +121,43 @@ namespace ForumService.Core.Handler.Post.Command
                 var errorMessage = ex.InnerException?.Message ?? ex.Message;
                 return new BaseResponseDto<bool> { Status = 500, Message = $"Failed to downvote post: {errorMessage}", ResponseData = false };
             }
+
+            // --- Send Notification (if applicable) ---
+            // We only notify if a new downvote was added or changed (shouldNotify = true)
+            // and the actor is not the post author (already checked, but good to be safe)
+            if (shouldNotify && post.AuthorId != request.RequesterId)
+            {
+                try
+                {
+                    var title = "Someone downvoted your post";
+                    string truncatedTitle = $"{post.Title.Substring(0, Math.Min(post.Title.Length, 50))}{(post.Title.Length > 50 ? "..." : "")}";
+                    var message = $"Your post \"{truncatedTitle}\" received a downvote.";
+
+                    var metadataDict = new Dictionary<string, string>
+                    {
+                        { "PostId", post.PostId.ToString() },
+                        { "TriggeredByUserId", request.RequesterId.ToString() }
+                    };
+
+                    var notificationRequest = new NotificationDto
+                    {
+                        UserId = post.AuthorId, // Send to the post author
+                        Title = title,
+                        Message = message,
+                        Url = $"/posts/{post.PostId}",
+                        Metadata = JsonSerializer.Serialize(metadataDict)
+                    };
+
+                    await _utilityServiceClient.SendNotificationAsync(notificationRequest, cancellationToken);
+                }
+                catch (Exception notifyEx)
+                {
+                    // Log the notification error, but don't fail the whole request
+                    _logger.LogError(notifyEx, "Successfully downvoted Post {PostId} but failed to send notification.", post.PostId);
+                }
+            }
+
+            return new BaseResponseDto<bool> { Status = 200, Message = successMessage, ResponseData = true };
         }
     }
 }

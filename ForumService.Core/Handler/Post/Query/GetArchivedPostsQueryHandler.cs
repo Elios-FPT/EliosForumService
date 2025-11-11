@@ -19,18 +19,15 @@ namespace ForumService.Core.Handler.Post.Query
     {
         private readonly IPostQueryRepository _postQueryRepository;
         private readonly IKafkaProducerRepository<User> _producerRepository;
-        private readonly IGenericRepository<Domain.Models.Category> _categoryRepository;
         private const string ResponseTopic = "user-forum-user";
         private const string DestinationService = "user";
 
         public GetArchivedPostsQueryHandler(
             IPostQueryRepository postQueryRepository,
-            IKafkaProducerRepository<User> producerRepository,
-            IGenericRepository<Domain.Models.Category> categoryRepository)
+            IKafkaProducerRepository<User> producerRepository)
         {
             _postQueryRepository = postQueryRepository ?? throw new ArgumentNullException(nameof(postQueryRepository));
             _producerRepository = producerRepository ?? throw new ArgumentNullException(nameof(producerRepository));
-            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
         public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> Handle(
@@ -81,13 +78,6 @@ namespace ForumService.Core.Handler.Post.Query
                     userProfilesDict.TryGetValue(post.ModeratedBy ?? Guid.Empty, out var moderatorProfile);
                     userProfilesDict.TryGetValue(post.DeletedBy ?? Guid.Empty, out var deleterProfile);
 
-                    string? categoryName = null;
-                    if (post.CategoryId.HasValue)
-                    {
-                        var category = await _categoryRepository.GetByIdAsync(post.CategoryId.Value);
-                        categoryName = category?.Name;
-                    }
-
                     var postDto = new ModeratorPostViewDto
                     {
                         PostId = post.PostId,
@@ -106,7 +96,8 @@ namespace ForumService.Core.Handler.Post.Query
                         IsDeleted = post.IsDeleted,
                         CreatedAt = post.CreatedAt,
                         UpdatedAt = post.UpdatedAt,
-                        CategoryName = categoryName,
+
+                        CategoryName = post.Category?.Name,
 
                         AuthorFirstName = authorProfile?.firstName,
                         AuthorLastName = authorProfile?.lastName,
