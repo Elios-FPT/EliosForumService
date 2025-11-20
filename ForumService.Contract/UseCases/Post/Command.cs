@@ -32,11 +32,11 @@ namespace ForumService.Contract.UseCases.Post
             Guid RequesterId,
             Guid PostId,
             string Title,
-            string? Summary,
             string Content,
             Guid? CategoryId,
             List<string>? Tags,
-            Guid? ReferenceId
+            Guid? ReferenceId,
+            bool SubmitForReview
         ) : ICommand<BaseResponseDto<bool>>;
 
         /// <summary>

@@ -22,6 +22,7 @@ namespace ForumService.Infrastructure.Data
         public DbSet<Report> Reports { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Vote> Votes { get; set; }
+        public DbSet<BannedKeyword> BannedKeywords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -55,6 +56,15 @@ namespace ForumService.Infrastructure.Data
 
             modelBuilder.Entity<Vote>()
                 .HasIndex(v => new { v.UserId, v.TargetType, v.TargetId })
+                .IsUnique();
+
+            modelBuilder.Entity<BannedKeyword>()
+           .Property(b => b.Keyword)
+           .IsRequired()
+           .HasMaxLength(200);
+
+            modelBuilder.Entity<BannedKeyword>()
+                .HasIndex(b => b.Keyword)
                 .IsUnique();
         }
     }
