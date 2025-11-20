@@ -1,15 +1,16 @@
 ﻿using ForumService.Contract.Message;
 using ForumService.Contract.Shared;
+using ForumService.Contract.TransferObjects;
 using ForumService.Core.Interfaces;
 using MediatR;
+using Microsoft.Extensions.Logging; 
 using System;
 using System.Linq;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Comment.Command;
-using Microsoft.Extensions.Logging; 
-using System.Text.Json;
-using ForumService.Contract.TransferObjects;
 
 namespace ForumService.Core.Handler.Comment.Command
 {
@@ -19,6 +20,7 @@ namespace ForumService.Core.Handler.Comment.Command
         private readonly IGenericRepository<Domain.Models.Comment> _commentRepository;
         private readonly IGenericRepository<Domain.Models.Post> _postRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IGenericRepository<Domain.Models.BannedKeyword> _bannedKeywordRepository; 
         private readonly ISUtilityServiceClient _utilityServiceClient; 
         private readonly ILogger<CreateCommentCommandHandler> _logger; 
 
@@ -26,12 +28,14 @@ namespace ForumService.Core.Handler.Comment.Command
             IGenericRepository<Domain.Models.Comment> commentRepository,
             IGenericRepository<Domain.Models.Post> postRepository,
             IUnitOfWork unitOfWork,
+            IGenericRepository<Domain.Models.BannedKeyword> bannedKeywordRepository,
             ISUtilityServiceClient utilityServiceClient, 
             ILogger<CreateCommentCommandHandler> logger) 
         {
             _commentRepository = commentRepository ?? throw new ArgumentNullException(nameof(commentRepository));
             _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _bannedKeywordRepository = bannedKeywordRepository ?? throw new ArgumentNullException(nameof(bannedKeywordRepository));
             _utilityServiceClient = utilityServiceClient ?? throw new ArgumentNullException(nameof(utilityServiceClient));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger)); 
         }
@@ -50,6 +54,16 @@ namespace ForumService.Core.Handler.Comment.Command
             if (string.IsNullOrWhiteSpace(request.Content))
             {
                 return new BaseResponseDto<Guid> { Status = 400, Message = "Comment content cannot be empty.", ResponseData = Guid.Empty };
+            }
+
+            if (await ContainsBannedKeywordAsync(request.Content))
+            {
+                return new BaseResponseDto<Guid>
+                {
+                    Status = 400,
+                    Message = "Nội dung bình luận chứa từ khóa không phù hợp.",
+                    ResponseData = Guid.Empty
+                };
             }
 
             await _unitOfWork.BeginTransactionAsync();
@@ -167,6 +181,33 @@ namespace ForumService.Core.Handler.Comment.Command
                 Message = "Comment created successfully.",
                 ResponseData = newCommentId
             };
+        }
+
+        private async Task<bool> ContainsBannedKeywordAsync(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+
+            var bannedKeywords = await _bannedKeywordRepository.GetListAsync(x => x.IsActive);
+
+            if (bannedKeywords != null && bannedKeywords.Any())
+            {
+                foreach (var banned in bannedKeywords)
+                {
+                    try
+                    {
+                        var pattern = banned.Keyword;
+                        if (Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase))
+                        {
+                            return true;
+                        }
+                    }
+                    catch (ArgumentException)
+                    {
+                        continue;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

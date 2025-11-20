@@ -29,11 +29,11 @@ namespace ForumService.Contract.UseCases.Post
         /// </summary>
         public record UpdatePostRequest(
             [Required, MaxLength(255)] string Title,
-            string? Summary, 
             [Required] string Content,
             Guid? CategoryId,
             Guid? ReferenceId = null,
-            List<string>? Tags = null
+            List<string>? Tags = null,
+            bool SubmitForReview = false
         );
 
         /// <summary>

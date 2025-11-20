@@ -2,6 +2,7 @@
 using ForumService.Contract.Shared;
 using ForumService.Core.Interfaces;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Comment.Command;
@@ -11,13 +12,16 @@ namespace ForumService.Core.Handler.Comment.Command
     public class UpdateCommentCommandHandler : ICommandHandler<UpdateCommentCommand, BaseResponseDto<bool>>
     {
         private readonly IGenericRepository<Domain.Models.Comment> _commentRepository;
+        private readonly IGenericRepository<Domain.Models.BannedKeyword> _bannedKeywordRepository; 
         private readonly IUnitOfWork _unitOfWork;
 
         public UpdateCommentCommandHandler(
             IGenericRepository<Domain.Models.Comment> commentRepository,
+            IGenericRepository<Domain.Models.BannedKeyword> bannedKeywordRepository,
             IUnitOfWork unitOfWork)
         {
             _commentRepository = commentRepository ?? throw new ArgumentNullException(nameof(commentRepository));
+            _bannedKeywordRepository = bannedKeywordRepository ?? throw new ArgumentNullException(nameof(bannedKeywordRepository));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
@@ -26,6 +30,16 @@ namespace ForumService.Core.Handler.Comment.Command
             if (string.IsNullOrWhiteSpace(request.Content))
             {
                 return new BaseResponseDto<bool> { Status = 400, Message = "Content cannot be empty.", ResponseData = false };
+            }
+
+            if (await ContainsBannedKeywordAsync(request.Content))
+            {
+                return new BaseResponseDto<bool>
+                {
+                    Status = 400,
+                    Message = "Nội dung bình luận chứa từ khóa không phù hợp.",
+                    ResponseData = false
+                };
             }
 
             await _unitOfWork.BeginTransactionAsync();
@@ -45,13 +59,6 @@ namespace ForumService.Core.Handler.Comment.Command
                     await _unitOfWork.RollbackAsync();
                     return new BaseResponseDto<bool> { Status = 403, Message = "You are not authorized to edit this comment.", ResponseData = false };
                 }
-
-                //  add a time limit for editing (e.g., cannot edit after 30 minutes)
-                // if (comment.CreatedAt.AddMinutes(30) < DateTime.UtcNow)
-                // {
-                //     await _unitOfWork.RollbackAsync();
-                //     return new BaseResponseDto<bool> { Status = 403, Message = "Comments can no longer be edited.", ResponseData = false };
-                // }
 
                 comment.Content = request.Content;
                 comment.UpdatedAt = DateTime.UtcNow;
@@ -76,6 +83,33 @@ namespace ForumService.Core.Handler.Comment.Command
                     ResponseData = false
                 };
             }
+        }
+
+        private async Task<bool> ContainsBannedKeywordAsync(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+
+            var bannedKeywords = await _bannedKeywordRepository.GetListAsync(x => x.IsActive);
+
+            if (bannedKeywords != null && bannedKeywords.Any())
+            {
+                foreach (var banned in bannedKeywords)
+                {
+                    try
+                    {
+                        var pattern = banned.Keyword;
+                        if (Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase))
+                        {
+                            return true;
+                        }
+                    }
+                    catch (ArgumentException)
+                    {
+                        continue;
+                    }
+                }
+            }
+            return false;
         }
     }
 }
