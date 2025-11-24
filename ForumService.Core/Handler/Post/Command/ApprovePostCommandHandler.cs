@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Post.Command;
-using Microsoft.Extensions.Logging; // Added
-using ForumService.Contract.TransferObjects; // Added
-using System.Text.Json; // Added
+using Microsoft.Extensions.Logging; 
+using ForumService.Contract.TransferObjects; 
+using System.Text.Json;
 
 namespace ForumService.Core.Handler.Post.Command
 {
@@ -17,19 +17,19 @@ namespace ForumService.Core.Handler.Post.Command
     {
         private readonly IGenericRepository<Domain.Models.Post> _postRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ISUtilityServiceClient _utilityServiceClient; // Added
-        private readonly ILogger<ApprovePostCommandHandler> _logger; // Added
+        private readonly ISUtilityServiceClient _utilityServiceClient; 
+        private readonly ILogger<ApprovePostCommandHandler> _logger; 
 
         public ApprovePostCommandHandler(
             IGenericRepository<Domain.Models.Post> postRepository,
             IUnitOfWork unitOfWork,
-            ISUtilityServiceClient utilityServiceClient, // Added
-            ILogger<ApprovePostCommandHandler> logger) // Added
+            ISUtilityServiceClient utilityServiceClient, 
+            ILogger<ApprovePostCommandHandler> logger) 
         {
             _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-            _utilityServiceClient = utilityServiceClient ?? throw new ArgumentNullException(nameof(utilityServiceClient)); // Added
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger)); // Added
+            _utilityServiceClient = utilityServiceClient ?? throw new ArgumentNullException(nameof(utilityServiceClient)); 
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger)); 
         }
 
         public async Task<BaseResponseDto<bool>> Handle(ApprovePostCommand request, CancellationToken cancellationToken)

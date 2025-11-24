@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects;
+using ForumService.Web.Attributes;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,7 @@ namespace ForumService.Web.Controllers.Upload
         /// Uploads files and returns their URLs and AttachmentIds.
         /// </summary>
         [HttpPost]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<List<UploadFileResponseDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<BaseResponseDto<List<UploadFileResponseDto>>> UploadFiles(List<IFormFile> files)
@@ -70,6 +72,7 @@ namespace ForumService.Web.Controllers.Upload
         /// Retrieves all files that are IMAGES (image/*) uploaded by the current user.
         /// </summary>
         [HttpGet("images")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<List<UploadFileResponseDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<BaseResponseDto<List<UploadFileResponseDto>>> GetMyUploadedImages()
@@ -95,6 +98,7 @@ namespace ForumService.Web.Controllers.Upload
         /// </summary>
         /// <param name="attachmentId">The ID of the attachment to delete.</param>
         [HttpDelete("{attachmentId}")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]

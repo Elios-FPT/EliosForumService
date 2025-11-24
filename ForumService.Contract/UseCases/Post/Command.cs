@@ -3,6 +3,7 @@ using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,36 +16,62 @@ namespace ForumService.Contract.UseCases.Post
         /// Unified Command to create a new post.
         /// </summary>
         public record CreatePostCommand(
-            Guid AuthorId,
-            Guid? CategoryId,
+            [property: Required] Guid AuthorId,
+            Guid? CategoryId, 
+
+            [property: Required(ErrorMessage = "Title is required")]
+            [property: StringLength(255, MinimumLength = 5, ErrorMessage = "Title must be between 5 and 255 characters")]
             string Title,
+
+            [property: Required(ErrorMessage = "Content is required")]
             string Content,
+
+            [property: RegularExpression("^(Post|Solution|Project)$", ErrorMessage = "Invalid PostType")]
             string? PostType,
+
             Guid? ReferenceId,
+            [property: MaxLength(10, ErrorMessage = "Cannot have more than 10 tags")]
             List<string>? Tags,
-            bool SubmitForReview // True = PendingReview, False = Draft
-        ) : ICommand<BaseResponseDto<bool>>;
+
+            bool SubmitForReview
+        ):ICommand<BaseResponseDto<bool>>;
 
         /// <summary>
         /// Command to update an existing post, including file attachment handling.
         /// </summary>
         public record UpdatePostCommand(
+            [property: Required(ErrorMessage = "RequesterId is required")]
             Guid RequesterId,
+
+            [property: Required(ErrorMessage = "PostId is required")]
             Guid PostId,
+
+            [property: Required(ErrorMessage = "Title is required")]
+            [property: StringLength(255, MinimumLength = 5, ErrorMessage = "Title must be between 5 and 255 characters")]
             string Title,
+
+            [property: Required(ErrorMessage = "Content is required")]
             string Content,
+
             Guid? CategoryId,
+
+            [property: MaxLength(10, ErrorMessage = "You can only add up to 10 tags")]
             List<string>? Tags,
+
             Guid? ReferenceId,
+
             bool SubmitForReview
-        ) : ICommand<BaseResponseDto<bool>>;
+        ):ICommand<BaseResponseDto<bool>>;
 
         /// <summary>
         /// Command to delete a post.
         /// </summary>
         public record DeletePostCommand(
+
+            [property: Required(ErrorMessage = "PostId is required")]
             Guid PostId,
-            // ADDED: The ID of the user requesting the deletion.
+
+            [property: Required(ErrorMessage = "RequesterId is required")]
             Guid RequesterId
         ) : ICommand<BaseResponseDto<bool>>;
 

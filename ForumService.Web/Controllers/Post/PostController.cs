@@ -1,14 +1,16 @@
 ﻿using Asp.Versioning;
+using ForumService.Web.Attributes;
 using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects;
 using ForumService.Contract.TransferObjects.Post;
+using ForumService.Web.Attributes;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IO; 
 using static ForumService.Contract.UseCases.Post.Command;
 using static ForumService.Contract.UseCases.Post.Query;
 using static ForumService.Contract.UseCases.Post.Request;
-using System.IO; 
 
 namespace ForumService.Web.Controllers.Post
 {
@@ -34,6 +36,7 @@ namespace ForumService.Web.Controllers.Post
         /// <param name="request">The post creation request.</param>
         /// <returns>Success status.</returns>
         [HttpPost]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -64,6 +67,7 @@ namespace ForumService.Web.Controllers.Post
         /// Updates an existing post and its file attachments.
         /// </summary>
         [HttpPut("{postId}")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<bool>> UpdatePost([FromRoute] Guid postId, [FromBody] UpdatePostRequest request)
         {
@@ -134,6 +138,7 @@ namespace ForumService.Web.Controllers.Post
         /// It supports filtering and pagination.
         /// </remarks>
         [HttpGet("my-posts")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetMyPosts([FromQuery] GetMyPostsRequest request)
@@ -176,6 +181,7 @@ namespace ForumService.Web.Controllers.Post
         /// <param name="postId">The ID of the post to retrieve.</param>
         /// <returns>The detailed information of the post.</returns>
         [HttpGet("my-posts/{postId}")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<PostViewDetailDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -201,6 +207,7 @@ namespace ForumService.Web.Controllers.Post
         /// Deletes a post by its ID. (Soft delete)
         /// </summary>
         [HttpDelete("{postId}")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<bool>> DeletePost([FromRoute] Guid postId)
         {
@@ -220,6 +227,7 @@ namespace ForumService.Web.Controllers.Post
         /// Submits a draft post for review and associates tags with it.
         /// </summary>
         [HttpPut("{postId}/submit")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)] 
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -260,6 +268,7 @@ namespace ForumService.Web.Controllers.Post
         /// If the user has already upvoted, it may remove the vote (toggle).
         /// </remarks>
         [HttpPost("{postId}/upvote")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -286,6 +295,7 @@ namespace ForumService.Web.Controllers.Post
         /// If the user has already downvoted, it may remove the vote (toggle).
         /// </remarks>
         [HttpPost("{postId}/downvote")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

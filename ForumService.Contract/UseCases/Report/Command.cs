@@ -20,5 +20,13 @@ namespace ForumService.Contract.UseCases.Report
             string Reason,
             string? Details
         ) : ICommand<BaseResponseDto<Guid>>;
+
+        public record ResolveReportCommand(
+           Guid ReportId,
+           Guid ModeratorId,
+           string Status,
+           bool DeleteContent, 
+           string? ModeratorNote
+       ) : ICommand<BaseResponseDto<bool>>;
     }
 }

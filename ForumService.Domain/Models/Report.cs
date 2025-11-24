@@ -18,6 +18,7 @@ namespace ForumService.Domain.Models
         public string? Details { get; set; }
         public string Status { get; set; } = "Pending";
         public Guid? ResolvedBy { get; set; } // Reference to user ID, fetched from UserService Redis cache
+        public string? ModeratorNote { get; set; }
         public DateTime? ResolvedAt { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

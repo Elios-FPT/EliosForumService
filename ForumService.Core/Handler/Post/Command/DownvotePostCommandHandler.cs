@@ -6,10 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System;
 using static ForumService.Contract.UseCases.Post.Command;
-using Microsoft.Extensions.Logging; // Added
-using ForumService.Contract.TransferObjects; // Added
-using System.Text.Json; // Added
-using System.Collections.Generic; // Added
+using Microsoft.Extensions.Logging; 
+using ForumService.Contract.TransferObjects; 
+using System.Text.Json; 
+using System.Collections.Generic; 
 
 namespace ForumService.Core.Handler.Post.Command
 {
@@ -18,21 +18,21 @@ namespace ForumService.Core.Handler.Post.Command
         private readonly IGenericRepository<Domain.Models.Post> _postRepository;
         private readonly IGenericRepository<Domain.Models.Vote> _voteRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ISUtilityServiceClient _utilityServiceClient; // Added
-        private readonly ILogger<DownvotePostCommandHandler> _logger; // Added
+        private readonly ISUtilityServiceClient _utilityServiceClient; 
+        private readonly ILogger<DownvotePostCommandHandler> _logger; 
 
         public DownvotePostCommandHandler(
             IGenericRepository<Domain.Models.Post> postRepository,
             IGenericRepository<Domain.Models.Vote> voteRepository,
             IUnitOfWork unitOfWork,
-            ISUtilityServiceClient utilityServiceClient, // Added
-            ILogger<DownvotePostCommandHandler> logger) // Added
+            ISUtilityServiceClient utilityServiceClient, 
+            ILogger<DownvotePostCommandHandler> logger) 
         {
             _postRepository = postRepository;
             _voteRepository = voteRepository;
             _unitOfWork = unitOfWork;
-            _utilityServiceClient = utilityServiceClient ?? throw new ArgumentNullException(nameof(utilityServiceClient)); // Added
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger)); // Added
+            _utilityServiceClient = utilityServiceClient ?? throw new ArgumentNullException(nameof(utilityServiceClient)); 
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger)); 
         }
 
         public async Task<BaseResponseDto<bool>> Handle(DownvotePostCommand request, CancellationToken cancellationToken)
