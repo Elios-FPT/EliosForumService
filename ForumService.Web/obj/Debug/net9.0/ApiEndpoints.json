@@ -1167,6 +1167,139 @@
     ]
   },
   {
+    "ContainingType": "ForumService.Web.Controllers.Report.ReportController",
+    "Method": "GetReports",
+    "RelativePath": "api/forum/reports",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "TargetType",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Status",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "ReporterId",
+        "Type": "System.Nullable\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "TargetId",
+        "Type": "System.Nullable\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "Limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Offset",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "SortBy",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "SortOrder",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 403
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "ForumService.Web.Controllers.Report.ReportController",
+    "Method": "GetReportById",
+    "RelativePath": "api/forum/reports/{reportId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "reportId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "ForumService.Web.Controllers.Report.ReportController",
+    "Method": "ResolveReport",
+    "RelativePath": "api/forum/reports/{reportId}/resolve",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "reportId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "ForumService.Contract.UseCases.Report.Request\u002BResolveReportRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Boolean, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
     "ContainingType": "ForumService.Web.Controllers.Upload.UploadsController",
     "Method": "UploadFiles",
     "RelativePath": "api/forum/upload",

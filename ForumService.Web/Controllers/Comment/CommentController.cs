@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using ForumService.Contract.Shared;
+using ForumService.Web.Attributes;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,7 @@ namespace ForumService.Web.Controllers.Comment
         /// <param name="request">The comment details.</param>
         /// <returns>The ID of the newly created comment.</returns>
         [HttpPost]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<Guid>), StatusCodes.Status201Created)] 
         [ProducesResponseType(typeof(BaseResponseDto<Guid>), StatusCodes.Status400BadRequest)] 
         [ProducesResponseType(typeof(BaseResponseDto<Guid>), StatusCodes.Status401Unauthorized)] 
@@ -91,6 +93,7 @@ namespace ForumService.Web.Controllers.Comment
         /// <param name="request">The request containing the new content.</param>
         /// <returns>A boolean indicating success.</returns>
         [HttpPut("{commentId}")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status401Unauthorized)]
@@ -141,6 +144,7 @@ namespace ForumService.Web.Controllers.Comment
         /// <param name="commentId">The ID of the comment to delete.</param>
         /// <returns>A boolean indicating success.</returns>
         [HttpDelete("{commentId}")]
+        [ServiceAuthorize("User")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status403Forbidden)]

@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects.Category;
+using ForumService.Web.Attributes;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -31,6 +32,7 @@ namespace ForumService.Web.Controllers.Category
         /// Creates a new category.
         /// </summary>
         [HttpPost]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<BaseResponseDto<bool>> CreateCategory([FromBody] CreateCategoryRequest request)
@@ -60,6 +62,7 @@ namespace ForumService.Web.Controllers.Category
         /// Updates an existing category.
         /// </summary>
         [HttpPut("{categoryId}")]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -91,6 +94,7 @@ namespace ForumService.Web.Controllers.Category
         /// Deletes a category by its ID.
         /// </summary>
         [HttpDelete("{CategoryId}")]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<BaseResponseDto<bool>> DeleteCategory([FromRoute] DeleteCategoryRequest request)
@@ -124,6 +128,7 @@ namespace ForumService.Web.Controllers.Category
         /// Retrieves all categories with optional filters.
         /// </summary>
         [HttpGet]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CategoryDto>>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<IEnumerable<CategoryDto>>> GetCategories([FromQuery] GetCategoryListQuery request)
         {
@@ -151,6 +156,7 @@ namespace ForumService.Web.Controllers.Category
         /// Retrieves a category by its ID.
         /// </summary>
         [HttpGet("{CategoryId}")]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<CategoryDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<BaseResponseDto<CategoryDto>> GetCategoryById([FromRoute] GetCategoryByIdRequest request)

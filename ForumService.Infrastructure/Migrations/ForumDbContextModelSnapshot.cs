@@ -277,6 +277,9 @@ namespace ForumService.Infrastructure.Migrations
                     b.Property<string>("Details")
                         .HasColumnType("text");
 
+                    b.Property<string>("ModeratorNote")
+                        .HasColumnType("text");
+
                     b.Property<string>("Reason")
                         .IsRequired()
                         .HasColumnType("text");

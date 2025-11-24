@@ -17,18 +17,21 @@ namespace ForumService.Core.Handler.Post.Command
     {
         private readonly IGenericRepository<Domain.Models.Post> _postRepository;
         private readonly IGenericRepository<Domain.Models.Tag> _tagRepository; 
-        private readonly IGenericRepository<Domain.Models.PostTag> _postTagRepository; 
+        private readonly IGenericRepository<Domain.Models.PostTag> _postTagRepository;
+        private readonly IGenericRepository<Domain.Models.BannedKeyword> _bannedKeywordRepository; 
         private readonly IUnitOfWork _unitOfWork;
 
         public SubmitPostForReviewCommandHandler(
             IGenericRepository<Domain.Models.Post> postRepository,
             IGenericRepository<Domain.Models.Tag> tagRepository, 
-            IGenericRepository<Domain.Models.PostTag> postTagRepository, 
+            IGenericRepository<Domain.Models.PostTag> postTagRepository,
+            IGenericRepository<Domain.Models.BannedKeyword> bannedKeywordRepository, 
             IUnitOfWork unitOfWork)
         {
             _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _postTagRepository = postTagRepository ?? throw new ArgumentNullException(nameof(postTagRepository));
+            _bannedKeywordRepository = bannedKeywordRepository ?? throw new ArgumentNullException(nameof(bannedKeywordRepository));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
@@ -57,6 +60,19 @@ namespace ForumService.Core.Handler.Post.Command
                     await _unitOfWork.RollbackAsync();
                     return new BaseResponseDto<bool> { Status = 400, Message = $"Post is not in Draft status (current status: {post.Status}).", ResponseData = false };
                 }
+
+                if (await ContainsBannedKeywordAsync(post.Title))
+                {
+                    await _unitOfWork.RollbackAsync();
+                    return new BaseResponseDto<bool> { Status = 400, Message = "Tiêu đề bài viết chứa từ khóa không phù hợp.", ResponseData = false };
+                }
+
+                if (await ContainsBannedKeywordAsync(post.Content))
+                {
+                    await _unitOfWork.RollbackAsync();
+                    return new BaseResponseDto<bool> { Status = 400, Message = "Nội dung bài viết chứa từ khóa không phù hợp.", ResponseData = false };
+                }
+
 
                 // --- Handle Tags ---
                 // 1. Remove all old PostTag records of this post
@@ -143,6 +159,37 @@ namespace ForumService.Core.Handler.Post.Command
             str = str[..(str.Length <= 45 ? str.Length : 45)]; 
             str = Regex.Replace(str, @"-+", "-");             
             return str;
+        }
+
+        // Helper method for checking banned keywords
+        private async Task<bool> ContainsBannedKeywordAsync(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+
+            // Note: Consider caching this list for better performance in the future
+            var bannedKeywords = await _bannedKeywordRepository.GetListAsync(x => x.IsActive);
+
+            if (bannedKeywords != null && bannedKeywords.Any())
+            {
+                foreach (var banned in bannedKeywords)
+                {
+                    try
+                    {
+                        var pattern = banned.Keyword;
+                        // Use Regex for flexible matching (case-insensitive)
+                        if (Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase))
+                        {
+                            return true;
+                        }
+                    }
+                    catch (ArgumentException)
+                    {
+                        // Ignore invalid regex patterns in DB to prevent crash
+                        continue;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

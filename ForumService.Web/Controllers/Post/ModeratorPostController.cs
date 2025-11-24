@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects.Post;
+using ForumService.Web.Attributes;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +30,8 @@ namespace ForumService.Web.Controllers.Post
         /// <summary>
         /// Retrieves a paginated list of PUBLISHED posts for moderator view (includes moderation details).
         /// </summary>
-        [HttpGet("published")] 
+        [HttpGet("published")]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetModeratorPublicPosts([FromQuery] GetModeratorPublicPostsRequest request)
@@ -65,6 +67,7 @@ namespace ForumService.Web.Controllers.Post
         /// Retrieves a list of posts pending review.
         /// </summary>
         [HttpGet("pending")]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetPendingPosts([FromQuery] GetPendingPostsQuery request)
         {
@@ -97,6 +100,7 @@ namespace ForumService.Web.Controllers.Post
         /// Retrieves a list of archived (rejected or soft-deleted) posts.
         /// </summary>
         [HttpGet("archived")]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetArchivedPosts([FromQuery] GetArchivedPostsQuery request)
         {
@@ -134,6 +138,7 @@ namespace ForumService.Web.Controllers.Post
         /// <param name="postId">The ID of the post to approve.</param>
         /// <returns>A boolean indicating success.</returns>
         [HttpPut("{postId}/approve")]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
@@ -161,6 +166,7 @@ namespace ForumService.Web.Controllers.Post
         /// <param name="request">An object containing the reason for rejection.</param>
         /// <returns>A boolean indicating success.</returns>
         [HttpPut("{postId}/reject")]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
@@ -190,6 +196,7 @@ namespace ForumService.Web.Controllers.Post
         /// <param name="request">An object containing the reason for deletion.</param>
         /// <returns>A boolean indicating success.</returns>
         [HttpDelete("{postId}")]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
