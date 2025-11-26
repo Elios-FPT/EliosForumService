@@ -3,6 +3,7 @@ using ForumService.Contract.Shared;
 using ForumService.Core.Handler.Post.Command;
 using ForumService.Core.Interfaces;
 using ForumService.Domain.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,9 @@ namespace ForumService.Tests.PostHandler
         private readonly Mock<IGenericRepository<PostTag>> _postTagRepoMock;
         private readonly Mock<IGenericRepository<BannedKeyword>> _bannedKeywordRepoMock;
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+        private readonly Mock<IKafkaProducer> _kafkaProducerMock;
+        private readonly Mock<IAppConfiguration> _appConfigMock;
+        private readonly Mock<ILogger<CreatePostCommandHandler>> _loggerMock;
         private readonly CreatePostCommandHandler _handler;
 
         public CreatePostCommandHandlerTests()
@@ -31,13 +35,19 @@ namespace ForumService.Tests.PostHandler
             _postTagRepoMock = new Mock<IGenericRepository<PostTag>>();
             _bannedKeywordRepoMock = new Mock<IGenericRepository<BannedKeyword>>();
             _unitOfWorkMock = new Mock<IUnitOfWork>();
+            _kafkaProducerMock = new Mock<IKafkaProducer>();
+            _appConfigMock = new Mock<IAppConfiguration>();
+            _loggerMock = new Mock<ILogger<CreatePostCommandHandler>>();
 
             _handler = new CreatePostCommandHandler(
                 _postRepoMock.Object,
                 _tagRepoMock.Object,
                 _postTagRepoMock.Object,
                 _bannedKeywordRepoMock.Object,
-                _unitOfWorkMock.Object
+                _unitOfWorkMock.Object,
+                _kafkaProducerMock.Object,
+                _appConfigMock.Object,     
+                _loggerMock.Object
             );
         }
 

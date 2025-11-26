@@ -1,15 +1,19 @@
 ﻿using ForumService.Contract.Message;
 using ForumService.Contract.Shared;
+using ForumService.Contract.TransferObjects;
 using ForumService.Contract.UseCases.Post;
 using ForumService.Core.Interfaces;
-using Domain = ForumService.Domain.Models; // Alias for brevity
+using ForumService.Core.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Post.Command;
+using Domain = ForumService.Domain.Models; // Alias for brevity
 
 namespace ForumService.Core.Handler.Post.Command
 {
@@ -25,18 +29,35 @@ namespace ForumService.Core.Handler.Post.Command
         private readonly IGenericRepository<Domain.Models.BannedKeyword> _bannedKeywordRepository;
         private readonly IUnitOfWork _unitOfWork;
 
+        private readonly IKafkaProducer _kafkaProducer;
+        private readonly ILogger<CreatePostCommandHandler> _logger;
+        private readonly string _topicName;
+
         public CreatePostCommandHandler(
             IGenericRepository<Domain.Models.Post> postRepository,
             IGenericRepository<Domain.Models.Tag> tagRepository,
             IGenericRepository<Domain.Models.PostTag> postTagRepository,
             IGenericRepository<Domain.Models.BannedKeyword> bannedKeywordRepository,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+
+            IKafkaProducer kafkaProducer, // Inject Producer
+            IAppConfiguration appConfig,  // Inject Config to get Service name
+            ILogger<CreatePostCommandHandler> logger
+            )
+
         {
             _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _postTagRepository = postTagRepository ?? throw new ArgumentNullException(nameof(postTagRepository));
             _bannedKeywordRepository = bannedKeywordRepository ?? throw new ArgumentNullException(nameof(bannedKeywordRepository));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+
+            _kafkaProducer = kafkaProducer ?? throw new ArgumentNullException(nameof(kafkaProducer));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            // Standard Topic name configuration: forum-user-userstats
+            string currentServiceName = appConfig.GetCurrentServiceName();
+            _topicName = $"{currentServiceName}-user-userstats";
         }
 
         public async Task<BaseResponseDto<bool>> Handle(CreatePostCommand request, CancellationToken cancellationToken)
@@ -49,6 +70,7 @@ namespace ForumService.Core.Handler.Post.Command
             string initialStatus;
             string currentPostType = request.PostType ?? "Post";
 
+            // Solution/Project then Published 
             if (currentPostType == "Solution" || currentPostType == "Project")
             {
                 initialStatus = "Published";
@@ -58,25 +80,22 @@ namespace ForumService.Core.Handler.Post.Command
                 initialStatus = request.SubmitForReview ? "PendingReview" : "Draft";
             }
 
-
+            // Check ban keyword 
             if (initialStatus == "Published" || initialStatus == "PendingReview")
             {
                 if (await ContainsBannedKeywordAsync(request.Title))
-                {
                     return new BaseResponseDto<bool> { Status = 400, Message = "Tiêu đề bài viết chứa từ khóa không phù hợp.", ResponseData = false };
-                }
 
                 if (await ContainsBannedKeywordAsync(request.Content))
-                {
                     return new BaseResponseDto<bool> { Status = 400, Message = "Nội dung bài viết chứa từ khóa không phù hợp.", ResponseData = false };
-                }
             }
 
             await _unitOfWork.BeginTransactionAsync();
+            Domain.Models.Post post; 
+
             try
             {
-               
-                var post = new Domain.Models.Post
+                post = new Domain.Models.Post
                 {
                     PostId = Guid.NewGuid(),
                     AuthorId = request.AuthorId,
@@ -85,7 +104,7 @@ namespace ForumService.Core.Handler.Post.Command
                     Content = request.Content,
                     PostType = currentPostType,
                     ReferenceId = request.ReferenceId,
-                    Status = initialStatus, 
+                    Status = initialStatus,
                     IsDeleted = false,
                     IsFeatured = false,
                     CreatedAt = DateTime.UtcNow,
@@ -96,7 +115,7 @@ namespace ForumService.Core.Handler.Post.Command
 
                 await _postRepository.AddAsync(post);
 
-
+                // Processing Tags 
                 if (request.Tags != null && request.Tags.Any())
                 {
                     var postTagsToAdd = new List<Domain.Models.PostTag>();
@@ -134,12 +153,6 @@ namespace ForumService.Core.Handler.Post.Command
                 }
 
                 await _unitOfWork.CommitAsync();
-
-                var successMessage = request.SubmitForReview
-                    ? "Post created and submitted for review successfully."
-                    : "Post draft saved successfully.";
-
-                return new BaseResponseDto<bool> { Status = 200, Message = post.PostId.ToString(), ResponseData = true };
             }
             catch (Exception ex)
             {
@@ -147,7 +160,50 @@ namespace ForumService.Core.Handler.Post.Command
                 var errorMessage = ex.InnerException?.Message ?? ex.Message;
                 return new BaseResponseDto<bool> { Status = 500, Message = $"Failed to create post: {errorMessage}", ResponseData = false };
             }
+
+            // LOGIC KAFKA: Only send if the status is published immediately
+            if (post.Status == "Published")
+            {
+                try
+                {
+                    var eventPayload = new PostApprovedEvent
+                    {
+                        PostId = post.PostId,
+                        UserId = post.AuthorId,
+                        ApprovedAt = DateTime.UtcNow
+                    };
+
+                    // EventWrapper
+                    var wrapper = new EventWrapper(
+                        EventType: "POST_APPROVED", 
+                        ModelType: nameof(PostApprovedEvent),
+                        Payload: eventPayload,
+                        EventId: Guid.NewGuid().ToString(),
+                        CorrelationId: Guid.NewGuid().ToString(),
+                        Timestamp: DateTime.UtcNow
+                    );
+
+                    string jsonPayload = JsonSerializer.Serialize(wrapper, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    // Send
+                    await _kafkaProducer.ProduceAsync(_topicName, post.AuthorId.ToString(), jsonPayload, cancellationToken);
+
+                    _logger.LogInformation("Sent stats event for auto-published post {PostId}", post.PostId);
+                }
+                catch (Exception kafkaEx)
+                {
+                    _logger.LogError(kafkaEx, "Post {PostId} created but failed to send stats event.", post.PostId);
+                }
+            }
+            // END KAFKA LOGIC
+
+            var successMessage = request.SubmitForReview
+                ? "Post created and submitted for review successfully."
+                : "Post draft saved successfully.";
+
+            return new BaseResponseDto<bool> { Status = 200, Message = post.PostId.ToString(), ResponseData = true };
         }
+
 
         private static string GenerateSlug(string phrase)
         {

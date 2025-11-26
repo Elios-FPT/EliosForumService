@@ -3,6 +3,7 @@ using ForumService.Contract.Shared;
 using ForumService.Core.Handler.Post.Command;
 using ForumService.Core.Interfaces;
 using ForumService.Domain.Models;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System;
 using System.Threading;
@@ -16,7 +17,9 @@ namespace ForumService.Tests.PostHandler
     {
         private readonly Mock<IGenericRepository<ForumService.Domain.Models.Post>> _postRepositoryMock;
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-
+        private readonly Mock<IKafkaProducer> _kafkaProducerMock;
+        private readonly Mock<IAppConfiguration> _appConfigMock;
+        private readonly Mock<ILogger<DeletePostCommandHandler>> _loggerMock;
         // Class cần test
         private readonly DeletePostCommandHandler _handler;
 
@@ -24,8 +27,17 @@ namespace ForumService.Tests.PostHandler
         {
             _postRepositoryMock = new Mock<IGenericRepository<ForumService.Domain.Models.Post>>();
             _unitOfWorkMock = new Mock<IUnitOfWork>();
+            _kafkaProducerMock = new Mock<IKafkaProducer>();
+            _appConfigMock = new Mock<IAppConfiguration>();
+            _loggerMock = new Mock<ILogger<DeletePostCommandHandler>>();
 
-            _handler = new DeletePostCommandHandler(_postRepositoryMock.Object, _unitOfWorkMock.Object);
+            _handler = new DeletePostCommandHandler(
+                _postRepositoryMock.Object,
+                _unitOfWorkMock.Object,
+                _kafkaProducerMock.Object, 
+                _appConfigMock.Object,    
+                _loggerMock.Object         
+            );
         }
 
         [Fact]
