@@ -2,6 +2,7 @@
 using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects;
 using ForumService.Core.Interfaces;
+using ForumService.Core.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,10 @@ namespace ForumService.Core.Handler.Report.Command
         private readonly IGenericRepository<Domain.Models.Comment> _commentRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ISUtilityServiceClient _utilityServiceClient; 
-        private readonly ILogger<ResolveReportCommandHandler> _logger; 
+        private readonly ILogger<ResolveReportCommandHandler> _logger;
+
+        private readonly IKafkaProducer _kafkaProducer;
+        private readonly string _topicName;
 
         public ResolveReportCommandHandler(
             IGenericRepository<Domain.Models.Report> reportRepository,
@@ -28,7 +32,9 @@ namespace ForumService.Core.Handler.Report.Command
             IGenericRepository<Domain.Models.Comment> commentRepository,
             IUnitOfWork unitOfWork,
             ISUtilityServiceClient utilityServiceClient,
-            ILogger<ResolveReportCommandHandler> logger)
+            ILogger<ResolveReportCommandHandler> logger,
+            IKafkaProducer kafkaProducer,
+            IAppConfiguration appConfig)
         {
             _reportRepository = reportRepository;
             _postRepository = postRepository;
@@ -36,6 +42,10 @@ namespace ForumService.Core.Handler.Report.Command
             _unitOfWork = unitOfWork;
             _utilityServiceClient = utilityServiceClient ?? throw new ArgumentNullException(nameof(utilityServiceClient));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _kafkaProducer = kafkaProducer ?? throw new ArgumentNullException(nameof(kafkaProducer));
+
+            string currentServiceName = appConfig.GetCurrentServiceName();
+            _topicName = $"{currentServiceName}-user-userstats";
         }
 
         public async Task<BaseResponseDto<bool>> Handle(ResolveReportCommand request, CancellationToken cancellationToken)
@@ -45,6 +55,9 @@ namespace ForumService.Core.Handler.Report.Command
             {
                 return new BaseResponseDto<bool> { Status = 400, Message = "Status must be 'Approved' or 'Rejected'.", ResponseData = false };
             }
+
+            Domain.Models.Post? deletedPost = null;
+            bool wasPublished = false;
 
             await _unitOfWork.BeginTransactionAsync();
             try
@@ -71,6 +84,10 @@ namespace ForumService.Core.Handler.Report.Command
                         var post = await _postRepository.GetByIdAsync(report.TargetId);
                         if (post != null && !post.IsDeleted)
                         {
+                            // Save for Kafka event logic later
+                            deletedPost = post;
+                            wasPublished = post.Status == "Published";
+
                             post.IsDeleted = true;
                             post.UpdatedAt = DateTime.UtcNow;
                             post.DeletedAt = DateTime.UtcNow;
@@ -101,6 +118,41 @@ namespace ForumService.Core.Handler.Report.Command
 
                 _ = SendNotificationAsync(report, request.ModeratorNote, cancellationToken);
 
+                // --- 5. KAFKA EVENT LOGIC  ---
+                if (deletedPost != null && wasPublished)
+                {
+                    try
+                    {
+                        var eventPayload = new PostDeletedEvent
+                        {
+                            PostId = deletedPost.PostId,
+                            UserId = deletedPost.AuthorId,
+                            DeletedAt = DateTime.UtcNow
+                        };
+
+                        var wrapper = new EventWrapper(
+                            EventType: "POST_DELETED",
+                            ModelType: nameof(PostDeletedEvent),
+                            Payload: eventPayload,
+                            EventId: Guid.NewGuid().ToString(),
+                            CorrelationId: Guid.NewGuid().ToString(),
+                            Timestamp: DateTime.UtcNow
+                        );
+
+                        string jsonPayload = JsonSerializer.Serialize(wrapper, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                        // Gửi Kafka với Key là AuthorId
+                        await _kafkaProducer.ProduceAsync(_topicName, deletedPost.AuthorId.ToString(), jsonPayload, cancellationToken);
+
+                        _logger.LogInformation("Sent POST_DELETED event for reported post {PostId}.", deletedPost.PostId);
+                    }
+                    catch (Exception kafkaEx)
+                    {
+                        _logger.LogError(kafkaEx, "Reported Post {PostId} deleted but failed to send stats event.", deletedPost.PostId);
+                    }
+                }
+                // END KAFKA EVENT LOGIC
+
                 string actionMessage = "Report processed successfully.";
                 if (request.Status == "Approved")
                 {
@@ -120,7 +172,7 @@ namespace ForumService.Core.Handler.Report.Command
             }
         }
 
-       
+
         private async Task SendNotificationAsync(Domain.Models.Report report, string? moderatorNote, CancellationToken token)
         {
             try
