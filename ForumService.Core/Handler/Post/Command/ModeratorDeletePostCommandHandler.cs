@@ -2,6 +2,7 @@
 using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects;
 using ForumService.Core.Interfaces;
+using ForumService.Core.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -22,21 +23,33 @@ namespace ForumService.Core.Handler.Post.Command
         private readonly ISUtilityServiceClient _utilityServiceClient;
         private readonly ILogger<ModeratorDeletePostCommandHandler> _logger;
 
+        private readonly IKafkaProducer _kafkaProducer;
+        private readonly string _topicName;
+
         public ModeratorDeletePostCommandHandler(
             IGenericRepository<Domain.Models.Post> postRepository,
             IUnitOfWork unitOfWork,
             ISUtilityServiceClient utilityServiceClient,
-            ILogger<ModeratorDeletePostCommandHandler> logger)
+            ILogger<ModeratorDeletePostCommandHandler> logger,
+            IKafkaProducer kafkaProducer,
+            IAppConfiguration appConfig)
         {
             _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _utilityServiceClient = utilityServiceClient ?? throw new ArgumentNullException(nameof(utilityServiceClient));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            _kafkaProducer = kafkaProducer ?? throw new ArgumentNullException(nameof(kafkaProducer));
+
+            string currentServiceName = appConfig.GetCurrentServiceName();
+            _topicName = $"{currentServiceName}-user-userstats";
         }
 
         public async Task<BaseResponseDto<bool>> Handle(ModeratorDeletePostCommand request, CancellationToken cancellationToken)
         {
             Domain.Models.Post post;
+            bool wasPublished = false;
+
             try
             {
                 post = await _postRepository.GetByIdAsync(request.PostId);
@@ -46,6 +59,7 @@ namespace ForumService.Core.Handler.Post.Command
                     return new BaseResponseDto<bool> { Status = 404, Message = "Post not found or has already been deleted.", ResponseData = false };
                 }
 
+                wasPublished = post.Status == "Published";
 
                 await _unitOfWork.BeginTransactionAsync();
 
@@ -61,6 +75,40 @@ namespace ForumService.Core.Handler.Post.Command
                 var errorMessage = ex.InnerException?.Message ?? ex.Message;
                 return new BaseResponseDto<bool> { Status = 500, Message = $"Failed to delete post: {errorMessage}", ResponseData = false };
             }
+
+            // --- 2. KAFKA EVENT LOGIC (Send event -1) ---
+            if (wasPublished)
+            {
+                try
+                {
+                    var eventPayload = new PostDeletedEvent
+                    {
+                        PostId = post.PostId,
+                        UserId = post.AuthorId,
+                        DeletedAt = DateTime.UtcNow
+                    };
+
+                    var wrapper = new EventWrapper(
+                        EventType: "POST_DELETED",
+                        ModelType: nameof(PostDeletedEvent),
+                        Payload: eventPayload,
+                        EventId: Guid.NewGuid().ToString(),
+                        CorrelationId: Guid.NewGuid().ToString(),
+                        Timestamp: DateTime.UtcNow
+                    );
+
+                    string jsonPayload = JsonSerializer.Serialize(wrapper, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    await _kafkaProducer.ProduceAsync(_topicName, post.AuthorId.ToString(), jsonPayload, cancellationToken);
+
+                    _logger.LogInformation("Sent POST_DELETED event for post {PostId} deleted by moderator.", post.PostId);
+                }
+                catch (Exception kafkaEx)
+                {
+                    _logger.LogError(kafkaEx, "Post {PostId} deleted by moderator but failed to send stats event.", post.PostId);
+                }
+            }
+            // END KAFKA EVENT LOGIC ---
 
             try
             {
@@ -95,4 +143,5 @@ namespace ForumService.Core.Handler.Post.Command
             return new BaseResponseDto<bool> { Status = 200, Message = "Post deleted successfully by moderator.", ResponseData = true };
         }
     }
+
 }

@@ -97,6 +97,8 @@ namespace ForumService.Core.Handler.Post.Command
 
                     string jsonPayload = JsonSerializer.Serialize(wrapper, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
+                    _logger.LogInformation("Preparing to send Kafka event. Payload: {JsonPayload}", jsonPayload);
+
                     await _kafkaProducer.ProduceAsync(_topicName, post.AuthorId.ToString(), jsonPayload, cancellationToken);
 
                     _logger.LogInformation("Sent POST_DELETED event for post {PostId}", post.PostId);
