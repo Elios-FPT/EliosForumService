@@ -21,7 +21,8 @@ namespace ForumService.Tests.ModeratorPostController
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
         private readonly Mock<ISUtilityServiceClient> _utilityServiceMock;
         private readonly Mock<ILogger<ApprovePostCommandHandler>> _loggerMock;
-
+        private readonly Mock<IKafkaProducer> _kafkaProducerMock;
+        private readonly Mock<IAppConfiguration> _appConfigMock;
         // Handler under test
         private readonly ApprovePostCommandHandler _handler;
 
@@ -31,12 +32,17 @@ namespace ForumService.Tests.ModeratorPostController
             _unitOfWorkMock = new Mock<IUnitOfWork>();
             _utilityServiceMock = new Mock<ISUtilityServiceClient>();
             _loggerMock = new Mock<ILogger<ApprovePostCommandHandler>>();
+            _kafkaProducerMock = new Mock<IKafkaProducer>();
+            _appConfigMock = new Mock<IAppConfiguration>();
+            _appConfigMock.Setup(x => x.GetCurrentServiceName()).Returns("forum");
 
             _handler = new ApprovePostCommandHandler(
                 _postRepositoryMock.Object,
                 _unitOfWorkMock.Object,
                 _utilityServiceMock.Object,
-                _loggerMock.Object
+                _loggerMock.Object,
+                _kafkaProducerMock.Object,   
+                _appConfigMock.Object
             );
         }
 

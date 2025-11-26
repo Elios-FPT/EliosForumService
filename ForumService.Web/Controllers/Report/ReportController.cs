@@ -90,7 +90,7 @@ namespace ForumService.Web.Controllers.Report
         /// Retrieves a list of reports with pagination and filtering. Accessible by Content Moderators.
         /// </summary>
         [HttpGet]
-        //[ServiceAuthorize("Content Moderator")]
+        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status403Forbidden)]
@@ -148,16 +148,16 @@ namespace ForumService.Web.Controllers.Report
         /// Resolve a report (Reject report OR Accept & Optionally Delete content). Accessible by Content Moderators.
         /// </summary>
         [HttpPut("{reportId}/resolve")]
-        //[ServiceAuthorize("Content Moderator")]
+        [ServiceAuthorize("Content Moderator")]
         public async Task<BaseResponseDto<bool>> ResolveReport(Guid reportId, [FromBody] ResolveReportRequest request)
         {
-            //var moderatorIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
-            //if (string.IsNullOrEmpty(moderatorIdHeader) || !Guid.TryParse(moderatorIdHeader, out var moderatorId))
-            //{
-            //    return new BaseResponseDto<bool> { Status = 401, Message = "Moderator not authenticated", ResponseData = false };
-            //}
+            var moderatorIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(moderatorIdHeader) || !Guid.TryParse(moderatorIdHeader, out var moderatorId))
+            {
+                return new BaseResponseDto<bool> { Status = 401, Message = "Moderator not authenticated", ResponseData = false };
+            }
 
-            var moderatorId = new Guid("902ea1b3-f664-4617-8f43-fdde557f12b6");
+            //var moderatorId = new Guid("902ea1b3-f664-4617-8f43-fdde557f12b6");
 
             try
             {

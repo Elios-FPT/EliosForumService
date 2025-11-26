@@ -1,15 +1,16 @@
 ﻿using ForumService.Contract.Message;
 using ForumService.Contract.Shared;
+using ForumService.Contract.TransferObjects;
 using ForumService.Core.Interfaces;
+using ForumService.Core.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Post.Command;
-using Microsoft.Extensions.Logging; 
-using ForumService.Contract.TransferObjects; 
-using System.Text.Json;
 
 namespace ForumService.Core.Handler.Post.Command
 {
@@ -17,26 +18,34 @@ namespace ForumService.Core.Handler.Post.Command
     {
         private readonly IGenericRepository<Domain.Models.Post> _postRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ISUtilityServiceClient _utilityServiceClient; 
-        private readonly ILogger<ApprovePostCommandHandler> _logger; 
+        private readonly ISUtilityServiceClient _utilityServiceClient;
+        private readonly ILogger<ApprovePostCommandHandler> _logger;
+        private readonly IKafkaProducer _kafkaProducer;
+        private readonly string _topicName;
+        private readonly string _currentServiceName;
 
         public ApprovePostCommandHandler(
             IGenericRepository<Domain.Models.Post> postRepository,
             IUnitOfWork unitOfWork,
-            ISUtilityServiceClient utilityServiceClient, 
-            ILogger<ApprovePostCommandHandler> logger) 
+            ISUtilityServiceClient utilityServiceClient,
+            ILogger<ApprovePostCommandHandler> logger,
+            IKafkaProducer kafkaProducer,
+            IAppConfiguration appConfig)
         {
             _postRepository = postRepository ?? throw new ArgumentNullException(nameof(postRepository));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-            _utilityServiceClient = utilityServiceClient ?? throw new ArgumentNullException(nameof(utilityServiceClient)); 
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger)); 
+            _utilityServiceClient = utilityServiceClient ?? throw new ArgumentNullException(nameof(utilityServiceClient));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _kafkaProducer = kafkaProducer ?? throw new ArgumentNullException(nameof(kafkaProducer));
+            _currentServiceName = appConfig.GetCurrentServiceName();
+            _topicName = $"{_currentServiceName}-user-userstats";
         }
 
         public async Task<BaseResponseDto<bool>> Handle(ApprovePostCommand request, CancellationToken cancellationToken)
         {
             await _unitOfWork.BeginTransactionAsync();
 
-            Domain.Models.Post post; // Declared here to be accessible outside the try-catch block
+            Domain.Models.Post post;
 
             try
             {
@@ -60,6 +69,7 @@ namespace ForumService.Core.Handler.Post.Command
                 post.ModeratedBy = request.ModeratorId;
 
                 await _postRepository.UpdateAsync(post);
+
                 await _unitOfWork.CommitAsync();
             }
             catch (Exception ex)
@@ -69,10 +79,40 @@ namespace ForumService.Core.Handler.Post.Command
                 return new BaseResponseDto<bool> { Status = 500, Message = $"Failed to approve post: {errorMessage}", ResponseData = false };
             }
 
-            // --- Add notification logic ---
+            // --- 3. KAFKA EVENT LOGIC (Fire and Forget) ---
             try
             {
-                // Only send notification if the moderator is not the author of the post
+                var eventPayload = new PostApprovedEvent
+                {
+                    PostId = post.PostId,
+                    UserId = post.AuthorId,
+                    ApprovedAt = DateTime.UtcNow
+                };
+
+                var wrapper = new EventWrapper(
+                    EventType: "POST_APPROVED",
+                    ModelType: nameof(PostApprovedEvent),
+                    Payload: eventPayload,
+                    EventId: Guid.NewGuid().ToString(),
+                    CorrelationId: Guid.NewGuid().ToString(),
+                    Timestamp: DateTime.UtcNow
+                );
+
+                // Serialize Wrapper
+                string jsonPayload = JsonSerializer.Serialize(wrapper, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                await _kafkaProducer.ProduceAsync(_topicName, post.AuthorId.ToString(), jsonPayload, cancellationToken);
+            }
+            catch (Exception kafkaEx)
+            {
+                _logger.LogError(kafkaEx, "Post {PostId} approved but failed to publish Kafka stats event.", post.PostId);
+            }
+            // --- End Kafka logic ---
+
+
+            // --- 4. Notification Logic ---
+            try
+            {
                 if (post.AuthorId != request.ModeratorId)
                 {
                     string title = "Your post has been approved";
@@ -86,7 +126,7 @@ namespace ForumService.Core.Handler.Post.Command
 
                     var notificationRequest = new NotificationDto
                     {
-                        UserId = post.AuthorId, // Send to the post author
+                        UserId = post.AuthorId,
                         Title = title,
                         Message = message,
                         Url = $"/posts/{post.PostId}",
@@ -98,8 +138,6 @@ namespace ForumService.Core.Handler.Post.Command
             }
             catch (Exception notifyEx)
             {
-                // Log the error but don't return failure to the client, 
-                // as the main action (approving post) succeeded
                 _logger.LogError(notifyEx, "Successfully approved post {PostId} but failed to send notification.", post.PostId);
             }
             // --- End notification logic ---

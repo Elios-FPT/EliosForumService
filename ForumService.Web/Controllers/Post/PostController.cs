@@ -143,18 +143,18 @@ namespace ForumService.Web.Controllers.Post
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetMyPosts([FromQuery] GetMyPostsRequest request)
         {
-            //var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
-            //if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
-            //{
-            //    return new BaseResponseDto<IEnumerable<PostViewDto>>
-            //    {
-            //        Status = 401,
-            //        Message = "User not authenticated or invalid/missing X-Auth-Request-User header",
-            //        ResponseData = Enumerable.Empty<PostViewDto>()
-            //    };
-            //}
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<IEnumerable<PostViewDto>>
+                {
+                    Status = 401,
+                    Message = "User not authenticated or invalid/missing X-Auth-Request-User header",
+                    ResponseData = Enumerable.Empty<PostViewDto>()
+                };
+            }
 
-            var userId = new Guid("102ea1b3-f664-4617-8f43-fdde557f12b6");
+            //var userId = new Guid("102ea1b3-f664-4617-8f43-fdde557f12b6");
 
             var query = new GetMyPostsQuery(
                 RequesterId: userId,
