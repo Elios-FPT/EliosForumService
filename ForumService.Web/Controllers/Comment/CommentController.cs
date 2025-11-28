@@ -30,6 +30,7 @@ namespace ForumService.Web.Controllers.Comment
         /// <returns>The ID of the newly created comment.</returns>
         [HttpPost]
         [ServiceAuthorize("User")]
+        [CheckBannedUser]
         [ProducesResponseType(typeof(BaseResponseDto<Guid>), StatusCodes.Status201Created)] 
         [ProducesResponseType(typeof(BaseResponseDto<Guid>), StatusCodes.Status400BadRequest)] 
         [ProducesResponseType(typeof(BaseResponseDto<Guid>), StatusCodes.Status401Unauthorized)] 
@@ -94,6 +95,7 @@ namespace ForumService.Web.Controllers.Comment
         /// <returns>A boolean indicating success.</returns>
         [HttpPut("{commentId}")]
         [ServiceAuthorize("User")]
+        [CheckBannedUser]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status401Unauthorized)]
@@ -145,6 +147,7 @@ namespace ForumService.Web.Controllers.Comment
         /// <returns>A boolean indicating success.</returns>
         [HttpDelete("{commentId}")]
         [ServiceAuthorize("User")]
+        [CheckBannedUser]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status403Forbidden)]

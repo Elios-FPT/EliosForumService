@@ -37,6 +37,7 @@ namespace ForumService.Web.Controllers.Post
         /// <returns>Success status.</returns>
         [HttpPost]
         [ServiceAuthorize("User")]
+        [CheckBannedUser]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -68,6 +69,7 @@ namespace ForumService.Web.Controllers.Post
         /// </summary>
         [HttpPut("{postId}")]
         [ServiceAuthorize("User")]
+        [CheckBannedUser]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<bool>> UpdatePost([FromRoute] Guid postId, [FromBody] UpdatePostRequest request)
         {
@@ -208,6 +210,7 @@ namespace ForumService.Web.Controllers.Post
         /// </summary>
         [HttpDelete("{postId}")]
         [ServiceAuthorize("User")]
+        [CheckBannedUser]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         public async Task<BaseResponseDto<bool>> DeletePost([FromRoute] Guid postId)
         {
@@ -228,6 +231,7 @@ namespace ForumService.Web.Controllers.Post
         /// </summary>
         [HttpPut("{postId}/submit")]
         [ServiceAuthorize("User")]
+        [CheckBannedUser]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)] 
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -269,6 +273,7 @@ namespace ForumService.Web.Controllers.Post
         /// </remarks>
         [HttpPost("{postId}/upvote")]
         [ServiceAuthorize("User")]
+        [CheckBannedUser]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -296,6 +301,7 @@ namespace ForumService.Web.Controllers.Post
         /// </remarks>
         [HttpPost("{postId}/downvote")]
         [ServiceAuthorize("User")]
+        [CheckBannedUser]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]

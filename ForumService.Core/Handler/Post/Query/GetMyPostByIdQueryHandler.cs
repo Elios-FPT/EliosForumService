@@ -119,7 +119,8 @@ namespace ForumService.Core.Handler.Post.Query
                     CreatedAt = postEntity.CreatedAt,
                     CategoryName = category?.Name,
                     Url = attachmentUrls,
-                    Tags = tags.Select(t => t.Name).ToList()
+                    Tags = tags.Select(t => t.Name).ToList(),
+                    ReferenceId = postEntity.ReferenceId
                 };
 
                 // Hydrate user details
