@@ -23,6 +23,8 @@ namespace ForumService.Infrastructure.Data
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Vote> Votes { get; set; }
         public DbSet<BannedKeyword> BannedKeywords { get; set; }
+        public DbSet<ForumUserBan> ForumUserBans { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +68,9 @@ namespace ForumService.Infrastructure.Data
             modelBuilder.Entity<BannedKeyword>()
                 .HasIndex(b => b.Keyword)
                 .IsUnique();
+
+            modelBuilder.Entity<ForumUserBan>()
+               .HasIndex(b => b.UserId);
         }
     }
 }

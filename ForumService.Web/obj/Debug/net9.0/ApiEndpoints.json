@@ -1,5 +1,213 @@
 [
   {
+    "ContainingType": "ForumService.Web.Controllers.BanUser.ForumUserBanController",
+    "Method": "BanUser",
+    "RelativePath": "api/forum/bans",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "ForumService.Contract.UseCases.BanUser.Request\u002BCreateBanUserRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 201
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 400
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 401
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 403
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 409
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "ForumService.Web.Controllers.BanUser.ForumUserBanController",
+    "Method": "GetBannedUsers",
+    "RelativePath": "api/forum/bans",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserId",
+        "Type": "System.Nullable\u00601[[System.Guid, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "IsActive",
+        "Type": "System.Nullable\u00601[[System.Boolean, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "IsRequired": false
+      },
+      {
+        "Name": "Limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Offset",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.BanUser.BanDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.BanUser.BanDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 500
+      }
+    ]
+  },
+  {
+    "ContainingType": "ForumService.Web.Controllers.BanUser.ForumUserBanController",
+    "Method": "GetBanById",
+    "RelativePath": "api/forum/bans/{banId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "banId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[ForumService.Contract.TransferObjects.BanUser.BanDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[ForumService.Contract.TransferObjects.BanUser.BanDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "ForumService.Web.Controllers.BanUser.ForumUserBanController",
+    "Method": "UpdateBan",
+    "RelativePath": "api/forum/bans/{banId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "banId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "ForumService.Contract.UseCases.BanUser.Request\u002BUpdateBanRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Boolean, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Boolean, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
+    "ContainingType": "ForumService.Web.Controllers.BanUser.ForumUserBanController",
+    "Method": "UnbanUser",
+    "RelativePath": "api/forum/bans/{banId}/unban",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "banId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "ForumService.Contract.UseCases.BanUser.Request\u002BUnbanUserRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Boolean, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Boolean, System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 404
+      }
+    ]
+  },
+  {
     "ContainingType": "ForumService.Web.Controllers.Category.CategoryController",
     "Method": "CreateCategory",
     "RelativePath": "api/forum/Category",

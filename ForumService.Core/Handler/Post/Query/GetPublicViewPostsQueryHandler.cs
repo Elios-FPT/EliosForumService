@@ -98,7 +98,8 @@ namespace ForumService.Core.Handler.Post.Query
                         AuthorFirstName = authorProfile?.firstName,
                         AuthorLastName = authorProfile?.lastName,
                         AuthorAvatarUrl = authorProfile?.avatarUrl,
-                        CategoryName = post.Category?.Name
+                        CategoryName = post.Category?.Name,
+                        ReferenceId = post.ReferenceId
                     };
 
                     postDtos.Add(postDto);

@@ -162,6 +162,48 @@ namespace ForumService.Infrastructure.Migrations
                     b.ToTable("Comments");
                 });
 
+            modelBuilder.Entity("ForumService.Domain.Models.ForumUserBan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("BanUntil")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("BannedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("BannedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("UnbanReason")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UnbannedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UnbannedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ForumUserBans");
+                });
+
             modelBuilder.Entity("ForumService.Domain.Models.Post", b =>
                 {
                     b.Property<Guid>("PostId")

@@ -33,5 +33,7 @@ namespace ForumService.Contract.TransferObjects.Post
         public string? AuthorLastName { get; set; }
         public string? AuthorAvatarUrl { get; set; }
         public string AuthorFullName => $"{AuthorFirstName} {AuthorLastName}".Trim();
+
+        public Guid? ReferenceId { get; set; }
     }
 }

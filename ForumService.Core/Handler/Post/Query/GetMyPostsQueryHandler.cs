@@ -75,7 +75,8 @@ namespace ForumService.Core.Handler.Post.Query
                         UpvoteCount = post.UpvoteCount,
                         DownvoteCount = post.DownvoteCount,
                         IsFeatured = post.IsFeatured,
-                        CreatedAt = post.CreatedAt
+                        CreatedAt = post.CreatedAt,
+                        ReferenceId = post.ReferenceId
                     };
 
                     var category = await _categoryRepository.GetByIdAsync(post.CategoryId);

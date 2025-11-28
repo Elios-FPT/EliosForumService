@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ForumService.Contract.Shared; 
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System;
+using System.Linq;
 
 namespace ForumService.Web.Attributes
 {
@@ -22,7 +26,15 @@ namespace ForumService.Web.Attributes
         {
             if (_requiredRoles.Length == 0)
             {
-                context.Result = new StatusCodeResult(500);
+                context.Result = new ObjectResult(new BaseResponseDto<object>
+                {
+                    Status = 500,
+                    Message = "Internal Server Error: No roles configured for this attribute.",
+                    ResponseData = null
+                })
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
                 return;
             }
 
@@ -30,7 +42,15 @@ namespace ForumService.Web.Attributes
 
             if (string.IsNullOrWhiteSpace(headerValue))
             {
-                context.Result = new ForbidResult($"Missing header: {HeaderName}");
+                context.Result = new ObjectResult(new BaseResponseDto<object>
+                {
+                    Status = 401,
+                    Message = $"Unauthorized: Missing required authentication header '{HeaderName}'.",
+                    ResponseData = null
+                })
+                {
+                    StatusCode = StatusCodes.Status401Unauthorized
+                };
                 return;
             }
 
@@ -44,8 +64,17 @@ namespace ForumService.Web.Attributes
 
             if (!hasRequiredRole)
             {
-                context.Result = new ForbidResult(
-                    $"Access denied. Required one of the following roles: {string.Join(", ", _requiredRoles.Select(r => r.Replace("role:", "")))}");
+                var requiredRolesClean = string.Join(", ", _requiredRoles.Select(r => r.Replace("role:", "")));
+
+                context.Result = new ObjectResult(new BaseResponseDto<object>
+                {
+                    Status = 403,
+                    Message = $"Access denied. You need one of the following roles: {requiredRolesClean}",
+                    ResponseData = null
+                })
+                {
+                    StatusCode = StatusCodes.Status403Forbidden
+                };
                 return;
             }
         }

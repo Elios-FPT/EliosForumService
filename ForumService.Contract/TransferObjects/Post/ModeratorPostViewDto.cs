@@ -58,5 +58,6 @@ namespace ForumService.Contract.TransferObjects.Post
         public string? DeletedByLastName { get; set; }
         public string? DeletedByAvatarUrl { get; set; }
         public string DeletedByFullName => $"{DeletedByFirstName} {DeletedByLastName}".Trim();
+        public Guid? ReferenceId { get; set; }
     }
 }

@@ -65,6 +65,8 @@ builder.Services.AddScoped(typeof(IKafkaConsumerFactory<>), typeof(KafkaConsumer
 builder.Services.AddScoped(typeof(IKafkaResponseHandler<>), typeof(KafkaResponseHandler<>));
 builder.Services.AddScoped<IKafkaTransaction, KafkaTransaction>();
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+builder.Services.AddHostedService<ForumService.Web.BackgroundServices.BanExpirationWorker>();
+
 
 builder.Services.AddHttpClient<ISUtilityServiceClient, SUtilityServiceClient>(client =>
 {

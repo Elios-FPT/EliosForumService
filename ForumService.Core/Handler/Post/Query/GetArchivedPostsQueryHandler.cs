@@ -114,7 +114,8 @@ namespace ForumService.Core.Handler.Post.Query
                         DeletedAt = post.DeletedAt,
                         DeletedByFirstName = deleterProfile?.firstName,
                         DeletedByLastName = deleterProfile?.lastName,
-                        DeletedByAvatarUrl = deleterProfile?.avatarUrl
+                        DeletedByAvatarUrl = deleterProfile?.avatarUrl,
+                        ReferenceId = post.ReferenceId
                     };
 
                     postDtos.Add(postDto);
