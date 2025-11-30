@@ -3,7 +3,6 @@ using ForumService.Web.Attributes;
 using ForumService.Contract.Shared;
 using ForumService.Contract.TransferObjects;
 using ForumService.Contract.TransferObjects.Post;
-using ForumService.Web.Attributes;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -58,8 +57,8 @@ namespace ForumService.Web.Controllers.Post
                 Content: request.Content,
                 PostType: request.PostType,
                 ReferenceId: request.ReferenceId,
-                Tags: request.Tags,                     // New: Supports tags even when Draft
-                SubmitForReview: request.SubmitForReview // New: Flag determines status
+                Tags: request.Tags,                     
+                SubmitForReview: request.SubmitForReview 
             );
             return await _sender.Send(command);
         }
@@ -99,21 +98,21 @@ namespace ForumService.Web.Controllers.Post
         /// Retrieves a paginated list of PUBLISHED posts.
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
-        public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetPublicViewPosts([FromQuery] GetPublishedPostsRequest request)
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
+        public async Task<PagedResponseDto<IEnumerable<PostViewDto>>> GetPublicViewPosts([FromQuery] GetPublishedPostsRequest request)
         {
 
             var query = new GetPublicViewPostsQuery(
-                AuthorId: request.AuthorId,
-                CategoryId: request.CategoryId,
-                PostType: request.PostType,
-                SearchKeyword: request.SearchKeyword,
-                ReferenceId: request.ReferenceId,
-                Limit: request.Limit,
-                Offset: request.Offset,
-                SortBy: request.SortBy,
-                SortOrder: request.SortOrder
-            );
+                 AuthorId: request.AuthorId,
+                 CategoryId: request.CategoryId,
+                 PostType: request.PostType,
+                 SearchKeyword: request.SearchKeyword,
+                 ReferenceId: request.ReferenceId,
+                 Page: request.Page,
+                 Size: request.Size,
+                 SortBy: request.SortBy,
+                 SortOrder: request.SortOrder
+             );
             return await _sender.Send(query);
         }
 
@@ -141,22 +140,23 @@ namespace ForumService.Web.Controllers.Post
         /// </remarks>
         [HttpGet("my-posts")]
         [ServiceAuthorize("User")]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<PostViewDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-        public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> GetMyPosts([FromQuery] GetMyPostsRequest request)
+        public async Task<PagedResponseDto<IEnumerable<PostViewDto>>> GetMyPosts([FromQuery] GetMyPostsRequest request)
         {
             var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+
+            // Logic check Auth 
             if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
             {
-                return new BaseResponseDto<IEnumerable<PostViewDto>>
+                return new PagedResponseDto<IEnumerable<PostViewDto>>
                 {
                     Status = 401,
                     Message = "User not authenticated or invalid/missing X-Auth-Request-User header",
                     ResponseData = Enumerable.Empty<PostViewDto>()
                 };
             }
-
-            //var userId = new Guid("102ea1b3-f664-4617-8f43-fdde557f12b6");
+            //var userId = new Guid("102ea1b3-f664-4617-8f43-fdde557f12b6"); // Test ID
 
             var query = new GetMyPostsQuery(
                 RequesterId: userId,
@@ -164,8 +164,8 @@ namespace ForumService.Web.Controllers.Post
                 CategoryId: request.CategoryId,
                 PostType: request.PostType,
                 SearchKeyword: request.SearchKeyword,
-                Limit: request.Limit,
-                Offset: request.Offset,
+                Page: request.Page,
+                Size: request.Size,
                 SortBy: request.SortBy,
                 SortOrder: request.SortOrder
             );

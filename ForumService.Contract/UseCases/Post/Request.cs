@@ -61,13 +61,13 @@ namespace ForumService.Contract.UseCases.Post
             string? SearchKeyword = null,
             Guid? ReferenceId = null,
 
-            // Pagination
-            int Limit = 20,
-            int Offset = 0,
+            // Pagination (Changed)
+            int Page = 1,       // Default page 1
+            int Size = 10,      // Default size 10
 
             // Sorting
-            string? SortBy = null,     // e.g., "ViewsCount", "CreatedAt"
-            string? SortOrder = null   // e.g., "ASC", "DESC"
+            string? SortBy = null,
+            string? SortOrder = null
         );
 
         public record GetModeratorPublicPostsRequest(
@@ -78,9 +78,9 @@ namespace ForumService.Contract.UseCases.Post
             string? SearchKeyword = null,
             Guid? ReferenceId = null,
 
-            // Pagination
-            int Limit = 20,
-            int Offset = 0,
+            // Pagination (Changed)
+            int Page = 1,       // Default page 1
+            int Size = 10,      // Default size 10
 
             // Sorting
             string? SortBy = null,    // e.g., "ViewsCount", "CreatedAt"
@@ -98,9 +98,9 @@ namespace ForumService.Contract.UseCases.Post
             string? SearchKeyword = null,
             Guid? ReferenceId = null,
 
-            // Pagination
-            int Limit = 20,
-            int Offset = 0,
+            // Pagination (Changed)
+            int Page = 1,       // Default page 1
+            int Size = 10,      // Default size 10
 
             // Sorting
             string? SortBy = null,
@@ -119,9 +119,9 @@ namespace ForumService.Contract.UseCases.Post
             string? SearchKeyword = null,
             Guid? ReferenceId = null,
 
-            // Pagination
-            int Limit = 20,
-            int Offset = 0,
+            // Pagination (Changed)
+            int Page = 1,       // Default page 1
+            int Size = 10,      // Default size 10
 
             // Sorting
             string? SortBy = null,    // e.g., "ViewsCount", "CreatedAt"
@@ -139,9 +139,9 @@ namespace ForumService.Contract.UseCases.Post
             string? SearchKeyword = null,
             Guid? ReferenceId = null,
 
-            // Pagination
-            int Limit = 20,
-            int Offset = 0,
+            // Pagination (Changed)
+            int Page = 1,       // Default page 1
+            int Size = 10,      // Default size 10
 
             // Sorting
             string? SortBy = null,    // e.g., "ViewsCount", "CreatedAt"

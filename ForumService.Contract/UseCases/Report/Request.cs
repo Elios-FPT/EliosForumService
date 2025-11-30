@@ -59,11 +59,8 @@ namespace ForumService.Contract.UseCases.Report
             Guid? TargetId = null,          // Filter reports for a specific content
 
             // Pagination
-            [Range(1, 100)]
-            int Limit = 20,                 // Page size
-
-            [Range(0, int.MaxValue)]
-            int Offset = 0,                 // Skip count (or PageNumber depending on your mapping logic)
+            int Page = 1,                   // Page number (default 1)
+            int Size = 10,                  // Page size (default 20)
 
             // Sorting
             string? SortBy = null,          // e.g., "CreatedAt"

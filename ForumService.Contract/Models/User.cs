@@ -13,7 +13,7 @@ namespace ForumService.Contract.Models
         public Guid id { get; set; }
         public string firstName { get; set; } = null!;
         public string lastName { get; set; } = null!;
-        public DateTime dateOfBirth { get; set; }
+        public string? dateOfBirth { get; set; }
         public string? gender { get; set; }
         public string? avatarUrl { get; set; }
         public string? avatarPrefix { get; set; }

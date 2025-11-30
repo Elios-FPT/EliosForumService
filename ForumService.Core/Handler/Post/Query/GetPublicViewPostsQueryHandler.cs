@@ -14,7 +14,7 @@ using static ForumService.Contract.UseCases.Post.Query;
 namespace ForumService.Core.Handler.Post.Query
 {
 
-    public class GetPublicViewPostsQueryHandler : IQueryHandler<GetPublicViewPostsQuery, BaseResponseDto<IEnumerable<PostViewDto>>>
+    public class GetPublicViewPostsQueryHandler : IQueryHandler<GetPublicViewPostsQuery, PagedResponseDto<IEnumerable<PostViewDto>>>
     {
         private readonly IPostQueryRepository _postQueryRepository;
         private readonly IKafkaProducerRepository<User> _producerRepository;
@@ -31,25 +31,28 @@ namespace ForumService.Core.Handler.Post.Query
             _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
-        public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> Handle(GetPublicViewPostsQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResponseDto<IEnumerable<PostViewDto>>> Handle(GetPublicViewPostsQuery request, CancellationToken cancellationToken)
         {
-            if (request.Limit <= 0 || request.Offset < 0)
-            {
-                return new BaseResponseDto<IEnumerable<PostViewDto>> { Status = 400, Message = "Invalid pagination parameters." };
-            }
+            var page = request.Page <= 0 ? 1 : request.Page;
+            var pageSize = request.Size <= 0 ? 10 : request.Size;
 
             try
             {
 
-                var posts = (await _postQueryRepository.GetPublicViewPostsAsync(request)).ToList();
+                var result = await _postQueryRepository.GetPublicViewPostsAsync(request);
+                var posts = result.Posts.ToList();
+                var totalItems = result.TotalCount;
 
                 if (!posts.Any())
                 {
-                    return new BaseResponseDto<IEnumerable<PostViewDto>>
+                    return new PagedResponseDto<IEnumerable<PostViewDto>>(
+                        Enumerable.Empty<PostViewDto>(),
+                        page,
+                        pageSize,
+                        0
+                    )
                     {
-                        Status = 200,
-                        Message = "No posts found.",
-                        ResponseData = Enumerable.Empty<PostViewDto>()
+                        Message = "No posts found."
                     };
                 }
 
@@ -64,6 +67,7 @@ namespace ForumService.Core.Handler.Post.Query
                     var userProfilesList = await _producerRepository.ProduceGetAllAsync(
                            DestinationService,
                            ResponseTopic);
+
 
                     userProfilesDict = userProfilesList
                         .Where(u => authorIds.Contains(u.id))
@@ -105,19 +109,24 @@ namespace ForumService.Core.Handler.Post.Query
                     postDtos.Add(postDto);
                 }
 
-                return new BaseResponseDto<IEnumerable<PostViewDto>>
+                return new PagedResponseDto<IEnumerable<PostViewDto>>(
+                    postDtos,
+                    page,
+                    pageSize,
+                    totalItems
+                )
                 {
-                    Status = 200,
-                    Message = "Posts retrieved successfully.",
-                    ResponseData = postDtos
+                    Message = "Posts retrieved successfully."
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponseDto<IEnumerable<PostViewDto>>
+                return new PagedResponseDto<IEnumerable<PostViewDto>>
                 {
                     Status = 500,
-                    Message = $"An error occurred: {ex.Message}"
+                    Message = $"An error occurred: {ex.Message}",
+                    ResponseData = null,
+                    Pagination = null
                 };
             }
         }

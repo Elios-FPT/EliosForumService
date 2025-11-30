@@ -17,15 +17,15 @@ namespace ForumService.Contract.UseCases.Report
         /// Mapped from GetReportsRequest.
         /// </summary>
         public record GetReportsQuery(
-           int Offset,
-           int Limit,
-           string? Status,
-           string? TargetType,
-           Guid? ReporterId,
-           Guid? TargetId,
-           string? SortBy,
-           string? SortOrder
-       ) : IQuery<BaseResponseDto<IEnumerable<ReportDto>>>;
+            int Page,
+            int Size,
+            string? Status,
+            string? TargetType,
+            Guid? ReporterId,
+            Guid? TargetId,
+            string? SortBy,
+            string? SortOrder
+        ) : IQuery<PagedResponseDto<IEnumerable<ReportDto>>>;
 
         public record GetReportByIdQuery(
             Guid ReportId

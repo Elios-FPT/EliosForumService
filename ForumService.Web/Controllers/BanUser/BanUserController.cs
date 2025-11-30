@@ -86,31 +86,31 @@ namespace ForumService.Web.Controllers.BanUser
         /// </summary>
         [HttpGet]
         [ServiceAuthorize("Admin", "Content Moderator")]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<BanDto>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<BanDto>>), StatusCodes.Status500InternalServerError)]
-        public async Task<BaseResponseDto<IEnumerable<BanDto>>> GetBannedUsers([FromQuery] GetBannedUsersRequest request)
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<BanDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<BanDto>>), StatusCodes.Status500InternalServerError)]
+        public async Task<PagedResponseDto<IEnumerable<BanDto>>> GetBannedUsers([FromQuery] GetBannedUsersRequest request)
         {
             try
             {
                 var query = new GetBannedUsersQuery(
                     UserId: request.UserId,
                     IsActive: request.IsActive,
-                    Limit: request.Limit,
-                    Offset: request.Offset
+                    Page: request.Page,
+                    Size: request.Size
                 );
 
                 var result = await Sender.Send(query);
-                HttpContext.Response.StatusCode = result.Status;
+                // HttpContext.Response.StatusCode = result.Status; // Optional: PagedResponseDto usually implies 200 OK structure
                 return result;
             }
             catch (Exception ex)
             {
-                HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                return new BaseResponseDto<IEnumerable<BanDto>>
+                return new PagedResponseDto<IEnumerable<BanDto>>
                 {
                     Status = 500,
                     Message = $"Error retrieving bans: {ex.Message}",
-                    ResponseData = Enumerable.Empty<BanDto>()
+                    ResponseData = Enumerable.Empty<BanDto>(),
+                    Pagination = null
                 };
             }
         }

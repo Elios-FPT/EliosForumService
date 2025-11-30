@@ -15,11 +15,11 @@ namespace ForumService.Contract.UseCases.Category
         /// Query to retrieve a list of categories (with pagination and filtering).
         /// </summary>
         public record GetCategoryListQuery(
-            string? SearchKeyword = null,
-            bool? IsActive = null,
-            int Limit = 20,
-            int Offset = 0
-        ) : IQuery<BaseResponseDto<IEnumerable<CategoryDto>>>;
+           string? SearchKeyword = null,
+           bool? IsActive = null,
+           int Page = 1,
+           int Size = 10
+       ) : IQuery<PagedResponseDto<IEnumerable<CategoryDto>>>;
 
         /// <summary>
         /// Query to get category details by ID.

@@ -77,26 +77,26 @@
         "IsRequired": false
       },
       {
-        "Name": "Limit",
+        "Name": "Page",
         "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "Offset",
+        "Name": "Size",
         "Type": "System.Int32",
         "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.BanUser.BanDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.BanUser.BanDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
         "StatusCode": 200
       },
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.BanUser.BanDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.BanUser.BanDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
@@ -257,19 +257,19 @@
         "IsRequired": false
       },
       {
-        "Name": "Limit",
+        "Name": "Page",
         "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "Offset",
+        "Name": "Size",
         "Type": "System.Int32",
         "IsRequired": false
       }
     ],
     "ReturnTypes": [
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Category.CategoryDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Category.CategoryDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
@@ -715,12 +715,12 @@
         "IsRequired": false
       },
       {
-        "Name": "Limit",
+        "Name": "Page",
         "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "Offset",
+        "Name": "Size",
         "Type": "System.Int32",
         "IsRequired": false
       },
@@ -737,7 +737,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.ModeratorPostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.ModeratorPostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
@@ -779,12 +779,12 @@
         "IsRequired": false
       },
       {
-        "Name": "Limit",
+        "Name": "Page",
         "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "Offset",
+        "Name": "Size",
         "Type": "System.Int32",
         "IsRequired": false
       },
@@ -801,7 +801,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.ModeratorPostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.ModeratorPostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
@@ -843,12 +843,12 @@
         "IsRequired": false
       },
       {
-        "Name": "Limit",
+        "Name": "Page",
         "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "Offset",
+        "Name": "Size",
         "Type": "System.Int32",
         "IsRequired": false
       },
@@ -865,7 +865,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.ModeratorPostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.ModeratorPostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
@@ -952,12 +952,12 @@
         "IsRequired": false
       },
       {
-        "Name": "Limit",
+        "Name": "Page",
         "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "Offset",
+        "Name": "Size",
         "Type": "System.Int32",
         "IsRequired": false
       },
@@ -974,7 +974,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.PostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.PostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
@@ -1233,12 +1233,12 @@
         "IsRequired": false
       },
       {
-        "Name": "Limit",
+        "Name": "Page",
         "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "Offset",
+        "Name": "Size",
         "Type": "System.Int32",
         "IsRequired": false
       },
@@ -1255,7 +1255,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.PostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Post.PostViewDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
@@ -1403,12 +1403,12 @@
         "IsRequired": false
       },
       {
-        "Name": "Limit",
+        "Name": "Page",
         "Type": "System.Int32",
         "IsRequired": false
       },
       {
-        "Name": "Offset",
+        "Name": "Size",
         "Type": "System.Int32",
         "IsRequired": false
       },
@@ -1425,28 +1425,28 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
         "StatusCode": 200
       },
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
         "StatusCode": 401
       },
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],
         "StatusCode": 403
       },
       {
-        "Type": "ForumService.Contract.Shared.BaseResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Type": "ForumService.Contract.Shared.PagedResponseDto\u00601[[System.Collections.Generic.IEnumerable\u00601[[ForumService.Contract.TransferObjects.Report.ReportDto, ForumService.Contract, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
         "MediaTypes": [
           "application/json"
         ],

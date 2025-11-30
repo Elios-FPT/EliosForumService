@@ -18,42 +18,36 @@ namespace ForumService.Core.Handler.Post.Query
     /// Handles retrieving posts created by the currently authenticated user.
     /// This version follows the consistent structure used across other post query handlers.
     /// </summary>
-    public class GetMyPostsQueryHandler : IQueryHandler<GetMyPostsQuery, BaseResponseDto<IEnumerable<PostViewDto>>>
+    public class GetMyPostsQueryHandler : IQueryHandler<GetMyPostsQuery, PagedResponseDto<IEnumerable<PostViewDto>>>
     {
         private readonly IPostQueryRepository _postQueryRepository;
-        private readonly IGenericRepository<Domain.Models.Category> _categoryRepository;
 
-        public GetMyPostsQueryHandler(
-            IPostQueryRepository postQueryRepository,
-            IGenericRepository<Domain.Models.Category> categoryRepository)
+        public GetMyPostsQueryHandler(IPostQueryRepository postQueryRepository)
         {
             _postQueryRepository = postQueryRepository ?? throw new ArgumentNullException(nameof(postQueryRepository));
-            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
-        public async Task<BaseResponseDto<IEnumerable<PostViewDto>>> Handle(GetMyPostsQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResponseDto<IEnumerable<PostViewDto>>> Handle(GetMyPostsQuery request, CancellationToken cancellationToken)
         {
-            if (request.Limit <= 0 || request.Offset < 0)
-            {
-                return new BaseResponseDto<IEnumerable<PostViewDto>>
-                {
-                    Status = 400,
-                    Message = "Limit must be positive and Offset must be non-negative.",
-                    ResponseData = Enumerable.Empty<PostViewDto>()
-                };
-            }
+            var page = request.Page <= 0 ? 1 : request.Page;
+            var pageSize = request.Size <= 0 ? 10 : request.Size;
 
             try
             {
-                var posts = (await _postQueryRepository.GetMyPostsAsync(request)).ToList();
+                var result = await _postQueryRepository.GetMyPostsAsync(request);
+                var posts = result.Posts.ToList();
+                var totalItems = result.TotalCount;
 
                 if (!posts.Any())
                 {
-                    return new BaseResponseDto<IEnumerable<PostViewDto>>
+                    return new PagedResponseDto<IEnumerable<PostViewDto>>(
+                        Enumerable.Empty<PostViewDto>(),
+                        page,
+                        pageSize,
+                        0
+                    )
                     {
-                        Status = 200,
-                        Message = "No posts found.",
-                        ResponseData = Enumerable.Empty<PostViewDto>()
+                        Message = "No posts found."
                     };
                 }
 
@@ -76,29 +70,31 @@ namespace ForumService.Core.Handler.Post.Query
                         DownvoteCount = post.DownvoteCount,
                         IsFeatured = post.IsFeatured,
                         CreatedAt = post.CreatedAt,
-                        ReferenceId = post.ReferenceId
+                        ReferenceId = post.ReferenceId,
+                        CategoryName = post.Category?.Name
                     };
-
-                    var category = await _categoryRepository.GetByIdAsync(post.CategoryId);
-                    postDto.CategoryName = category?.Name;
 
                     postDtos.Add(postDto);
                 }
 
-                return new BaseResponseDto<IEnumerable<PostViewDto>>
+                return new PagedResponseDto<IEnumerable<PostViewDto>>(
+                    postDtos,
+                    page,
+                    pageSize,
+                    totalItems
+                )
                 {
-                    Status = 200,
-                    Message = "Posts retrieved successfully.",
-                    ResponseData = postDtos
+                    Message = "Posts retrieved successfully."
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponseDto<IEnumerable<PostViewDto>>
+                return new PagedResponseDto<IEnumerable<PostViewDto>>
                 {
                     Status = 500,
                     Message = $"An internal server error occurred: {ex.Message}",
-                    ResponseData = Enumerable.Empty<PostViewDto>()
+                    ResponseData = null,
+                    Pagination = null
                 };
             }
         }

@@ -61,18 +61,31 @@ namespace ForumService.Core.Handler.Post.Command
                     return new BaseResponseDto<bool> { Status = 400, Message = $"Post is not in Draft status (current status: {post.Status}).", ResponseData = false };
                 }
 
-                if (await ContainsBannedKeywordAsync(post.Title))
+                // Check Title
+                var bannedKeywordInTitle = await GetBannedKeywordAsync(post.Title);
+                if (!string.IsNullOrEmpty(bannedKeywordInTitle))
                 {
                     await _unitOfWork.RollbackAsync();
-                    return new BaseResponseDto<bool> { Status = 400, Message = "Tiêu đề bài viết chứa từ khóa không phù hợp.", ResponseData = false };
+                    return new BaseResponseDto<bool>
+                    {
+                        Status = 400,
+                        Message = $"The post title contains a banned keyword: '{bannedKeywordInTitle}'",
+                        ResponseData = false
+                    };
                 }
 
-                if (await ContainsBannedKeywordAsync(post.Content))
+                // Check Content
+                var bannedKeywordInContent = await GetBannedKeywordAsync(post.Content);
+                if (!string.IsNullOrEmpty(bannedKeywordInContent))
                 {
                     await _unitOfWork.RollbackAsync();
-                    return new BaseResponseDto<bool> { Status = 400, Message = "Nội dung bài viết chứa từ khóa không phù hợp.", ResponseData = false };
+                    return new BaseResponseDto<bool>
+                    {
+                        Status = 400,
+                        Message = $"The post content contains a banned keyword: '{bannedKeywordInContent}'",
+                        ResponseData = false
+                    };
                 }
-
 
                 // --- Handle Tags ---
                 // 1. Remove all old PostTag records of this post
@@ -162,11 +175,10 @@ namespace ForumService.Core.Handler.Post.Command
         }
 
         // Helper method for checking banned keywords
-        private async Task<bool> ContainsBannedKeywordAsync(string text)
+        private async Task<string?> GetBannedKeywordAsync(string text)
         {
-            if (string.IsNullOrEmpty(text)) return false;
+            if (string.IsNullOrEmpty(text)) return null;
 
-            // Note: Consider caching this list for better performance in the future
             var bannedKeywords = await _bannedKeywordRepository.GetListAsync(x => x.IsActive);
 
             if (bannedKeywords != null && bannedKeywords.Any())
@@ -176,20 +188,19 @@ namespace ForumService.Core.Handler.Post.Command
                     try
                     {
                         var pattern = banned.Keyword;
-                        // Use Regex for flexible matching (case-insensitive)
+
                         if (Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase))
                         {
-                            return true;
+                            return pattern;
                         }
                     }
                     catch (ArgumentException)
                     {
-                        // Ignore invalid regex patterns in DB to prevent crash
                         continue;
                     }
                 }
             }
-            return false;
+            return null;
         }
     }
 }

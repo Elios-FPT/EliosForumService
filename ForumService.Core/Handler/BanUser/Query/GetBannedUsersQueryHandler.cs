@@ -7,15 +7,17 @@ using ForumService.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static ForumService.Contract.UseCases.BanUser.Query;
 
 namespace ForumService.Core.Handler.BanUser.Query
 {
-    public class GetBannedUsersQueryHandler : IQueryHandler<Contract.UseCases.BanUser.Query.GetBannedUsersQuery, BaseResponseDto<IEnumerable<BanDto>>>
+    public class GetBannedUsersQueryHandler : IQueryHandler<GetBannedUsersQuery, PagedResponseDto<IEnumerable<BanDto>>>
     {
         private readonly IGenericRepository<ForumUserBan> _banRepository;
-        private readonly IKafkaProducerRepository<User> _producerRepository; 
+        private readonly IKafkaProducerRepository<User> _producerRepository;
 
         private const string ResponseTopic = "user-forum-user";
         private const string DestinationService = "user";
@@ -28,45 +30,54 @@ namespace ForumService.Core.Handler.BanUser.Query
             _producerRepository = producerRepository ?? throw new ArgumentNullException(nameof(producerRepository));
         }
 
-        public async Task<BaseResponseDto<IEnumerable<BanDto>>> Handle(Contract.UseCases.BanUser.Query.GetBannedUsersQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResponseDto<IEnumerable<BanDto>>> Handle(GetBannedUsersQuery request, CancellationToken cancellationToken)
         {
+            var page = request.Page <= 0 ? 1 : request.Page;
+            var pageSize = request.Size <= 0 ? 20 : request.Size;
+
             try
             {
-                // 1. Build Filter & Get Data from DB
-                System.Linq.Expressions.Expression<Func<ForumUserBan, bool>> filter = b => true;
+                // 1. Build Filter Expression
+                Expression<Func<ForumUserBan, bool>> filter = b => true;
 
-                if (request.UserId.HasValue)
+                if (request.UserId.HasValue && request.IsActive.HasValue)
                 {
-                    var oldFilter = filter;
-                    filter = b => oldFilter.Compile()(b) && b.UserId == request.UserId.Value;
+                    var uid = request.UserId.Value;
+                    var active = request.IsActive.Value;
+                    filter = b => b.UserId == uid && b.IsActive == active;
+                }
+                else if (request.UserId.HasValue)
+                {
+                    var uid = request.UserId.Value;
+                    filter = b => b.UserId == uid;
+                }
+                else if (request.IsActive.HasValue)
+                {
+                    var active = request.IsActive.Value;
+                    filter = b => b.IsActive == active;
                 }
 
-                if (request.IsActive.HasValue)
+                // 2. Get Total Count
+                var totalItems = await _banRepository.GetCountAsync(filter);
+
+                if (totalItems == 0)
                 {
-                    var oldFilter = filter;
-                    filter = b => oldFilter.Compile()(b) && b.IsActive == request.IsActive.Value;
-                }
-
-                int limit = request.Limit > 0 ? request.Limit : 20;
-                int pageNumber = (request.Offset / limit) + 1;
-
-                var bans = await _banRepository.GetListAsync(
-                    filter: filter,
-                    orderBy: q => q.OrderByDescending(b => b.BannedAt),
-                    pageSize: limit,
-                    pageNumber: pageNumber
-                );
-
-                if (!bans.Any())
-                {
-                    return new BaseResponseDto<IEnumerable<BanDto>>
+                    return new PagedResponseDto<IEnumerable<BanDto>>(
+                        Enumerable.Empty<BanDto>(), page, pageSize, 0)
                     {
-                        Status = 200,
-                        Message = "Không có dữ liệu.",
-                        ResponseData = Enumerable.Empty<BanDto>()
+                        Message = "No banned users found."
                     };
                 }
 
+                // 3. Get Paged Data from DB
+                var bans = await _banRepository.GetListAsync(
+                    filter: filter,
+                    orderBy: q => q.OrderByDescending(b => b.BannedAt),
+                    pageSize: pageSize,
+                    pageNumber: page
+                );
+
+                // 4. Fetch User Profiles
                 var userIdsToFetch = bans.Select(b => b.UserId)
                                          .Concat(bans.Select(b => b.BannedBy))
                                          .Distinct()
@@ -76,8 +87,8 @@ namespace ForumService.Core.Handler.BanUser.Query
                 try
                 {
                     var userProfilesList = await _producerRepository.ProduceGetAllAsync(
-                           DestinationService,
-                           ResponseTopic);
+                            DestinationService,
+                            ResponseTopic);
 
                     userProfilesDict = userProfilesList
                         .Where(u => userIdsToFetch.Contains(u.id))
@@ -88,7 +99,7 @@ namespace ForumService.Core.Handler.BanUser.Query
                     userProfilesDict = new Dictionary<Guid, User>();
                 }
 
-                // 3. Map Entity -> DTO
+                // 5. Map Entity -> DTO
                 var banDtos = bans.Select(b =>
                 {
                     userProfilesDict.TryGetValue(b.UserId, out var bannedUser);
@@ -117,20 +128,24 @@ namespace ForumService.Core.Handler.BanUser.Query
                     };
                 });
 
-                return new BaseResponseDto<IEnumerable<BanDto>>
+                return new PagedResponseDto<IEnumerable<BanDto>>(
+                    banDtos,
+                    page,
+                    pageSize,
+                    totalItems
+                )
                 {
-                    Status = 200,
-                    Message = "Lấy danh sách thành công.",
-                    ResponseData = banDtos
+                    Message = "Get list successfully."
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponseDto<IEnumerable<BanDto>>
+                return new PagedResponseDto<IEnumerable<BanDto>>
                 {
                     Status = 500,
-                    Message = $"Lỗi truy vấn: {ex.Message}",
-                    ResponseData = Enumerable.Empty<BanDto>()
+                    Message = $"Query error: {ex.Message}",
+                    ResponseData = Enumerable.Empty<BanDto>(),
+                    Pagination = null
                 };
             }
         }

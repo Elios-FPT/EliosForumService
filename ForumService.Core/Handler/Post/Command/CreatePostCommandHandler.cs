@@ -13,7 +13,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Post.Command;
-using Domain = ForumService.Domain.Models; // Alias for brevity
 
 namespace ForumService.Core.Handler.Post.Command
 {
@@ -40,8 +39,8 @@ namespace ForumService.Core.Handler.Post.Command
             IGenericRepository<Domain.Models.BannedKeyword> bannedKeywordRepository,
             IUnitOfWork unitOfWork,
 
-            IKafkaProducer kafkaProducer, // Inject Producer
-            IAppConfiguration appConfig,  // Inject Config to get Service name
+            IKafkaProducer kafkaProducer,
+            IAppConfiguration appConfig,  
             ILogger<CreatePostCommandHandler> logger
             )
 
@@ -83,11 +82,27 @@ namespace ForumService.Core.Handler.Post.Command
             // Check ban keyword 
             if (initialStatus == "Published" || initialStatus == "PendingReview")
             {
-                if (await ContainsBannedKeywordAsync(request.Title))
-                    return new BaseResponseDto<bool> { Status = 400, Message = "Tiêu đề bài viết chứa từ khóa không phù hợp.", ResponseData = false };
+                var bannedKeywordInTitle = await GetBannedKeywordAsync(request.Title);
+                if (!string.IsNullOrEmpty(bannedKeywordInTitle))
+                {
+                    return new BaseResponseDto<bool>
+                    {
+                        Status = 400,
+                        Message = $"The post title contains a banned keyword: '{bannedKeywordInTitle}'",
+                        ResponseData = false
+                    };
+                }
 
-                if (await ContainsBannedKeywordAsync(request.Content))
-                    return new BaseResponseDto<bool> { Status = 400, Message = "Nội dung bài viết chứa từ khóa không phù hợp.", ResponseData = false };
+                var bannedKeywordInContent = await GetBannedKeywordAsync(request.Content);
+                if (!string.IsNullOrEmpty(bannedKeywordInContent))
+                {
+                    return new BaseResponseDto<bool>
+                    {
+                        Status = 400,
+                        Message = $"The post content contains a banned keyword: '{bannedKeywordInContent}'",
+                        ResponseData = false
+                    };
+                }
             }
 
             await _unitOfWork.BeginTransactionAsync();
@@ -215,9 +230,9 @@ namespace ForumService.Core.Handler.Post.Command
             return str;
         }
 
-        private async Task<bool> ContainsBannedKeywordAsync(string text)
+        private async Task<string?> GetBannedKeywordAsync(string text)
         {
-            if (string.IsNullOrEmpty(text)) return false;
+            if (string.IsNullOrEmpty(text)) return null;
 
             var bannedKeywords = await _bannedKeywordRepository.GetListAsync(x => x.IsActive);
 
@@ -231,7 +246,7 @@ namespace ForumService.Core.Handler.Post.Command
 
                         if (Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase))
                         {
-                            return true;
+                            return pattern; 
                         }
                     }
                     catch (ArgumentException)
@@ -240,7 +255,7 @@ namespace ForumService.Core.Handler.Post.Command
                     }
                 }
             }
-            return false; 
+            return null; 
         }
     }
 }

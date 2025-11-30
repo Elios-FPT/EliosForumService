@@ -14,130 +14,102 @@ using static ForumService.Contract.UseCases.Post.Query;
 
 namespace ForumService.Core.Handler.Post.Query
 {
-    public class GetArchivedPostsQueryHandler
-        : IQueryHandler<GetArchivedPostsQuery, BaseResponseDto<IEnumerable<ModeratorPostViewDto>>>
+    public class GetArchivedPostsQueryHandler : IQueryHandler<GetArchivedPostsQuery, PagedResponseDto<IEnumerable<ModeratorPostViewDto>>>
     {
         private readonly IPostQueryRepository _postQueryRepository;
         private readonly IKafkaProducerRepository<User> _producerRepository;
         private const string ResponseTopic = "user-forum-user";
         private const string DestinationService = "user";
 
-        public GetArchivedPostsQueryHandler(
-            IPostQueryRepository postQueryRepository,
-            IKafkaProducerRepository<User> producerRepository)
+        public GetArchivedPostsQueryHandler(IPostQueryRepository postQueryRepository, IKafkaProducerRepository<User> producerRepository)
         {
             _postQueryRepository = postQueryRepository ?? throw new ArgumentNullException(nameof(postQueryRepository));
             _producerRepository = producerRepository ?? throw new ArgumentNullException(nameof(producerRepository));
         }
 
-        public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> Handle(
-            GetArchivedPostsQuery request,
-            CancellationToken cancellationToken)
+        public async Task<PagedResponseDto<IEnumerable<ModeratorPostViewDto>>> Handle(GetArchivedPostsQuery request, CancellationToken cancellationToken)
         {
-            if (request.Limit <= 0 || request.Offset < 0)
-            {
-                return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
-                {
-                    Status = 400,
-                    Message = "Limit must be positive and Offset must be non-negative.",
-                    ResponseData = Enumerable.Empty<ModeratorPostViewDto>()
-                };
-            }
+            var page = request.Page <= 0 ? 1 : request.Page;
+            var pageSize = request.Size <= 0 ? 10 : request.Size;
 
             try
             {
-                var posts = (await _postQueryRepository.GetArchivedPostsAsync(request)).ToList();
+                var result = await _postQueryRepository.GetArchivedPostsAsync(request);
+                var posts = result.Posts.ToList();
+                var totalItems = result.TotalCount;
 
                 if (!posts.Any())
                 {
-                    return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
-                    {
-                        Status = 200,
-                        Message = "No archived posts found.",
-                        ResponseData = Enumerable.Empty<ModeratorPostViewDto>()
-                    };
+                    return new PagedResponseDto<IEnumerable<ModeratorPostViewDto>>(Enumerable.Empty<ModeratorPostViewDto>(), page, pageSize, 0)
+                    { Message = "No archived posts found." };
                 }
 
-                // --- Load user profiles ---
                 Dictionary<Guid, User> userProfilesDict;
                 try
                 {
                     var userProfilesList = await _producerRepository.ProduceGetAllAsync(DestinationService, ResponseTopic);
                     userProfilesDict = userProfilesList.ToDictionary(u => u.id);
                 }
-                catch
-                {
-                    userProfilesDict = new Dictionary<Guid, User>();
-                }
+                catch { userProfilesDict = new Dictionary<Guid, User>(); }
 
-                var postDtos = new List<ModeratorPostViewDto>();
+                var postDtos = MapPostsToDtos(posts, userProfilesDict);
 
-                foreach (var post in posts)
-                {
-                    userProfilesDict.TryGetValue(post.AuthorId, out var authorProfile);
-                    userProfilesDict.TryGetValue(post.ModeratedBy ?? Guid.Empty, out var moderatorProfile);
-                    userProfilesDict.TryGetValue(post.DeletedBy ?? Guid.Empty, out var deleterProfile);
-
-                    var postDto = new ModeratorPostViewDto
-                    {
-                        PostId = post.PostId,
-                        AuthorId = post.AuthorId,
-                        CategoryId = post.CategoryId,
-                        Title = post.Title,
-                        Summary = post.Summary,
-                        Content = post.Content,
-                        PostType = post.PostType,
-                        Status = post.Status,
-                        ViewsCount = post.ViewsCount,
-                        CommentCount = post.CommentCount,
-                        UpvoteCount = post.UpvoteCount,
-                        DownvoteCount = post.DownvoteCount,
-                        IsFeatured = post.IsFeatured,
-                        IsDeleted = post.IsDeleted,
-                        CreatedAt = post.CreatedAt,
-                        UpdatedAt = post.UpdatedAt,
-
-                        CategoryName = post.Category?.Name,
-
-                        AuthorFirstName = authorProfile?.firstName,
-                        AuthorLastName = authorProfile?.lastName,
-                        AuthorAvatarUrl = authorProfile?.avatarUrl,
-
-                        ModeratedBy = post.ModeratedBy,
-                        ModeratedAt = post.ModeratedAt,
-                        RejectionReason = post.RejectionReason,
-                        ModeratorFirstName = moderatorProfile?.firstName,
-                        ModeratorLastName = moderatorProfile?.lastName,
-                        ModeratorAvatarUrl = moderatorProfile?.avatarUrl,
-
-                        DeletedBy = post.DeletedBy,
-                        DeletedAt = post.DeletedAt,
-                        DeletedByFirstName = deleterProfile?.firstName,
-                        DeletedByLastName = deleterProfile?.lastName,
-                        DeletedByAvatarUrl = deleterProfile?.avatarUrl,
-                        ReferenceId = post.ReferenceId
-                    };
-
-                    postDtos.Add(postDto);
-                }
-
-                return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
-                {
-                    Status = 200,
-                    Message = "Archived posts retrieved successfully.",
-                    ResponseData = postDtos
-                };
+                return new PagedResponseDto<IEnumerable<ModeratorPostViewDto>>(postDtos, page, pageSize, totalItems)
+                { Message = "Archived posts retrieved successfully." };
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[ERROR] Failed to retrieve archived posts: {ex}");
-                return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
-                {
-                    Status = 500,
-                    Message = $"An error occurred: {ex.Message}",
-                    ResponseData = Enumerable.Empty<ModeratorPostViewDto>()
-                };
+                return new PagedResponseDto<IEnumerable<ModeratorPostViewDto>> { Status = 500, Message = $"An error occurred: {ex.Message}" };
             }
+        }
+
+        private List<ModeratorPostViewDto> MapPostsToDtos(List<Domain.Models.Post> posts, Dictionary<Guid, User> userProfilesDict)
+        {
+            var postDtos = new List<ModeratorPostViewDto>();
+            foreach (var post in posts)
+            {
+                userProfilesDict.TryGetValue(post.AuthorId, out var authorProfile);
+                userProfilesDict.TryGetValue(post.ModeratedBy ?? Guid.Empty, out var moderatorProfile);
+                userProfilesDict.TryGetValue(post.DeletedBy ?? Guid.Empty, out var deleterProfile);
+
+                postDtos.Add(new ModeratorPostViewDto
+                {
+                    PostId = post.PostId,
+                    AuthorId = post.AuthorId,
+                    CategoryId = post.CategoryId,
+                    Title = post.Title,
+                    Summary = post.Summary,
+                    Content = post.Content,
+                    PostType = post.PostType,
+                    Status = post.Status,
+                    ViewsCount = post.ViewsCount,
+                    CommentCount = post.CommentCount,
+                    UpvoteCount = post.UpvoteCount,
+                    DownvoteCount = post.DownvoteCount,
+                    IsFeatured = post.IsFeatured,
+                    IsDeleted = post.IsDeleted,
+                    CreatedAt = post.CreatedAt,
+                    UpdatedAt = post.UpdatedAt,
+                    CategoryName = post.Category?.Name,
+                    AuthorFirstName = authorProfile?.firstName,
+                    AuthorLastName = authorProfile?.lastName,
+                    AuthorAvatarUrl = authorProfile?.avatarUrl,
+                    ModeratedBy = post.ModeratedBy,
+                    ModeratedAt = post.ModeratedAt,
+                    RejectionReason = post.RejectionReason,
+                    ModeratorFirstName = moderatorProfile?.firstName,
+                    ModeratorLastName = moderatorProfile?.lastName,
+                    ModeratorAvatarUrl = moderatorProfile?.avatarUrl,
+                    DeletedBy = post.DeletedBy,
+                    DeletedAt = post.DeletedAt,
+                    DeletedByFirstName = deleterProfile?.firstName,
+                    DeletedByLastName = deleterProfile?.lastName,
+                    DeletedByAvatarUrl = deleterProfile?.avatarUrl,
+                    ReferenceId = post.ReferenceId
+                });
+            }
+            return postDtos;
         }
     }
 }

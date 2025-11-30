@@ -18,16 +18,16 @@ namespace ForumService.Contract.UseCases.Post
         /// This is the most complex query, offering full filtering, sorting, and pagination.
         /// </summary>
         public record GetPublicViewPostsQuery(
-            Guid? AuthorId = null,
-            Guid? CategoryId = null,
-            string? PostType = null,
-            string? SearchKeyword = null,
-            Guid? ReferenceId = null,
-            int Limit = 20,
-            int Offset = 0,
-            string? SortBy = null,
-            string? SortOrder = null
-        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
+             Guid? AuthorId = null,
+             Guid? CategoryId = null,
+             string? PostType = null,
+             string? SearchKeyword = null,
+             Guid? ReferenceId = null,
+             int Page = 1,
+             int Size = 10,
+             string? SortBy = null,
+             string? SortOrder = null
+         ) : IQuery<PagedResponseDto<IEnumerable<PostViewDto>>>;
 
 
         // --- Queries for moderators (Moderator API) ---
@@ -42,11 +42,11 @@ namespace ForumService.Contract.UseCases.Post
              string? PostType = null,
              string? SearchKeyword = null,
              Guid? ReferenceId = null,
-             int Limit = 20,
-             int Offset = 0,
+             int Page = 1,
+             int Size = 10,
              string? SortBy = null, 
              string? SortOrder = null
-        ) : IQuery<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>>;
+        ) : IQuery<PagedResponseDto<IEnumerable<ModeratorPostViewDto>>>;
 
 
         /// <summary>
@@ -59,11 +59,11 @@ namespace ForumService.Contract.UseCases.Post
              string? PostType = null,
              string? SearchKeyword = null,
              Guid? ReferenceId = null,
-             int Limit = 20,
-             int Offset = 0,
+             int Page = 1,
+             int Size = 10,
              string? SortBy = null,
              string? SortOrder = null
-        ) : IQuery<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>>;
+        ) : IQuery<PagedResponseDto<IEnumerable<ModeratorPostViewDto>>>;
 
         /// <summary>
         /// Query for moderators to get a paginated list of 'Rejected' or soft-deleted posts.
@@ -74,11 +74,11 @@ namespace ForumService.Contract.UseCases.Post
              string? PostType = null,
              string? SearchKeyword = null,
              Guid? ReferenceId = null,
-             int Limit = 20,
-             int Offset = 0,
+             int Page = 1,
+             int Size = 10,
              string? SortBy = null,
              string? SortOrder = null
-        ) : IQuery<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>>;
+        ) : IQuery<PagedResponseDto<IEnumerable<ModeratorPostViewDto>>>;
 
         /// <summary>
         /// Query to get all posts belonging to a specific user (the requester).
@@ -90,12 +90,12 @@ namespace ForumService.Contract.UseCases.Post
             Guid? CategoryId = null,
             string? PostType = null,
             string? SearchKeyword = null,
-            // Pagination & Sorting
-            int Limit = 20,
-            int Offset = 0,
+             // Pagination & Sorting
+            int Page = 1,
+            int Size = 10,
             string? SortBy = null,
             string? SortOrder = null
-        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
+        ) : IQuery<PagedResponseDto<IEnumerable<PostViewDto>>>;
 
         /// <summary>
         /// Query to get a single post by its ID, scoped to the requester.
@@ -112,28 +112,5 @@ namespace ForumService.Contract.UseCases.Post
             Guid PostId
         ) : IQuery<BaseResponseDto<PostViewDetailDto>>;
 
-        /// <summary>
-        /// Query to get the total number of posts created by a specific author.
-        /// </summary>
-        public record GetPostCountByAuthorQuery(
-            Guid AuthorId
-        ) : IQuery<BaseResponseDto<int>>;
-
-        /// <summary>
-        /// Query to get a list of featured posts.
-        /// </summary>
-        public record GetFeaturedPostsQuery(
-            int Limit = 10,
-            int Offset = 0
-        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
-
-        /// <summary>
-        /// Query to get a list of posts by category.
-        /// </summary>
-        public record GetPostsByCategoryQuery(
-            Guid CategoryId,
-            int Limit = 20,
-            int Offset = 0
-        ) : IQuery<BaseResponseDto<IEnumerable<PostViewDto>>>;
     }
 }

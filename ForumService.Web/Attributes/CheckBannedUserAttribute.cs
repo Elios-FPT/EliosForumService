@@ -6,15 +6,21 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace ForumService.Web.Attributes
 {
+    /// <summary>
+    /// Attribute used to check whether the current user is banned from performing this action.
+    /// It verifies the user ID from the request header and checks ban status in the database.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class CheckBannedUserAttribute : Attribute, IAsyncActionFilter
     {
+        
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             var userIdHeader = context.HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
 
             if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
             {
+                // Return 401 Unauthorized response if header is missing or invalid
                 context.Result = new ObjectResult(new BaseResponseDto<object>
                 {
                     Status = 401,
@@ -37,16 +43,18 @@ namespace ForumService.Web.Attributes
                               && (b.BanUntil == null || b.BanUntil > DateTime.UtcNow)
                 );
 
+                // If a ban record exists, block the action
                 if (bannedUser != null)
                 {
-                    var message = $"Tài khoản của bạn đã bị khóa tính năng này. Lý do: {bannedUser.Reason}.";
+                    var message = $"Your account has been restricted from using this feature. Reason: {bannedUser.Reason}.";
+
                     if (bannedUser.BanUntil.HasValue)
                     {
-                        message += $" Thời hạn đến: {bannedUser.BanUntil.Value:dd/MM/yyyy HH:mm}";
+                        message += $" Ban valid until: {bannedUser.BanUntil.Value:dd/MM/yyyy HH:mm}.";
                     }
                     else
                     {
-                        message += " Thời hạn: Vĩnh viễn.";
+                        message += " Duration: Permanent.";
                     }
 
                     context.Result = new ObjectResult(new BaseResponseDto<object>

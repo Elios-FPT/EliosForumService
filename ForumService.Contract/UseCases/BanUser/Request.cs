@@ -17,8 +17,8 @@ namespace ForumService.Contract.UseCases.BanUser
             Guid UserId, // The ID of the user to be banned
 
             [Required]
-            [MinLength(5, ErrorMessage = "Lý do phải dài ít nhất 5 ký tự.")]
-            [MaxLength(500, ErrorMessage = "Lý do không được vượt quá 500 ký tự.")]
+            [MinLength(5, ErrorMessage = "Reason must be at least 5 characters long.")]
+            [MaxLength(500, ErrorMessage = "Reason cannot exceed 500 characters.")]
             string Reason,
 
             /// <summary>
@@ -31,23 +31,18 @@ namespace ForumService.Contract.UseCases.BanUser
         /// Request to retrieve a paginated list of banned users.
         /// </summary>
         public record GetBannedUsersRequest(
-            // Filters
-            Guid? UserId = null,         // Filter by specific banned user
-            bool? IsActive = null,       // Filter by Active/Inactive bans
+            Guid? UserId = null,
+            bool? IsActive = null,
 
-            // Pagination
-            [Range(1, 100)]
-            int Limit = 20,
-
-            [Range(0, int.MaxValue)]
-            int Offset = 0
+            int Page = 1,
+            int Size = 10
         );
 
         /// <summary>
         /// Request to remove ban for user.
         /// </summary>
         public record UnbanUserRequest(
-            [MaxLength(500, ErrorMessage = "Lý do gỡ cấm không được vượt quá 500 ký tự.")]
+            [MaxLength(500, ErrorMessage = "Unban reason cannot exceed 500 characters.")]
             string? UnbanReason 
         );
 
@@ -56,11 +51,11 @@ namespace ForumService.Contract.UseCases.BanUser
         /// </summary>
         public record UpdateBanRequest(
             [Required]
-            [MinLength(5, ErrorMessage = "Lý do phải dài ít nhất 5 ký tự.")]
-            [MaxLength(500, ErrorMessage = "Lý do không được vượt quá 500 ký tự.")]
+               [MinLength(5, ErrorMessage = "Reason must be at least 5 characters long.")]
+            [MaxLength(500, ErrorMessage = "Reason cannot exceed 500 characters.")]
             string Reason,
 
-            DateTime? BanUntil // Thời hạn mới (null = vĩnh viễn)
+            DateTime? BanUntil // New ban duration (null = permanent)
         );
     }
 }
