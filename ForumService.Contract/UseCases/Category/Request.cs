@@ -36,8 +36,8 @@ namespace ForumService.Contract.UseCases.Category
         public record GetCategoriesRequest(
             string? SearchKeyword = null,
             bool? IsActive = null,
-            int Limit = 20,
-            int Offset = 0
+            int Page = 1,
+            int Size = 10
         );
     }
 }

@@ -31,16 +31,15 @@ namespace ForumService.Web.Controllers.Post
         /// Retrieves a paginated list of PUBLISHED posts for moderator view (includes moderation details).
         /// </summary>
         [HttpGet("published")]
-        [ServiceAuthorize("Content Moderator")]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
+        [ServiceAuthorize("Admin", "Content Moderator")]
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-        public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetModeratorPublicPosts([FromQuery] GetModeratorPublicPostsRequest request)
+        public async Task<PagedResponseDto<IEnumerable<ModeratorPostViewDto>>> GetModeratorPublicPosts([FromQuery] GetModeratorPublicPostsRequest request)
         {
-
             var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
             if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var moderatorId))
             {
-                return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
+                return new PagedResponseDto<IEnumerable<ModeratorPostViewDto>>
                 {
                     Status = 401,
                     Message = "User not authenticated",
@@ -54,27 +53,26 @@ namespace ForumService.Web.Controllers.Post
                 PostType: request.PostType,
                 SearchKeyword: request.SearchKeyword,
                 ReferenceId: request.ReferenceId,
-                Limit: request.Limit,
-                Offset: request.Offset,
+                Page: request.Page,
+                Size: request.Size,
                 SortBy: request.SortBy,
                 SortOrder: request.SortOrder
             );
             return await _sender.Send(query);
-            
         }
 
         /// <summary>
         /// Retrieves a list of posts pending review.
         /// </summary>
         [HttpGet("pending")]
-        [ServiceAuthorize("Content Moderator")]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
-        public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetPendingPosts([FromQuery] GetPendingPostsQuery request)
+        [ServiceAuthorize("Admin", "Content Moderator")]
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
+        public async Task<PagedResponseDto<IEnumerable<ModeratorPostViewDto>>> GetPendingPosts([FromQuery] GetPendingPostsRequest request)
         {
             var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
             if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var moderatorId))
             {
-                return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>>
+                return new PagedResponseDto<IEnumerable<ModeratorPostViewDto>>
                 {
                     Status = 401,
                     Message = "User not authenticated",
@@ -88,8 +86,8 @@ namespace ForumService.Web.Controllers.Post
                 PostType: request.PostType,
                 SearchKeyword: request.SearchKeyword,
                 ReferenceId: request.ReferenceId,
-                Limit: request.Limit,
-                Offset: request.Offset,
+                Page: request.Page,
+                Size: request.Size,
                 SortBy: request.SortBy,
                 SortOrder: request.SortOrder
             );
@@ -100,16 +98,17 @@ namespace ForumService.Web.Controllers.Post
         /// Retrieves a list of archived (rejected or soft-deleted) posts.
         /// </summary>
         [HttpGet("archived")]
-        [ServiceAuthorize("Content Moderator")]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
-        public async Task<BaseResponseDto<IEnumerable<ModeratorPostViewDto>>> GetArchivedPosts([FromQuery] GetArchivedPostsQuery request)
+        [ServiceAuthorize("Admin", "Content Moderator")]
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<ModeratorPostViewDto>>), StatusCodes.Status200OK)]
+        public async Task<PagedResponseDto<IEnumerable<ModeratorPostViewDto>>> GetArchivedPosts([FromQuery] GetArchivedPostsRequest request)
         {
             var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
             if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var moderatorId))
             {
-                return new BaseResponseDto<IEnumerable<ModeratorPostViewDto>> { 
-                    Status = 401, 
-                    Message = "User not authenticated", 
+                return new PagedResponseDto<IEnumerable<ModeratorPostViewDto>>
+                {
+                    Status = 401,
+                    Message = "User not authenticated",
                     ResponseData = Enumerable.Empty<ModeratorPostViewDto>()
                 };
             }
@@ -120,8 +119,8 @@ namespace ForumService.Web.Controllers.Post
                 PostType: request.PostType,
                 SearchKeyword: request.SearchKeyword,
                 ReferenceId: request.ReferenceId,
-                Limit: request.Limit,
-                Offset: request.Offset,
+                Page: request.Page,
+                Size: request.Size,
                 SortBy: request.SortBy,
                 SortOrder: request.SortOrder
             );
@@ -138,7 +137,7 @@ namespace ForumService.Web.Controllers.Post
         /// <param name="postId">The ID of the post to approve.</param>
         /// <returns>A boolean indicating success.</returns>
         [HttpPut("{postId}/approve")]
-        [ServiceAuthorize("Content Moderator")]
+        [ServiceAuthorize("Admin", "Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
@@ -166,7 +165,7 @@ namespace ForumService.Web.Controllers.Post
         /// <param name="request">An object containing the reason for rejection.</param>
         /// <returns>A boolean indicating success.</returns>
         [HttpPut("{postId}/reject")]
-        [ServiceAuthorize("Content Moderator")]
+        [ServiceAuthorize("Admin", "Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
@@ -196,7 +195,7 @@ namespace ForumService.Web.Controllers.Post
         /// <param name="request">An object containing the reason for deletion.</param>
         /// <returns>A boolean indicating success.</returns>
         [HttpDelete("{postId}")]
-        [ServiceAuthorize("Content Moderator")]
+        [ServiceAuthorize("Admin", "Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]

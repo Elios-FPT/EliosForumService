@@ -32,7 +32,7 @@ namespace ForumService.Web.Controllers.Category
         /// Creates a new category.
         /// </summary>
         [HttpPost]
-        [ServiceAuthorize("Content Moderator")]
+        [ServiceAuthorize("Admin", "Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<BaseResponseDto<bool>> CreateCategory([FromBody] CreateCategoryRequest request)
@@ -62,7 +62,7 @@ namespace ForumService.Web.Controllers.Category
         /// Updates an existing category.
         /// </summary>
         [HttpPut("{categoryId}")]
-        [ServiceAuthorize("Content Moderator")]
+        [ServiceAuthorize("Admin", "Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -94,7 +94,7 @@ namespace ForumService.Web.Controllers.Category
         /// Deletes a category by its ID.
         /// </summary>
         [HttpDelete("{CategoryId}")]
-        [ServiceAuthorize("Content Moderator")]
+        [ServiceAuthorize("Admin", "Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<BaseResponseDto<bool>> DeleteCategory([FromRoute] DeleteCategoryRequest request)
@@ -128,26 +128,27 @@ namespace ForumService.Web.Controllers.Category
         /// Retrieves all categories with optional filters.
         /// </summary>
         [HttpGet]
-        [ServiceAuthorize("Content Moderator")]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<CategoryDto>>), StatusCodes.Status200OK)]
-        public async Task<BaseResponseDto<IEnumerable<CategoryDto>>> GetCategories([FromQuery] GetCategoryListQuery request)
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<CategoryDto>>), StatusCodes.Status200OK)]
+        public async Task<PagedResponseDto<IEnumerable<CategoryDto>>> GetCategories([FromQuery] GetCategoriesRequest request)
         {
             try
             {
                 var query = new GetCategoryListQuery(
                     SearchKeyword: request.SearchKeyword,
-                    Limit: request.Limit,
-                    Offset: request.Offset,
-                    IsActive: request.IsActive);
+                    IsActive: request.IsActive,
+                    Page: request.Page,
+                    Size: request.Size
+                );
                 return await Sender.Send(query);
             }
             catch (Exception ex)
             {
-                return new BaseResponseDto<IEnumerable<CategoryDto>>
+                return new PagedResponseDto<IEnumerable<CategoryDto>>
                 {
                     Status = 500,
                     Message = $"Failed to retrieve categories: {ex.Message}",
-                    ResponseData = null
+                    ResponseData = null,
+                    Pagination = null
                 };
             }
         }
@@ -156,7 +157,6 @@ namespace ForumService.Web.Controllers.Category
         /// Retrieves a category by its ID.
         /// </summary>
         [HttpGet("{CategoryId}")]
-        [ServiceAuthorize("Content Moderator")]
         [ProducesResponseType(typeof(BaseResponseDto<CategoryDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<BaseResponseDto<CategoryDto>> GetCategoryById([FromRoute] GetCategoryByIdRequest request)

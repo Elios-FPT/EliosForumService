@@ -56,12 +56,13 @@ namespace ForumService.Core.Handler.Comment.Command
                 return new BaseResponseDto<Guid> { Status = 400, Message = "Comment content cannot be empty.", ResponseData = Guid.Empty };
             }
 
-            if (await ContainsBannedKeywordAsync(request.Content))
+            var bannedKeyword = await GetBannedKeywordAsync(request.Content);
+            if (!string.IsNullOrEmpty(bannedKeyword))
             {
                 return new BaseResponseDto<Guid>
                 {
                     Status = 400,
-                    Message = "Nội dung bình luận chứa từ khóa không phù hợp.",
+                    Message = $"The comment content contains a banned keyword: '{bannedKeyword}'",
                     ResponseData = Guid.Empty
                 };
             }
@@ -183,9 +184,9 @@ namespace ForumService.Core.Handler.Comment.Command
             };
         }
 
-        private async Task<bool> ContainsBannedKeywordAsync(string text)
+        private async Task<string?> GetBannedKeywordAsync(string text)
         {
-            if (string.IsNullOrEmpty(text)) return false;
+            if (string.IsNullOrEmpty(text)) return null;
 
             var bannedKeywords = await _bannedKeywordRepository.GetListAsync(x => x.IsActive);
 
@@ -196,9 +197,10 @@ namespace ForumService.Core.Handler.Comment.Command
                     try
                     {
                         var pattern = banned.Keyword;
+
                         if (Regex.IsMatch(text, pattern, RegexOptions.IgnoreCase))
                         {
-                            return true;
+                            return pattern;
                         }
                     }
                     catch (ArgumentException)
@@ -207,7 +209,7 @@ namespace ForumService.Core.Handler.Comment.Command
                     }
                 }
             }
-            return false;
+            return null;
         }
     }
 }

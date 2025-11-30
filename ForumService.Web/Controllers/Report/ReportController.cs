@@ -90,18 +90,18 @@ namespace ForumService.Web.Controllers.Report
         /// Retrieves a list of reports with pagination and filtering. Accessible by Content Moderators.
         /// </summary>
         [HttpGet]
-        [ServiceAuthorize("Content Moderator")]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(typeof(BaseResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status500InternalServerError)]
-        public async Task<BaseResponseDto<IEnumerable<ReportDto>>> GetReports([FromQuery] GetReportsRequest request)
+        [ServiceAuthorize("Admin", "Content Moderator")]
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(PagedResponseDto<IEnumerable<ReportDto>>), StatusCodes.Status500InternalServerError)]
+        public async Task<PagedResponseDto<IEnumerable<ReportDto>>> GetReports([FromQuery] GetReportsRequest request)
         {
             try
             {
                 var query = new GetReportsQuery(
-                    Offset: request.Offset,
-                    Limit: request.Limit,
+                    Page: request.Page,
+                    Size: request.Size,
                     Status: request.Status,
                     TargetType: request.TargetType,
                     ReporterId: request.ReporterId,
@@ -112,23 +112,22 @@ namespace ForumService.Web.Controllers.Report
 
                 var result = await Sender.Send(query);
 
-                HttpContext.Response.StatusCode = result.Status;
                 return result;
             }
             catch (Exception ex)
             {
-                HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                return new BaseResponseDto<IEnumerable<ReportDto>>
+                return new PagedResponseDto<IEnumerable<ReportDto>>
                 {
                     Status = 500,
                     Message = $"Failed to retrieve reports: {ex.Message}",
-                    ResponseData = Enumerable.Empty<ReportDto>()
+                    ResponseData = Enumerable.Empty<ReportDto>(),
+                    Pagination = null
                 };
             }
         }
 
         [HttpGet("{reportId}")]
-        [ServiceAuthorize("Content Moderator")]
+        [ServiceAuthorize("Admin", "Content Moderator")]
         public async Task<BaseResponseDto<ReportDto>> GetReportById(Guid reportId)
         {
             try
@@ -148,7 +147,7 @@ namespace ForumService.Web.Controllers.Report
         /// Resolve a report (Reject report OR Accept & Optionally Delete content). Accessible by Content Moderators.
         /// </summary>
         [HttpPut("{reportId}/resolve")]
-        [ServiceAuthorize("Content Moderator")]
+        [ServiceAuthorize("Admin", "Content Moderator")]
         public async Task<BaseResponseDto<bool>> ResolveReport(Guid reportId, [FromBody] ResolveReportRequest request)
         {
             var moderatorIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();

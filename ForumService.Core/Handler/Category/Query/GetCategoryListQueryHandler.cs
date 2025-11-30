@@ -13,11 +13,10 @@ using static ForumService.Contract.UseCases.Category.Query;
 
 namespace ForumService.Core.Handler.Category.Query
 {
-    public class GetCategoryListQueryHandler : IQueryHandler<GetCategoryListQuery, BaseResponseDto<IEnumerable<CategoryDto>>>
+    public class GetCategoryListQueryHandler : IQueryHandler<GetCategoryListQuery, PagedResponseDto<IEnumerable<CategoryDto>>>
     {
         private readonly IGenericRepository<Domain.Models.Category> _categoryRepository;
         private readonly IMapper _mapper;
-
 
         public GetCategoryListQueryHandler(IGenericRepository<Domain.Models.Category> categoryRepository, IMapper mapper)
         {
@@ -25,68 +24,83 @@ namespace ForumService.Core.Handler.Category.Query
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<BaseResponseDto<IEnumerable<CategoryDto>>> Handle(GetCategoryListQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResponseDto<IEnumerable<CategoryDto>>> Handle(GetCategoryListQuery request, CancellationToken cancellationToken)
         {
-            // Validate limit and offset
-            if (request.Limit <= 0 || request.Offset < 0)
-            {
-                return new BaseResponseDto<IEnumerable<CategoryDto>>
-                {
-                    Status = 400,
-                    Message = "Limit must be positive and Offset must be non-negative.",
-                    ResponseData = null
-                };
-            }
+            // 1. Validate Pagination
+            var page = request.Page <= 0 ? 1 : request.Page;
+            var pageSize = request.Size <= 0 ? 10 : request.Size;
 
             try
             {
-                // Build filter dynamically
+                // 2. Build filter dynamically
                 Expression<Func<Domain.Models.Category, bool>> filter = c => true;
 
                 if (!string.IsNullOrEmpty(request.SearchKeyword))
                 {
                     var searchKeywordSlug = GenerateSlug(request.SearchKeyword);
-                    filter = c => c.Slug.Contains(searchKeywordSlug);
-                }
+                    var searchLower = request.SearchKeyword.ToLower();
 
-                if (request.IsActive.HasValue)
+                    if (request.IsActive.HasValue)
+                    {
+                        // Case: Both Search and IsActive
+                        var isActive = request.IsActive.Value;
+                        filter = c => (c.Slug.Contains(searchKeywordSlug) || c.Name.ToLower().Contains(searchLower))
+                                      && c.IsActive == isActive;
+                    }
+                    else
+                    {
+                        // Case: Search only
+                        filter = c => c.Slug.Contains(searchKeywordSlug) || c.Name.ToLower().Contains(searchLower);
+                    }
+                }
+                else if (request.IsActive.HasValue)
                 {
+                    // Case: IsActive only
                     var isActive = request.IsActive.Value;
-                    // Build expression dynamically
-                    var param = Expression.Parameter(typeof(Domain.Models.Category), "c");
-                    var body = Expression.AndAlso(
-                        Expression.Invoke(filter, param),
-                        Expression.Equal(
-                            Expression.Property(param, nameof(Domain.Models.Category.IsActive)),
-                            Expression.Constant(isActive)
-                        )
-                    );
-                    filter = Expression.Lambda<Func<Domain.Models.Category, bool>>(body, param);
+                    filter = c => c.IsActive == isActive;
                 }
 
-                var categories = await _categoryRepository.GetListAsyncUntracked<Domain.Models.Category>(
+                // 3. Get Total Count 
+                var totalItems = await _categoryRepository.GetCountAsync(filter);
+
+                if (totalItems == 0)
+                {
+                    return new PagedResponseDto<IEnumerable<CategoryDto>>(
+                        Enumerable.Empty<CategoryDto>(), page, pageSize, 0)
+                    {
+                        Message = "No categories found."
+                    };
+                }
+
+                // 4. Get Paged Data
+                var categories = await _categoryRepository.GetListAsyncUntracked(
                     filter: filter,
                     orderBy: q => q.OrderBy(c => c.Name),
-                    pageSize: request.Limit,
-                    pageNumber: request.Offset + 1
+                    selector: x => x, 
+                    pageSize: pageSize,
+                    pageNumber: page
                 );
 
                 var result = _mapper.Map<IEnumerable<CategoryDto>>(categories);
 
-                return new BaseResponseDto<IEnumerable<CategoryDto>>
+                return new PagedResponseDto<IEnumerable<CategoryDto>>(
+                    result,
+                    page,
+                    pageSize,
+                    totalItems
+                )
                 {
-                    Status = 200,
-                    Message = categories.Any() ? "Categories retrieved successfully." : "No categories found.",
-                    ResponseData = result
+                    Message = "Categories retrieved successfully."
                 };
             }
             catch (Exception ex)
             {
-                return new BaseResponseDto<IEnumerable<CategoryDto>>
+                return new PagedResponseDto<IEnumerable<CategoryDto>>
                 {
                     Status = 500,
                     Message = $"Failed to retrieve categories: {ex.Message}",
-                    ResponseData = null
+                    ResponseData = null,
+                    Pagination = null
                 };
             }
         }

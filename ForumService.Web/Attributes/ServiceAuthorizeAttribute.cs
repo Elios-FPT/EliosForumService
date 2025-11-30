@@ -10,6 +10,7 @@ namespace ForumService.Web.Attributes
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
     public class ServiceAuthorizeAttribute : Attribute, IAuthorizationFilter
     {
+        // The list of normalized required roles (e.g., "role:admin", "role:moderator")
         private readonly string[] _requiredRoles;
         private const string HeaderName = "X-Auth-Request-Groups";
 

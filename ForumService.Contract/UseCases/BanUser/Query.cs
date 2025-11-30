@@ -15,11 +15,11 @@ namespace ForumService.Contract.UseCases.BanUser
         /// Query to get list of bans.
         /// </summary>
         public record GetBannedUsersQuery(
-            Guid? UserId,
-            bool? IsActive,
-            int Limit,
-            int Offset
-        ) : IQuery<BaseResponseDto<IEnumerable<BanDto>>>;
+             Guid? UserId,
+             bool? IsActive,
+             int Page,
+             int Size
+         ) : IQuery<PagedResponseDto<IEnumerable<BanDto>>>;
 
         /// <summary>
         /// Query details of a ban ID.
