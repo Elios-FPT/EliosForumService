@@ -236,7 +236,7 @@ namespace ForumService.Tests.PostHandler
 
             // Assert
             Assert.Equal(400, result.Status);
-            Assert.Contains("Tiêu đề bài viết chứa từ khóa không phù hợp", result.Message);
+            Assert.Contains("The post title contains a banned keyword:", result.Message);
             _unitOfWorkMock.Verify(x => x.RollbackAsync(), Times.Once);
         }
 
@@ -275,7 +275,7 @@ namespace ForumService.Tests.PostHandler
 
             // Assert
             Assert.Equal(400, result.Status);
-            Assert.Contains("Nội dung bài viết chứa từ khóa không phù hợp", result.Message);
+            Assert.Contains("The post content contains a banned keywor", result.Message);
             _unitOfWorkMock.Verify(x => x.RollbackAsync(), Times.Once);
         }
 

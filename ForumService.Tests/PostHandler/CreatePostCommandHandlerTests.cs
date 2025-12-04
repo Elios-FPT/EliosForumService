@@ -74,7 +74,7 @@ namespace ForumService.Tests.PostHandler
             var result = await _handler.Handle(command, CancellationToken.None);
 
             Assert.Equal(400, result.Status);
-            Assert.Equal("Tiêu đề bài viết chứa từ khóa không phù hợp.", result.Message);
+            Assert.Equal("The post title contains a banned keyword: 'chết tiệt'", result.Message);
         }
 
         [Fact]
@@ -91,7 +91,7 @@ namespace ForumService.Tests.PostHandler
             var result = await _handler.Handle(command, CancellationToken.None);
 
             Assert.Equal(400, result.Status);
-            Assert.Equal("Nội dung bài viết chứa từ khóa không phù hợp.", result.Message);
+            Assert.Equal("The post content contains a banned keyword: 'đồ ngu'", result.Message);
         }
 
         [Fact]

@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using Xunit;
 using static ForumService.Contract.UseCases.Comment.Command;
 
-namespace ForumService.Tests.Handlers.Comment
+namespace ForumService.Tests.CommentHandler
 {
     public class CreateCommentCommandHandlerTests
     {
@@ -65,7 +65,6 @@ namespace ForumService.Tests.Handlers.Comment
             var command = new CreateCommentCommand(Guid.NewGuid(), null, Guid.NewGuid(), "Nội dung chứa từ cấm");
             var bannedList = new List<BannedKeyword> { new BannedKeyword { Keyword = "từ cấm", IsActive = true } };
 
-            // Mock GetListAsync: trả về danh sách từ cấm
             _bannedKeywordRepoMock.Setup(x => x.GetListAsync(
                 It.IsAny<Expression<Func<BannedKeyword, bool>>>(),
                 null, null, null, null
@@ -74,7 +73,7 @@ namespace ForumService.Tests.Handlers.Comment
             var result = await _handler.Handle(command, CancellationToken.None);
 
             Assert.Equal(400, result.Status);
-            Assert.Contains("từ khóa không phù hợp", result.Message);
+            Assert.Contains("The comment content contains a banned keyword", result.Message);
         }
 
         [Fact]
