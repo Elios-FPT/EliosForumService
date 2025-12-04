@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using Xunit;
 using static ForumService.Contract.UseCases.Comment.Command;
 
-namespace ForumService.Tests.Handlers.Comment
+namespace ForumService.Tests.CommentHandler
 {
     public class UpdateCommentCommandHandlerTests
     {
