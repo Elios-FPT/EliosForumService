@@ -60,7 +60,6 @@ namespace ForumService.Tests.PostHandler
                 }
             };
 
-            // Setup Repository to return Tuple (List, TotalCount)
             _postQueryRepoMock.Setup(r => r.GetMyPostsAsync(query))
                 .ReturnsAsync((postsFromDb, 2));
 
@@ -72,8 +71,6 @@ namespace ForumService.Tests.PostHandler
             Assert.Equal("Posts retrieved successfully.", result.Message);
             Assert.NotNull(result.ResponseData);
             Assert.Equal(2, result.ResponseData.Count());
-
-            // Check Mapping
             var firstPost = result.ResponseData.First();
             Assert.Equal("My First Post", firstPost.Title);
             Assert.Equal("General", firstPost.CategoryName);

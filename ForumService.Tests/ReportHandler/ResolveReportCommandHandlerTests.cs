@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Report.Command;
 using ForumService.Contract.TransferObjects;
 
-namespace ForumService.Tests.ReportController
+namespace ForumService.Tests.ReportHandler
 {
     public class ResolveReportCommandHandlerTests
     {

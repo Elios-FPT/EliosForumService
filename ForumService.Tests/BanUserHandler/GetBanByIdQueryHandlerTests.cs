@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.BanUser.Query;
 using ForumService.Domain.Models;
 
-namespace ForumService.Tests.BanUserController
+namespace ForumService.Tests.BanUserHandler
 {
     public class GetBanByIdQueryHandlerTests
     {
@@ -66,9 +66,7 @@ namespace ForumService.Tests.BanUserController
             var userId = Guid.NewGuid();
             var bannedById = Guid.NewGuid();
             var unbannedById = Guid.NewGuid();
-
             var query = new GetBanByIdQuery(banId);
-
             var banEntity = new ForumUserBan
             {
                 Id = banId,
@@ -108,26 +106,13 @@ namespace ForumService.Tests.BanUserController
             // Assert
             Assert.Equal(200, result.Status);
             Assert.NotNull(result.ResponseData);
-
             var dto = result.ResponseData;
-
-            // Check Ban Details
             Assert.Equal(banId, dto.Id);
             Assert.Equal("Spamming", dto.Reason);
             Assert.False(dto.IsActive);
-
-            // Check User Enrichment
             Assert.Equal("Bad", dto.UserFirstName);
             Assert.Equal("user.png", dto.UserAvatarUrl);
-
-            // Check Banner Enrichment
             Assert.Equal("Super", dto.BannedByFirstName);
-
-            // Check Unbanner Enrichment (Logic handles UnbannedBy)
-            // Note: The DTO in your code currently doesn't have fields like UnbannedByFirstName explicitly shown 
-            // in the 'var banDto = new BanDto { ... }' block provided, but the handler fetches 'unbannerAdmin'.
-            // If BanDto doesn't have those properties, they won't be mapped. 
-            // Based on the provided code, only User and BannedBy fields are mapped.
             Assert.Equal(unbannedById, dto.UnbannedBy);
         }
 

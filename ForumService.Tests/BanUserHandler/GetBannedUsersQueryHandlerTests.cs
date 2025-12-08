@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.BanUser.Query;
 using ForumService.Domain.Models;
 
-namespace ForumService.Tests.BanUserController
+namespace ForumService.Tests.BanUserHandler
 {
     public class GetBannedUsersQueryHandlerTests
     {
@@ -133,7 +133,6 @@ namespace ForumService.Tests.BanUserController
 
             // Assert
             _banRepoMock.Verify(r => r.GetCountAsync(It.IsNotNull<Expression<Func<ForumUserBan, bool>>>()), Times.Once);
-            // Note: Verifying the exact Lambda expression content with Moq is complex; ensuring it's called is often sufficient for unit tests unless using a Callback to inspect.
         }
 
         // Test Case 4: Filter Logic - IsActive Only

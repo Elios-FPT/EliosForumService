@@ -37,7 +37,7 @@ namespace ForumService.Core.Handler.Comment.Command
                 return new BaseResponseDto<bool>
                 {
                     Status = 400,
-                    Message = "Nội dung bình luận chứa từ khóa không phù hợp.",
+                    Message = "Comment content contains inappropriate keywords.",
                     ResponseData = false
                 };
             }

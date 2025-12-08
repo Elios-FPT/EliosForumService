@@ -11,7 +11,7 @@ using static ForumService.Contract.UseCases.BanUser.Command;
 using ForumService.Domain.Models;
 using ForumService.Contract.TransferObjects;
 
-namespace ForumService.Tests.BanUserController
+namespace ForumService.Tests.BanUserHandler
 {
     public class UnbanUserCommandHandlerTests
     {

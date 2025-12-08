@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Category.Command;
 
-namespace ForumService.Tests.CategoryController
+namespace ForumService.Tests.CategoryHandler
 {
     public class DeleteCategoryCommandHandlerTests
     {

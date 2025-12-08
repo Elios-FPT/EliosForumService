@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.BanUser.Command;
 using ForumService.Contract.TransferObjects;
 
-namespace ForumService.Tests.BanUserController
+namespace ForumService.Tests.BanUserHandler
 {
     public class CreateBanUserCommandHandlerTests
     {
