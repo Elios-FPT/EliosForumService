@@ -12,41 +12,47 @@ using System.Threading.Tasks;
 using Xunit;
 using static ForumService.Contract.UseCases.Post.Command;
 
-namespace ForumService.Tests.ModeratorPostController
+namespace ForumService.Tests.ModeratorPostHandler
 {
-    public class RejectPostHandlerTests
+    public class ApprovePostHandlerTests
     {
         // Mock Dependencies
         private readonly Mock<IGenericRepository<ForumService.Domain.Models.Post>> _postRepositoryMock;
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
         private readonly Mock<ISUtilityServiceClient> _utilityServiceMock;
-        private readonly Mock<ILogger<RejectPostCommandHandler>> _loggerMock;
-
+        private readonly Mock<ILogger<ApprovePostCommandHandler>> _loggerMock;
+        private readonly Mock<IKafkaProducer> _kafkaProducerMock;
+        private readonly Mock<IAppConfiguration> _appConfigMock;
         // Handler under test
-        private readonly RejectPostCommandHandler _handler;
+        private readonly ApprovePostCommandHandler _handler;
 
-        public RejectPostHandlerTests()
+        public ApprovePostHandlerTests()
         {
             _postRepositoryMock = new Mock<IGenericRepository<ForumService.Domain.Models.Post>>();
             _unitOfWorkMock = new Mock<IUnitOfWork>();
             _utilityServiceMock = new Mock<ISUtilityServiceClient>();
-            _loggerMock = new Mock<ILogger<RejectPostCommandHandler>>();
+            _loggerMock = new Mock<ILogger<ApprovePostCommandHandler>>();
+            _kafkaProducerMock = new Mock<IKafkaProducer>();
+            _appConfigMock = new Mock<IAppConfiguration>();
+            _appConfigMock.Setup(x => x.GetCurrentServiceName()).Returns("forum");
 
-            _handler = new RejectPostCommandHandler(
+            _handler = new ApprovePostCommandHandler(
                 _postRepositoryMock.Object,
                 _unitOfWorkMock.Object,
                 _utilityServiceMock.Object,
-                _loggerMock.Object
+                _loggerMock.Object,
+                _kafkaProducerMock.Object,   
+                _appConfigMock.Object
             );
         }
 
         // Test Case 1: Post Not Found
         [Fact]
-        [Trait("Category", "RejectPostHandler - Validation")]
+        [Trait("Category", "ApprovePostHandler - Validation")]
         public async Task Handle_WhenPostNotFound_Returns404()
         {
             // Arrange
-            var command = new RejectPostCommand(Guid.NewGuid(), Guid.NewGuid(), "Violation of rules");
+            var command = new ApprovePostCommand(Guid.NewGuid(), Guid.NewGuid());
             _postRepositoryMock.Setup(x => x.GetByIdAsync(It.IsAny<Guid>()))
                 .ReturnsAsync((ForumService.Domain.Models.Post)null);
 
@@ -61,11 +67,11 @@ namespace ForumService.Tests.ModeratorPostController
 
         // Test Case 2: Post Deleted
         [Fact]
-        [Trait("Category", "RejectPostHandler - Validation")]
+        [Trait("Category", "ApprovePostHandler - Validation")]
         public async Task Handle_WhenPostIsDeleted_Returns404()
         {
             // Arrange
-            var command = new RejectPostCommand(Guid.NewGuid(), Guid.NewGuid(), "Reason");
+            var command = new ApprovePostCommand(Guid.NewGuid(), Guid.NewGuid());
             var post = new ForumService.Domain.Models.Post { PostId = Guid.NewGuid(), IsDeleted = true };
 
             _postRepositoryMock.Setup(x => x.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(post);
@@ -80,15 +86,15 @@ namespace ForumService.Tests.ModeratorPostController
 
         // Test Case 3: Invalid Status (Not PendingReview)
         [Fact]
-        [Trait("Category", "RejectPostHandler - Validation")]
+        [Trait("Category", "ApprovePostHandler - Validation")]
         public async Task Handle_WhenPostStatusIsNotPendingReview_Returns400()
         {
             // Arrange
-            var command = new RejectPostCommand(Guid.NewGuid(), Guid.NewGuid(), "Reason");
+            var command = new ApprovePostCommand(Guid.NewGuid(), Guid.NewGuid());
             var post = new ForumService.Domain.Models.Post
             {
                 PostId = Guid.NewGuid(),
-                Status = "Published", // Đã public rồi thì không reject được nữa (theo logic hiện tại)
+                Status = "Draft", 
                 IsDeleted = false
             };
 
@@ -99,30 +105,28 @@ namespace ForumService.Tests.ModeratorPostController
 
             // Assert
             Assert.Equal(400, result.Status);
-            Assert.Contains("Only posts with 'PendingReview' status can be rejected", result.Message);
+            Assert.Contains("Only posts with 'PendingReview' status can be approved", result.Message);
             _unitOfWorkMock.Verify(x => x.RollbackAsync(), Times.Once);
         }
 
-        // Test Case 4: Happy Path (Reject + Update Reason + Notify)
+        // Test Case 4: Happy Path (Success + Notify)
         [Fact]
-        [Trait("Category", "RejectPostHandler - Success")]
-        public async Task Handle_WhenStatusIsPendingReview_ShouldRejectAndUpdateReasonAndNotify()
+        [Trait("Category", "ApprovePostHandler - Success")]
+        public async Task Handle_WhenStatusIsPendingReview_ShouldApproveAndNotifyAuthor()
         {
             // Arrange
             var moderatorId = Guid.NewGuid();
             var authorId = Guid.NewGuid();
-            var rejectionReason = "Content violates policy guideline #3";
-
             var post = new ForumService.Domain.Models.Post
             {
                 PostId = Guid.NewGuid(),
-                AuthorId = authorId,
+                AuthorId = authorId, 
                 Status = "PendingReview",
-                Title = "Spam Post",
+                Title = "A Great Post Waiting For Review",
                 IsDeleted = false
             };
 
-            var command = new RejectPostCommand(post.PostId, moderatorId, rejectionReason);
+            var command = new ApprovePostCommand(post.PostId, moderatorId);
             _postRepositoryMock.Setup(x => x.GetByIdAsync(post.PostId)).ReturnsAsync(post);
 
             // Act
@@ -130,11 +134,10 @@ namespace ForumService.Tests.ModeratorPostController
 
             // Assert
             Assert.Equal(200, result.Status);
-            Assert.Equal("Post rejected successfully.", result.Message);
+            Assert.Equal("Post approved and published successfully.", result.Message);
 
             // 1. Check Post Update logic
-            Assert.Equal("Rejected", post.Status);
-            Assert.Equal(rejectionReason, post.RejectionReason); 
+            Assert.Equal("Published", post.Status);
             Assert.Equal(moderatorId, post.ModeratedBy);
             Assert.Equal(moderatorId, post.UpdatedBy);
 
@@ -142,24 +145,17 @@ namespace ForumService.Tests.ModeratorPostController
             _unitOfWorkMock.Verify(x => x.CommitAsync(), Times.Once);
 
             // 2. Check Notification sent to Author
-            // Verify notification contains the specific rejection reason
-            _utilityServiceMock.Verify(x => x.SendNotificationAsync(
-                It.Is<NotificationDto>(n =>
-                    n.UserId == authorId &&
-                    n.Title.Contains("rejected") &&
-                    n.Message.Contains(rejectionReason) 
-                ),
-                It.IsAny<CancellationToken>()),
-                Times.Once);
+            _utilityServiceMock.Verify(x => x.SendNotificationAsync(It.Is<NotificationDto>(n => n.UserId == authorId && n.Title.Contains("approved")),
+                It.IsAny<CancellationToken>()), Times.Once);
         }
 
         // Test Case 5: Moderator is Author (No Notification)
         [Fact]
-        [Trait("Category", "RejectPostHandler - Success")]
-        public async Task Handle_WhenModeratorIsAuthor_ShouldRejectButNotNotify()
+        [Trait("Category", "ApprovePostHandler - Success")]
+        public async Task Handle_WhenModeratorIsAuthor_ShouldApproveButNotNotify()
         {
             // Arrange
-            var userId = Guid.NewGuid(); // Vừa là Author vừa là Moderator (tự reject bài mình?)
+            var userId = Guid.NewGuid(); 
             var post = new ForumService.Domain.Models.Post
             {
                 PostId = Guid.NewGuid(),
@@ -168,7 +164,7 @@ namespace ForumService.Tests.ModeratorPostController
                 IsDeleted = false
             };
 
-            var command = new RejectPostCommand(post.PostId, userId, "Self rejection");
+            var command = new ApprovePostCommand(post.PostId, userId);
             _postRepositoryMock.Setup(x => x.GetByIdAsync(post.PostId)).ReturnsAsync(post);
 
             // Act
@@ -176,8 +172,9 @@ namespace ForumService.Tests.ModeratorPostController
 
             // Assert
             Assert.Equal(200, result.Status);
-            Assert.Equal("Rejected", post.Status);
+            Assert.Equal("Published", post.Status);
 
+            // Verify Commit logic
             _unitOfWorkMock.Verify(x => x.CommitAsync(), Times.Once);
 
             // Verify Notification is NEVER sent
@@ -186,7 +183,7 @@ namespace ForumService.Tests.ModeratorPostController
 
         // Test Case 6: Notification Failure (Failover)
         [Fact]
-        [Trait("Category", "RejectPostHandler - NotificationFail")]
+        [Trait("Category", "ApprovePostHandler - NotificationFail")]
         public async Task Handle_WhenNotificationFails_ShouldStillReturnSuccessAndLog()
         {
             // Arrange
@@ -200,19 +197,19 @@ namespace ForumService.Tests.ModeratorPostController
                 Title = "Test Post"
             };
 
-            var command = new RejectPostCommand(post.PostId, moderatorId, "Reason");
+            var command = new ApprovePostCommand(post.PostId, moderatorId);
             _postRepositoryMock.Setup(x => x.GetByIdAsync(post.PostId)).ReturnsAsync(post);
 
             // Mock Notification Exception
             _utilityServiceMock.Setup(x => x.SendNotificationAsync(It.IsAny<NotificationDto>(), It.IsAny<CancellationToken>()))
-                .ThrowsAsync(new Exception("Notification Service Timeout"));
+                .ThrowsAsync(new Exception("Notification Service Down"));
 
             // Act
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.Equal(200, result.Status); 
-            Assert.Equal("Rejected", post.Status);
+            Assert.Equal("Published", post.Status);
             _unitOfWorkMock.Verify(x => x.CommitAsync(), Times.Once);
 
             // Verify Error Logger
@@ -228,7 +225,7 @@ namespace ForumService.Tests.ModeratorPostController
 
         // Test Case 7: Database Error
         [Fact]
-        [Trait("Category", "RejectPostHandler - Exception")]
+        [Trait("Category", "ApprovePostHandler - Exception")]
         public async Task Handle_WhenDbCommitFails_Returns500()
         {
             // Arrange
@@ -237,7 +234,7 @@ namespace ForumService.Tests.ModeratorPostController
                 PostId = Guid.NewGuid(),
                 Status = "PendingReview"
             };
-            var command = new RejectPostCommand(post.PostId, Guid.NewGuid(), "Reason");
+            var command = new ApprovePostCommand(post.PostId, Guid.NewGuid());
 
             _postRepositoryMock.Setup(x => x.GetByIdAsync(It.IsAny<Guid>())).ReturnsAsync(post);
 

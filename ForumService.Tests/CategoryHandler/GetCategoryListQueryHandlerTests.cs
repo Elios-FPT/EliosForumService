@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Category.Query;
 
-namespace ForumService.Tests.CategoryController
+namespace ForumService.Tests.CategoryHandler
 {
     public class GetCategoryListQueryHandlerTests
     {

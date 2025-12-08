@@ -87,7 +87,6 @@ namespace ForumService.Tests.PostHandler
             var categoryId = Guid.NewGuid();
             var query = new GetMyPostByIdQuery(postId, requesterId);
 
-            // 1. Mock Post
             var postEntity = new Domain.Models.Post
             {
                 PostId = postId,
@@ -102,34 +101,26 @@ namespace ForumService.Tests.PostHandler
             _postRepoMock.Setup(r => r.GetOneAsync(It.IsAny<Expression<Func<Domain.Models.Post, bool>>>(), null, null))
                 .ReturnsAsync(postEntity);
 
-            // 2. Mock Category
             _categoryRepoMock.Setup(r => r.GetByIdAsync(categoryId))
                 .ReturnsAsync(new Domain.Models.Category { Name = "General" });
 
-            // 3. Mock Tags
             _tagRepoMock.Setup(r => r.GetTagNamesByPostIdAsync(postId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<Domain.Models.Tag> { new Domain.Models.Tag { Name = "csharp" } });
 
-            // 4. Mock Attachments
             _attachmentRepoMock.Setup(r => r.GetListAsyncUntracked(
                     It.IsAny<Expression<Func<Domain.Models.Attachment, bool>>>(),
                     null,
-                    It.IsAny<Expression<Func<Domain.Models.Attachment, string>>>(), // Selector
+                    It.IsAny<Expression<Func<Domain.Models.Attachment, string>>>(), 
                     null, null, null))
                 .ReturnsAsync(new List<string> { "http://file.url" });
 
-            // 5. Mock Comments (Flat list with Parent/Child)
             var parentCommentId = Guid.NewGuid();
             var comments = new List<Domain.Models.Comment>
             {
                 new Domain.Models.Comment { CommentId = parentCommentId, PostId = postId, AuthorId = requesterId, Content = "Parent" },
                 new Domain.Models.Comment { CommentId = Guid.NewGuid(), PostId = postId, ParentCommentId = parentCommentId, AuthorId = Guid.NewGuid(), Content = "Child" }
             };
-            // Mocking GetListAsyncUntracked with selector mapping to CommentDto
-            // Since the handler uses a projection (Select), we mock the return of the projection directly
-            // However, Moq with Expressions and Projections is tricky.
-            // Simplified approach: The handler calls GetListAsyncUntracked<CommentDto>.
-            // We need to match the Generic Type Argument.
+
             var commentDtos = comments.Select(c => new CommentDto
             {
                 CommentId = c.CommentId,
@@ -145,7 +136,6 @@ namespace ForumService.Tests.PostHandler
                     null, null, null))
                 .ReturnsAsync(commentDtos);
 
-            // 6. Mock User Service (Kafka)
             var users = new List<User>
             {
                 new User { id = requesterId, firstName = "Me", lastName = "Myself" }
@@ -169,8 +159,6 @@ namespace ForumService.Tests.PostHandler
             Assert.Equal("General", data.CategoryName); // Category enriched
             Assert.Single(data.Tags); // Tags enriched
             Assert.Single(data.Url); // Attachments enriched
-
-            // Verify Comment Tree
             Assert.Single(data.Comments); // Should have 1 root comment
             Assert.Single(data.Comments.First().Replies); // Root comment should have 1 reply
         }
@@ -203,7 +191,6 @@ namespace ForumService.Tests.PostHandler
                     It.IsAny<Expression<Func<Domain.Models.Attachment, string>>>(), null, null, null))
                 .ReturnsAsync(new List<string>());
 
-            // FAIL User Service
             _producerRepoMock.Setup(p => p.ProduceGetAllAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string?>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("Kafka down"));
 
@@ -215,7 +202,6 @@ namespace ForumService.Tests.PostHandler
             Assert.Equal("Post", result.ResponseData.Title);
             Assert.Null(result.ResponseData.AuthorFirstName); // Should be null due to failure
 
-            // Verify Logger was called
             _loggerMock.Verify(x => x.Log(
                 LogLevel.Warning,
                 It.IsAny<EventId>(),

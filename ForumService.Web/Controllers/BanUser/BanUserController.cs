@@ -221,5 +221,45 @@ namespace ForumService.Web.Controllers.BanUser
                 };
             }
         }
+
+        /// <summary>
+        /// Retrieves the ban status of the current authenticated user.
+        /// </summary>
+        /// <returns>Ban details if active, or null/empty if not banned.</returns>
+        [HttpGet("myStatus")]
+        [ProducesResponseType(typeof(BaseResponseDto<UserBanStatusDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BaseResponseDto<UserBanStatusDto>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(BaseResponseDto<UserBanStatusDto>), StatusCodes.Status500InternalServerError)]
+        public async Task<BaseResponseDto<UserBanStatusDto>> GetMyBanStatus()
+        {
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+
+            if (string.IsNullOrEmpty(userIdHeader) || !Guid.TryParse(userIdHeader, out var userId))
+            {
+                return new BaseResponseDto<UserBanStatusDto>
+                {
+                    Status = 401,
+                    Message = "User not authenticated or invalid X-Auth-Request-User header",
+                    ResponseData = null
+                };
+            }
+
+            try
+            {
+                var query = new GetMyBanStatusQuery(userId);
+                var result = await Sender.Send(query);
+                HttpContext.Response.StatusCode = result.Status;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponseDto<UserBanStatusDto>
+                {
+                    Status = 500,
+                    Message = $"Error checking ban status: {ex.Message}",
+                    ResponseData = null
+                };
+            }
+        }
     }
 }

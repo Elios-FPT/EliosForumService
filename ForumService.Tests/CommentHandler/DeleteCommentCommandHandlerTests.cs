@@ -167,9 +167,7 @@ namespace ForumService.Tests.CommentHandler
             var postId = Guid.NewGuid();
             var mainCommentId = Guid.NewGuid();
             var replyCommentId = Guid.NewGuid();
-
             var command = new DeleteCommentCommand(mainCommentId, requesterId);
-
             // Mock Post (Start with 10 comments)
             var post = new Domain.Models.Post
             {
@@ -196,15 +194,10 @@ namespace ForumService.Tests.CommentHandler
                 IsDeleted = false
             };
 
-            // Setup GetByIdAsync to return correct comment based on ID
             _commentRepoMock.Setup(r => r.GetByIdAsync(mainCommentId)).ReturnsAsync(mainComment);
             _commentRepoMock.Setup(r => r.GetByIdAsync(replyCommentId)).ReturnsAsync(replyComment);
-
             _postRepoMock.Setup(r => r.GetByIdAsync(postId)).ReturnsAsync(post);
 
-            // Setup GetListAsync for finding replies
-            // 1st Call (For Main Comment): Returns [replyComment]
-            // 2nd Call (For Reply Comment): Returns [] (Empty)
             _commentRepoMock.SetupSequence(r => r.GetListAsync(
                     It.IsAny<Expression<Func<Domain.Models.Comment, bool>>>(),
                     null, null, null, null))
@@ -222,14 +215,10 @@ namespace ForumService.Tests.CommentHandler
             Assert.Equal(200, result.Status);
             Assert.True(result.ResponseData);
             Assert.Contains("1 replies deleted", result.Message);
-
-            // Verify both comments were marked deleted
             Assert.True(mainComment.IsDeleted);
             Assert.NotNull(mainComment.DeletedAt);
             Assert.True(replyComment.IsDeleted);
             Assert.NotNull(replyComment.DeletedAt);
-
-            // Verify Post Comment Count Update (10 - 2 = 8)
             Assert.Equal(8, post.CommentCount);
             Assert.Equal(requesterId, post.UpdatedBy);
             _postRepoMock.Verify(r => r.UpdateAsync(post), Times.Once);

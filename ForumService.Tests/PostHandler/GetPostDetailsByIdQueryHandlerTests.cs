@@ -90,7 +90,6 @@ namespace ForumService.Tests.PostHandler
             var categoryId = Guid.NewGuid();
             var query = new GetPostDetailsByIdQuery(postId);
 
-            // 1. Mock Post
             var postEntity = new Domain.Models.Post
             {
                 PostId = postId,
@@ -104,18 +103,15 @@ namespace ForumService.Tests.PostHandler
             _postRepoMock.Setup(r => r.GetOneAsync(It.IsAny<Expression<Func<Domain.Models.Post, bool>>>(), null, null))
                 .ReturnsAsync(postEntity);
 
-            // 2. Mock Category
             _categoryRepoMock.Setup(r => r.GetByIdAsync(categoryId))
                 .ReturnsAsync(new Domain.Models.Category { Name = "Tech" });
 
-            // 3. Mock Attachments & Tags
             _attachmentRepoMock.Setup(r => r.GetListAsyncUntracked(It.IsAny<Expression<Func<Domain.Models.Attachment, bool>>>(), null,
                     It.IsAny<Expression<Func<Domain.Models.Attachment, string>>>(), null, null, null))
                 .ReturnsAsync(new List<string> { "img.png" });
             _tagRepoMock.Setup(r => r.GetTagNamesByPostIdAsync(postId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(new List<Domain.Models.Tag> { new Domain.Models.Tag { Name = "C#" } });
 
-            // 4. Mock Comments (Nested Logic)
             var parentId = Guid.NewGuid();
             var childId = Guid.NewGuid();
             var parentAuthorId = Guid.NewGuid();
@@ -126,7 +122,6 @@ namespace ForumService.Tests.PostHandler
                 new CommentDto { CommentId = childId, AuthorId = authorId, Content = "Child", ParentCommentId = parentId, Replies = new List<CommentDto>() }
             };
 
-            // Using It.IsAny matcher for the complicated selector expression
             _commentRepoMock.Setup(r => r.GetListAsyncUntracked(
                     It.IsAny<Expression<Func<Domain.Models.Comment, bool>>>(),
                     It.IsAny<Expression<Func<IQueryable<Domain.Models.Comment>, IOrderedQueryable<Domain.Models.Comment>>>>(),
@@ -134,7 +129,6 @@ namespace ForumService.Tests.PostHandler
                     null, null, null))
                 .ReturnsAsync(commentDtos);
 
-            // 5. Mock User Service
             var users = new List<User>
             {
                 new User { id = authorId, firstName = "Post", lastName = "Author" },
@@ -150,18 +144,13 @@ namespace ForumService.Tests.PostHandler
             Assert.Equal(200, result.Status);
             var data = result.ResponseData;
 
-            // Check Post Info
             Assert.Equal("Published Post", data.Title);
             Assert.Equal("Post", data.AuthorFirstName);
             Assert.Equal("Tech", data.CategoryName);
-
-            // Check View Count Increment Logic (Mock verification)
             _unitOfWorkMock.Verify(u => u.BeginTransactionAsync(), Times.Once);
             _postRepoMock.Verify(r => r.UpdateAsync(postEntity), Times.Once); // Should update view count
             _unitOfWorkMock.Verify(u => u.CommitAsync(), Times.Once);
-            Assert.Equal(11, postEntity.ViewsCount); // 10 + 1
-
-            // Check Comment Tree Structure
+            Assert.Equal(11, postEntity.ViewsCount); 
             Assert.Single(data.Comments); // Should contain only root comment
             var rootComment = data.Comments.First();
             Assert.Equal(parentId, rootComment.CommentId);

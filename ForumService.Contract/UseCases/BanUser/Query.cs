@@ -26,5 +26,10 @@ namespace ForumService.Contract.UseCases.BanUser
         /// /// </summary>
         public record GetBanByIdQuery(Guid BanId) : IQuery<BaseResponseDto<BanDto>>;
 
+        /// <summary>
+        /// Query to get the ban status of the current user.
+        /// Returns UserBanStatusDto which contains simplified ban info.
+        /// </summary>
+        public record GetMyBanStatusQuery(Guid UserId) : IQuery<BaseResponseDto<UserBanStatusDto>>;
     }
 }

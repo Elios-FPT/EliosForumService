@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Report.Query;
 
-namespace ForumService.Tests.ReportController
+namespace ForumService.Tests.ReportHandler
 {
     public class GetReportByIdQueryHandlerTests
     {

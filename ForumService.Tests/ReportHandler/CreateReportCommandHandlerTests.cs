@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static ForumService.Contract.UseCases.Report.Command;
 
-namespace ForumService.Tests.ReportController
+namespace ForumService.Tests.ReportHandler
 {
     public class CreateReportCommandHandlerTests
     {
