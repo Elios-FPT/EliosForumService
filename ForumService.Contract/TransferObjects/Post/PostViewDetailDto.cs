@@ -35,5 +35,6 @@ namespace ForumService.Contract.TransferObjects.Post
         public string AuthorFullName => $"{AuthorFirstName} {AuthorLastName}".Trim();
 
         public Guid? ReferenceId { get; set; }
+        public string? UserVoteType { get; set; }
     }
 }

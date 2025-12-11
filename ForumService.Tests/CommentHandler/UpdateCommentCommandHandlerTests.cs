@@ -75,7 +75,7 @@ namespace ForumService.Tests.CommentHandler
 
             // Assert
             Assert.Equal(400, result.Status);
-            Assert.Equal("Nội dung bình luận chứa từ khóa không phù hợp.", result.Message);
+            Assert.Equal("Comment content contains inappropriate keywords.", result.Message);
         }
 
         [Fact]

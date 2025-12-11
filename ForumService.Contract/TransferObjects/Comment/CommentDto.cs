@@ -25,5 +25,6 @@ namespace ForumService.Contract.TransferObjects.Comment
         public string AuthorFullName => $"{AuthorFirstName} {AuthorLastName}".Trim();
 
         public List<CommentDto> Replies { get; set; } = new();
+        public string? UserVoteType { get; set; }
     }
 }

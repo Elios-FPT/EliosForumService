@@ -3234,6 +3234,7 @@
         "dependencies": {
           "AutoMapper": "12.0.0",
           "AutoMapper.Extensions.Microsoft.DependencyInjection": "12.0.0",
+          "ForumService.Contract": "1.0.0",
           "ForumService.Domain": "1.0.0"
         },
         "compile": {
@@ -3247,7 +3248,6 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
-          "ForumService.Contract": "1.0.0",
           "System.ComponentModel.Annotations": "5.0.0"
         },
         "compile": {
@@ -10025,6 +10025,7 @@
   "projectFileDependencyGroups": {
     "net9.0": [
       "Asp.Versioning.Mvc.ApiExplorer >= 8.1.0",
+      "ForumService.Contract >= 1.0.0",
       "ForumService.Core >= 1.0.0",
       "ForumService.Infrastructure >= 1.0.0",
       "Microsoft.AspNetCore.OpenApi >= 9.0.9",
@@ -10064,6 +10065,9 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
+            "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\ForumService.Contract.csproj": {
+              "projectPath": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\ForumService.Contract.csproj"
+            },
             "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Core\\ForumService.Core.csproj": {
               "projectPath": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Core\\ForumService.Core.csproj"
             },

@@ -22,6 +22,7 @@ namespace ForumService.Tests.PostHandler
         private readonly Mock<IGenericRepository<Domain.Models.Comment>> _commentRepoMock;
         private readonly Mock<IGenericRepository<Domain.Models.Category>> _categoryRepoMock;
         private readonly Mock<IGenericRepository<Domain.Models.Attachment>> _attachmentRepoMock;
+        private readonly Mock<IGenericRepository<Domain.Models.Vote>> _voteRepoMock;
         private readonly Mock<ITagQueryRepository> _tagRepoMock;
         private readonly Mock<IKafkaProducerRepository<User>> _producerRepoMock;
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
@@ -36,6 +37,7 @@ namespace ForumService.Tests.PostHandler
             _commentRepoMock = new Mock<IGenericRepository<Domain.Models.Comment>>();
             _categoryRepoMock = new Mock<IGenericRepository<Domain.Models.Category>>();
             _attachmentRepoMock = new Mock<IGenericRepository<Domain.Models.Attachment>>();
+            _voteRepoMock = new Mock<IGenericRepository<Domain.Models.Vote>>();
             _tagRepoMock = new Mock<ITagQueryRepository>();
             _producerRepoMock = new Mock<IKafkaProducerRepository<User>>();
             _unitOfWorkMock = new Mock<IUnitOfWork>();
@@ -46,6 +48,7 @@ namespace ForumService.Tests.PostHandler
                 _commentRepoMock.Object,
                 _categoryRepoMock.Object,
                 _attachmentRepoMock.Object,
+                _voteRepoMock.Object,
                 _tagRepoMock.Object,
                 _producerRepoMock.Object,
                 _unitOfWorkMock.Object,
@@ -61,7 +64,7 @@ namespace ForumService.Tests.PostHandler
         public async Task Handle_PostNotFound_ReturnsNotFound()
         {
             // Arrange
-            var query = new GetPostDetailsByIdQuery(Guid.NewGuid());
+            var query = new GetPostDetailsByIdQuery(Guid.NewGuid(), Guid.NewGuid());
 
             _postRepoMock.Setup(r => r.GetOneAsync(
                     It.IsAny<Expression<Func<Domain.Models.Post, bool>>>(),
@@ -88,7 +91,7 @@ namespace ForumService.Tests.PostHandler
             var postId = Guid.NewGuid();
             var authorId = Guid.NewGuid();
             var categoryId = Guid.NewGuid();
-            var query = new GetPostDetailsByIdQuery(postId);
+            var query = new GetPostDetailsByIdQuery(postId, Guid.NewGuid());
 
             var postEntity = new Domain.Models.Post
             {
@@ -168,7 +171,7 @@ namespace ForumService.Tests.PostHandler
         {
             // Arrange
             var postId = Guid.NewGuid();
-            var query = new GetPostDetailsByIdQuery(postId);
+            var query = new GetPostDetailsByIdQuery(postId, Guid.NewGuid());
             var postEntity = new Domain.Models.Post { PostId = postId, ViewsCount = 0, Status = "Published" };
 
             _postRepoMock.Setup(r => r.GetOneAsync(It.IsAny<Expression<Func<Domain.Models.Post, bool>>>(), null, null))
@@ -215,7 +218,7 @@ namespace ForumService.Tests.PostHandler
         public async Task Handle_UserServiceFails_ReturnsDataWithoutUserEnrichment()
         {
             // Arrange
-            var query = new GetPostDetailsByIdQuery(Guid.NewGuid());
+            var query = new GetPostDetailsByIdQuery(Guid.NewGuid(), Guid.NewGuid());
             var postEntity = new Domain.Models.Post { Status = "Published" };
 
             _postRepoMock.Setup(r => r.GetOneAsync(It.IsAny<Expression<Func<Domain.Models.Post, bool>>>(), null, null))
@@ -259,7 +262,7 @@ namespace ForumService.Tests.PostHandler
         public async Task Handle_DbException_ReturnsInternalServerError()
         {
             // Arrange
-            var query = new GetPostDetailsByIdQuery(Guid.NewGuid());
+            var query = new GetPostDetailsByIdQuery(Guid.NewGuid(), Guid.NewGuid());
 
             _postRepoMock.Setup(r => r.GetOneAsync(It.IsAny<Expression<Func<Domain.Models.Post, bool>>>(), null, null))
                 .ThrowsAsync(new Exception("Critical DB Error"));
