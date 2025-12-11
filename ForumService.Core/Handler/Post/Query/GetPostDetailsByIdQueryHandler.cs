@@ -22,6 +22,7 @@ namespace ForumService.Core.Handler.Post.Query
         private readonly IGenericRepository<Domain.Models.Comment> _commentRepository;
         private readonly IGenericRepository<Domain.Models.Category> _categoryRepository;
         private readonly IGenericRepository<Domain.Models.Attachment> _attachmentRepository;
+        private readonly IGenericRepository<Domain.Models.Vote> _voteRepository;
         private readonly ITagQueryRepository _tagRepository;
         private readonly IKafkaProducerRepository<User> _producerRepository;
         private readonly IUnitOfWork _unitOfWork; 
@@ -34,6 +35,7 @@ namespace ForumService.Core.Handler.Post.Query
             IGenericRepository<Domain.Models.Comment> commentRepository,
             IGenericRepository<Domain.Models.Category> categoryRepository,
             IGenericRepository<Domain.Models.Attachment> attachmentRepository,
+            IGenericRepository<Domain.Models.Vote> voteRepository,
             ITagQueryRepository tagRepository,
             IKafkaProducerRepository<User> producerRepository,
             IUnitOfWork unitOfWork, 
@@ -43,6 +45,7 @@ namespace ForumService.Core.Handler.Post.Query
             _commentRepository = commentRepository ?? throw new ArgumentNullException(nameof(commentRepository));
             _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
             _attachmentRepository = attachmentRepository ?? throw new ArgumentNullException(nameof(attachmentRepository));
+            _voteRepository = voteRepository ?? throw new ArgumentNullException(nameof(voteRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _producerRepository = producerRepository ?? throw new ArgumentNullException(nameof(producerRepository));
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork)); 
@@ -99,6 +102,24 @@ namespace ForumService.Core.Handler.Post.Query
                     orderBy: q => q.OrderBy(c => c.CreatedAt)
                 )).ToList();
 
+                Dictionary<Guid, string> userVotesDict = new Dictionary<Guid, string>();
+
+                if (request.RequesterId.HasValue)
+                {
+                    // get all targetIds (post + comments)
+                    var targetIds = new List<Guid> { postEntity.PostId };
+                    targetIds.AddRange(allComments.Select(c => c.CommentId));
+
+                    // Query votes by UserId and TargetIds
+                    // fillter by request.RequesterId and targetIds
+                    var userVotes = await _voteRepository.GetListAsync(
+                        filter: v => v.UserId == request.RequesterId.Value && targetIds.Contains(v.TargetId)
+                    );
+
+                    // Map: TargetId -> VoteType (VD: "Upvote", "Downvote")
+                    userVotesDict = userVotes.ToDictionary(v => v.TargetId, v => v.VoteType);
+                }
+
                 Domain.Models.Category? category = null;
                 if (postEntity.CategoryId.HasValue)
                 {
@@ -129,8 +150,16 @@ namespace ForumService.Core.Handler.Post.Query
                     CategoryName = category?.Name,
                     Url = attachmentUrls,
                     Tags = tags.Select(t => t.Name).ToList(),
-                    ReferenceId = postEntity.ReferenceId
+                    ReferenceId = postEntity.ReferenceId,
+
+                    UserVoteType = userVotesDict.ContainsKey(postEntity.PostId) ? userVotesDict[postEntity.PostId] : null
                 };
+
+                // map user votes to comments
+                foreach (var comment in allComments)
+                {
+                    comment.UserVoteType = userVotesDict.ContainsKey(comment.CommentId) ? userVotesDict[comment.CommentId] : null;
+                }
 
                 try
                 {

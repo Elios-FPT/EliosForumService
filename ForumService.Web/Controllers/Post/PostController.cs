@@ -126,8 +126,15 @@ namespace ForumService.Web.Controllers.Post
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<BaseResponseDto<PostViewDetailDto>> GetPostDetailsById([FromRoute] Guid postId)
         {
-           
-            var query = new GetPostDetailsByIdQuery(postId);
+            Guid? requesterId = null;
+            var userIdHeader = HttpContext.Request.Headers["X-Auth-Request-User"].FirstOrDefault();
+
+            if (!string.IsNullOrEmpty(userIdHeader) && Guid.TryParse(userIdHeader, out var parsedId))
+            {
+                requesterId = parsedId;
+            }
+
+            var query = new GetPostDetailsByIdQuery(postId, requesterId);
             return await _sender.Send(query);
         }
 

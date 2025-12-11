@@ -109,7 +109,8 @@ namespace ForumService.Contract.UseCases.Post
         /// Query to get the detailed view of a single published post.
         /// </summary>
         public record GetPostDetailsByIdQuery(
-            Guid PostId
+            Guid PostId,
+            Guid? RequesterId
         ) : IQuery<BaseResponseDto<PostViewDetailDto>>;
 
     }

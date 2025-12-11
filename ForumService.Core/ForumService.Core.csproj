@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ForumService.Contract\ForumService.Contract.csproj" />
     <ProjectReference Include="..\ForumService.Domain\ForumService.Domain.csproj" />
   </ItemGroup>
 

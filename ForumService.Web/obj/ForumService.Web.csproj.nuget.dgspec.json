@@ -103,6 +103,9 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
+              "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\ForumService.Contract.csproj": {
+                "projectPath": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\ForumService.Contract.csproj"
+              },
               "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Domain\\ForumService.Domain.csproj": {
                 "projectPath": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Domain\\ForumService.Domain.csproj"
               }
@@ -181,11 +184,7 @@
         "frameworks": {
           "net9.0": {
             "targetAlias": "net9.0",
-            "projectReferences": {
-              "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\ForumService.Contract.csproj": {
-                "projectPath": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\ForumService.Contract.csproj"
-              }
-            }
+            "projectReferences": {}
           }
         },
         "warningProperties": {
@@ -388,6 +387,9 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
+              "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\ForumService.Contract.csproj": {
+                "projectPath": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Contract\\ForumService.Contract.csproj"
+              },
               "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Core\\ForumService.Core.csproj": {
                 "projectPath": "C:\\Users\\User\\Desktop\\ForumService\\EliosForumService\\ForumService.Core\\ForumService.Core.csproj"
               },
